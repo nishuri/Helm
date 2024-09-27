@@ -2,12 +2,12 @@
   hosts: localhost
   connection: local
   vars:
-    ssh_key_filepath: {{ssh_key_filename }}
+    ssh_key_filepath: {{ ssh_key_filepath }}
     ssh_passphrase: "{{ ssh_passphrase }}"
   tasks:
     - name: Generate SSH key "{{ ssh_key_filename }}"
       community.crypto.openssh_keypair:
-        path: "{{ssh_key_filename }}"
+        path: "{{ ssh_key_filepath }}"
         type: rsa
         size: 4096
         passphrase: "{{ ssh_passphrase }}"
@@ -16,10 +16,10 @@
 
     - name: Set permissions for private key
       file:
-        path: "{{ssh_key_filename }}"
-        mode: '0777'
+        path: "{{ ssh_key_filepath }}"
+        mode: '400'
 
     - name: Set permissions for public key
       file:
-        path: "{{ssh_key_filename }}.pub"
-        mode: '0777'
+        path: "{{ ssh_key_filepath }}.pub"
+        mode: '600'
