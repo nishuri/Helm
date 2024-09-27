@@ -2,10 +2,10 @@
   hosts: localhost
   connection: local
   vars:
-    ssh_key_filepath: {{ ssh_key_filepath }}
+    ssh_key_filepath: "{{ ssh_key_filepath }}"
     ssh_passphrase: "{{ ssh_passphrase }}"
   tasks:
-    - name: Generate SSH key "{{ ssh_key_filename }}"
+    - name: Generate SSH key "{{ ssh_key_filepath }}"
       community.crypto.openssh_keypair:
         path: "{{ ssh_key_filepath }}"
         type: rsa
