@@ -1,0 +1,25 @@
+- name: Generate SSH key with passphrase and set permissions
+  hosts: localhost
+  connection: local
+  vars:
+    ssh_key_filename: id_rsa_test
+    ssh_passphrase: "Orange1snewBlack"
+  tasks:
+    - name: Generate SSH key "{{ ssh_key_filename }}"
+      community.crypto.openssh_keypair:
+        path: "~/.ssh/{{ ssh_key_filename }}"
+        type: rsa
+        size: 4096
+        passphrase: "{{ ssh_passphrase }}"
+        state: present
+        force: no
+
+    - name: Set permissions for private key
+      file:
+        path: "~/.ssh/{{ ssh_key_filename }}"
+        mode: '0777'
+
+    - name: Set permissions for public key
+      file:
+        path: "~/.ssh/{{ ssh_key_filename }}.pub"
+        mode: '0777'
