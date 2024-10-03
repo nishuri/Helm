@@ -1,4 +1,4 @@
-## ansible-playbook keys.yaml --extra-vars "ssh_private_key_filepath=/home/ec2-user/manish ssh_public_key_filepath=/home/ec2-user/public/manish ssh_passphrase=ansibleNew"
+## ansible-playbook keys.yaml --extra-vars "ssh_private_key_filepath=/home/ec2-user/manish.pem ssh_public_key_filepath=/home/ec2-user/public/manish.pem ssh_passphrase=ansibleNew"
 
 ---
 - name: Generate SSH key with passphrase and set permissions
