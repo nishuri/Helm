@@ -1,3 +1,5 @@
+## ansible-playbook keys.yaml --extra-vars "ssh_private_key_filepath=/home/ec2-user/vineetha ssh_public_key_filepath=/home/ec2-user/public/vineetha ssh_passphrase=ansibleNew"
+
 ---
 - name: Generate SSH key with passphrase and set permissions
   hosts: localhost
