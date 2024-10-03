@@ -3,8 +3,8 @@
   hosts: localhost
   connection: local
   vars:
-    ssh_key_filepath: "/home/ec2-user/test"
-    ssh_passphrase: "Orange1sn3wb1aCk"
+    ssh_key_filepath: "{{ ssh_key_filepath }}"
+    ssh_passphrase: "{{ ssh_passphrase }}"
   tasks:
     - name: Generate private key
       community.crypto.openssl_privatekey:
