@@ -27,8 +27,8 @@
         
     - name: Convert private key to PEM format
       community.crypto.openssl_privatekey_convert:
-        src_path: {{ ssh_key_filepath }}
-        dest_path: {{ ssh_key_filepath }}.pem
+        src_path: "{{ ssh_key_filepath }}"
+        dest_path: "{{ ssh_key_filepath }}.pem"
         dest_passphrase: "{{ ssh_passphrase }}"
         format: pkcs1 
 
