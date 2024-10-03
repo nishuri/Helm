@@ -3,8 +3,8 @@
   hosts: localhost
   connection: local
   vars:
-    ssh_key_filepath: "{{ ssh_key_filepath }}"
-    ssh_passphrase: "{{ ssh_passphrase }}"
+    ssh_key_filepath: "/home/ec2-user/test"
+    ssh_passphrase: "Orange1sn3wb1aCk"
   tasks:
     - name: Generate SSH key "{{ ssh_key_filepath }}"
       community.crypto.openssh_keypair:
@@ -25,10 +25,12 @@
       file:
         path: "{{ ssh_key_filepath }}.pub"
         mode: '0600'
-        
+     
     - name: Convert private key to PEM format using ssh-keygen
-      command: >
-        ssh-keygen -p -m PEM -f "{{ ssh_key_filepath }}" -N "{{ ssh_passphrase }}"
+      community.general.expect:
+        command: "ssh-keygen -p -m PEM -f {{ ssh_key_filepath }} -N {{ ssh_passphrase }}"
+        responses:
+          "Enter old passphrase:": "{{ ssh_passphrase }}"
 
     - name: Set permissions for PEM private key
       file:
