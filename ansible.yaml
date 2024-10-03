@@ -1,38 +1,38 @@
+---
 - name: Generate SSH key with passphrase and set permissions
   hosts: localhost
   connection: local
   vars:
-    ssh_key_filepath: "{{ ssh_key_filepath }}"
+    ssh_private_key_filepath: "{{ ssh_private_key_filepath }}"
+    ssh_public_key_filepath: "{{ ssh_public_key_filepath }}"
     ssh_passphrase: "{{ ssh_passphrase }}"
   tasks:
-    - name: Generate SSH key "{{ ssh_key_filepath }}"
-      community.crypto.openssh_keypair:
-        path: "{{ ssh_key_filepath }}"
-        type: rsa
+    - name: Generate private key
+      community.crypto.openssl_privatekey:
+        path: "{{ ssh_private_key_filepath }}"
+        type: RSA
         size: 4096
         passphrase: "{{ ssh_passphrase }}"
+        cipher: auto
         state: present
-        force: no
-        private_key_format: ssh
+        force: false
+      register: private_key
+
+    - name: Generate public key
+      community.crypto.openssl_publickey:
+        path: "{{ ssh_public_key_filepath }}.pub"
+        privatekey_path: "{{ ssh_private_key_filepath }}"
+        privatekey_passphrase: "{{ ssh_passphrase }}"
+        state: present
+        force: false
+      when: private_key.changed
 
     - name: Set permissions for private key
       file:
-        path: "{{ ssh_key_filepath }}"
+        path: "{{ ssh_private_key_filepath }}"
         mode: '400'
 
     - name: Set permissions for public key
       file:
-        path: "{{ ssh_key_filepath }}.pub"
+        path: "{{ ssh_public_key_filepath }}.pub"
         mode: '600'
-        
-    - name: Convert private key to PEM format
-      community.crypto.openssl_privatekey_convert:
-        src_path: "{{ ssh_key_filepath }}"
-        dest_path: "{{ ssh_key_filepath }}.pem"
-        dest_passphrase: "{{ ssh_passphrase }}"
-        format: pkcs1 
-
-    - name: Set permissions for PEM Private key
-      file:
-        path: "{{ ssh_key_filepath }}.pem"
-        mode: '400'
