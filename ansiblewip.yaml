@@ -6,36 +6,22 @@
     ssh_key_filepath: "/home/ec2-user/test"
     ssh_passphrase: "Orange1sn3wb1aCk"
   tasks:
-    - name: Generate SSH key "{{ ssh_key_filepath }}"
-      community.crypto.openssh_keypair:
+    - name: Generate private key
+      community.crypto.openssl_privatekey:
         path: "{{ ssh_key_filepath }}"
         type: rsa
         size: 4096
         passphrase: "{{ ssh_passphrase }}"
         state: present
         force: no
-        private_key_format: ssh
+      register: private_key
 
-    - name: Set permissions for private key
-      file:
+    - name: Generate public key
+      community.crypto.openssl_publickey:
         path: "{{ ssh_key_filepath }}"
-        mode: '0400'
-
-    - name: Set permissions for public key
-      file:
-        path: "{{ ssh_key_filepath }}.pub"
-        mode: '0600'
-     
-    - name: Convert private key to PEM format using expect
-      shell: >
-        expect -c '
-        spawn ssh-keygen -p -m PEM -f {{ ssh_key_filepath }} -N {{ ssh_passphrase }}
-        expect "Enter old passphrase:"
-        send "{{ ssh_passphrase }}\r"
-        expect eof
-        '
-
-    - name: Set permissions for PEM private key
-      file:
-        path: "{{ ssh_key_filepath }}.pem"
-        mode: '0400'
+        privatekey_path: "{{ ssh_key_filepath }}"
+        passphrase: "{{ ssh_passphrase }}"
+        state: present
+        force: no
+      when: private_key.changed
+      
