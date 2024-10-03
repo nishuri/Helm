@@ -26,13 +26,16 @@
         path: "{{ ssh_key_filepath }}.pub"
         mode: '0600'
      
-    - name: Convert private key to PEM format using ssh-keygen
-      community.general.expect:
-        command: "ssh-keygen -p -m PEM -f {{ ssh_key_filepath }} -N {{ ssh_passphrase }}"
-        responses:
-          "Enter old passphrase:": "{{ ssh_passphrase }}"
+    - name: Convert private key to PEM format using expect
+      shell: >
+        expect -c '
+        spawn ssh-keygen -p -m PEM -f {{ ssh_key_filepath }} -N {{ ssh_passphrase }}
+        expect "Enter old passphrase:"
+        send "{{ ssh_passphrase }}\r"
+        expect eof
+        '
 
     - name: Set permissions for PEM private key
       file:
-        path: "{{ ssh_key_filepath }}"
+        path: "{{ ssh_key_filepath }}.pem"
         mode: '0400'
