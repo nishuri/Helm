@@ -13,6 +13,7 @@
         passphrase: "{{ ssh_passphrase }}"
         state: present
         force: no
+        private_key_format: ssh
 
     - name: Set permissions for private key
       file:
