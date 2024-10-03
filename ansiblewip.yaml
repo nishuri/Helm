@@ -13,7 +13,7 @@
         size: 4096
         passphrase: "{{ ssh_passphrase }}"
         state: present
-        force: no
+        force: false
       register: private_key
 
     - name: Generate public key
@@ -22,6 +22,6 @@
         privatekey_path: "{{ ssh_key_filepath }}"
         privatekey_passphrase: "{{ ssh_passphrase }}"
         state: present
-        force: no
+        force: false
       when: private_key.changed
       
