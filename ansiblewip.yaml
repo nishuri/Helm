@@ -20,7 +20,7 @@
 
     - name: Generate public key
       community.crypto.openssl_publickey:
-        path: "{{ ssh_public_key_filepath }}"
+        path: "{{ ssh_public_key_filepath }}.pub"
         privatekey_path: "{{ ssh_private_key_filepath }}"
         privatekey_passphrase: "{{ ssh_passphrase }}"
         state: present
