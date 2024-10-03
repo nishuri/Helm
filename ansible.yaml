@@ -22,7 +22,7 @@
 
     - name: Generate public key
       community.crypto.openssl_publickey:
-        path: "{{ ssh_public_key_filepath }}.pub"
+        path: "{{ ssh_public_key_filepath }}"
         privatekey_path: "{{ ssh_private_key_filepath }}"
         privatekey_passphrase: "{{ ssh_passphrase }}"
         state: present
@@ -36,5 +36,5 @@
 
     - name: Set permissions for public key
       file:
-        path: "{{ ssh_public_key_filepath }}.pub"
+        path: "{{ ssh_public_key_filepath }}"
         mode: '600'
