@@ -24,3 +24,14 @@
       file:
         path: "{{ ssh_key_filepath }}.pub"
         mode: '600'
+        
+    - name: Convert private key to PEM format
+      shell:
+        openssl rsa -in "{{ ssh_key_filepath }}" -out "{{ ssh_key_filepath }}.pem" -passin pass:{{ ssh_passphrase }}
+      args:
+        warn: false
+
+    - name: Set permissions for PEM Private key
+      file:
+        path: "{{ ssh_key_filepath }}.pem"
+        mode: '400'
