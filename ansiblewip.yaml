@@ -20,7 +20,7 @@
       community.crypto.openssl_publickey:
         path: "{{ ssh_key_filepath }}"
         privatekey_path: "{{ ssh_key_filepath }}"
-        passphrase: "{{ ssh_passphrase }}"
+        privatekey_passphrase: "{{ ssh_passphrase }}"
         state: present
         force: no
       when: private_key.changed
