@@ -30,6 +30,7 @@
         src_path: {{ ssh_key_filepath }}
         dest_path: {{ ssh_key_filepath }}.pem
         dest_passphrase: "{{ ssh_passphrase }}"
+        format: pkcs1 
 
     - name: Set permissions for PEM Private key
       file:
