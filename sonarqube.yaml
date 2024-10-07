@@ -2,26 +2,12 @@ parameters:
   - name: dependsOn
     type: object
     default: []
-  - name: WORKING_DIRECTORY
-    type: string
-    default: $(Build.SourcesDirectory)
-  - name: ENVIRONMENT_NAME
-    type: string
-  - name: INFRA_ENVIRONMENT_NAME
-    type: string
-  - name: NEXUS_DOMAIN
-    type: string
   - name: sonarScan
     type: boolean
     default: true
   - name: sonarPublish
     type: boolean
     default: true
-  - name: LOCATION_SHORT_CODE
-    type: string
-  - name: PUSH_IMAGES_TO_EVERY_ACR
-    type: boolean
-    default: false
   - name: CLIENT_PROJECT_KEY
     type: string
 
