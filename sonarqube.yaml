@@ -1,0 +1,79 @@
+parameters:
+  - name: dependsOn
+    type: object
+    default: []
+  - name: WORKING_DIRECTORY
+    type: string
+    default: $(Build.SourcesDirectory)
+  - name: ENVIRONMENT_NAME
+    type: string
+  - name: INFRA_ENVIRONMENT_NAME
+    type: string
+  - name: NEXUS_DOMAIN
+    type: string
+  - name: sonarScan
+    type: boolean
+    default: true
+  - name: sonarPublish
+    type: boolean
+    default: true
+  - name: LOCATION_SHORT_CODE
+    type: string
+  - name: PUSH_IMAGES_TO_EVERY_ACR
+    type: boolean
+    default: false
+  - name: CLIENT_PROJECT_KEY
+    type: string
+
+stages:
+  - stage: SonarAnalysis
+    dependsOn: ${{ parameters.dependsOn }}
+    displayName: Sonar Analysis
+    jobs:
+      - job: sonarscan
+        variables:
+          semVersion: $[ stageDependencies.Versioning.generateAppVersionFromBranchName.outputs['Version.GitVersion.SemVer'] ]
+
+        steps:
+          - task: JavaToolInstaller@0
+            inputs:
+              versionSpec: '17'
+              jdkArchitectureOption: 'x64'
+              jdkSourceOption: 'PreInstalled'
+          - task: SonarQubePrepare@5
+            condition: and(succeeded(), eq('${{ parameters.sonarScan }}', true))
+            inputs:
+              SonarQube: "SonarQubeConnect"
+              scannerMode: "CLI"
+              configMode: "manual"
+              cliProjectKey: ${{ parameters.CLIENT_PROJECT_KEY }}
+              cliProjectVersion: $(semVersion)
+              cliSources: "."
+              extraProperties: |
+                sonar.qualitygate.wait=true
+                sonar.qualitygate.timeout=1800
+                sonar.ws.timeout=900
+                sonar.sources=./materials-connect-be/.
+                sonar.java.binaries=./materials-connect-be/.
+                sonar.inclusions=**/src/main/**
+                sonar.exclusions=**/*.yaml,**/*.xml,**/*.xlsx,**/*.xls,**/*.pom,**/*.gradle,**/src/test/*.*,**/Dockerfile,**/*.txt,**/*.js,**/*.so,**/*.dll,**/Dockerfile.*
+                sonar.tests=./materials-connect-be/.
+                sonar.java.test.binaries=./materials-connect-be/.
+                sonar.test.inclusions=**/src/test/**
+                sonar.test.exclusions=**/*.yaml,**/*.xml,**/*.xlsx,**/*.xls,**/*.pom,**/*.gradle,**/src/main/*.*,**/Dockerfile,**/*.txt,**/*.js,**/*.so,**/*.dll,**/Dockerfile.*
+                sonar.scm.exclusions.disabled=true
+                sonar.coverage.jacoco.xmlReportPaths=./materials-connect-be/build/reports/jacoco/coverageMergedReport/coverageMergedReport.xml
+
+          - script: |
+              FILTERED_PARAMS=$(echo $SONARQUBE_SCANNER_PARAMS | sed 's/"sonar.branch.name":"[^"]*"\,//g')
+              echo "##vso[task.setvariable variable=SONARQUBE_SCANNER_PARAMS]$FILTERED_PARAMS"
+            condition: and(succeeded(), eq('${{ parameters.sonarScan }}', true))
+            displayName: Filter out non-CE sonar parameters
+
+          - task: SonarQubeAnalyze@5
+            condition: and(succeeded(), eq('${{ parameters.sonarScan }}', true))
+
+          - task: SonarQubePublish@5
+            condition: and(succeeded(), eq('${{ parameters.sonarScan }}', true), eq('${{ parameters.sonarPublish }}', true))
+            inputs:
+              pollingTimeoutSec: "300"
