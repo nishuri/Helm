@@ -1,65 +1,49 @@
 parameters:
-  - name: dependsOn
-    type: object
-    default: []
-  - name: sonarScan
-    type: boolean
-    default: true
-  - name: sonarPublish
-    type: boolean
-    default: true
-  - name: CLIENT_PROJECT_KEY
+  - name: semVer
     type: string
+  - name: sonar
+    type: boolean
+    default: false
+  - name: SProjectKey
+    type: string
+  - name: qualityGateTimeout
+    type: number
+    default: 1800
 
-stages:
-  - stage: SonarAnalysis
-    dependsOn: ${{ parameters.dependsOn }}
-    displayName: Sonar Analysis
-    jobs:
-      - job: sonarscan
-        variables:
-          semVersion: $[ stageDependencies.Versioning.generateAppVersionFromBranchName.outputs['Version.GitVersion.SemVer'] ]
+steps:
+  - task: SonarQubePrepare@6
+    condition: and(succeeded(), eq(${{ parameters.sonar }}, true))
+    inputs:
+      SonarQube: 'JARVISsonarqube'
+      scannerMode: 'CLI'
+      configMode: 'manual'
+      cliProjectKey: ${{parameters.SProjectKey}}
+      cliProjectVersion: ${{parameters.semVer}}
+      cliSources: '.'
+      extraProperties: |
+        sonar.qualitygate.wait=true
+        sonar.qualitygate.timeout=${{ parameters.qualityGateTimeout }}
+        sonar.ws.timeout=900
+        sonar.sources=./init,./main,./ops
+        sonar.inclusions=**/*.tf
+        sonar.exclusions=**//*.tfstate,**/*.tfvars,**/*.yml
+        sonar.log.level=INFO
+        sonar.terraform.provider.azure.version=3.102.0
 
-        steps:
-          - task: JavaToolInstaller@0
-            inputs:
-              versionSpec: '17'
-              jdkArchitectureOption: 'x64'
-              jdkSourceOption: 'PreInstalled'
-          - task: SonarQubePrepare@5
-            condition: and(succeeded(), eq('${{ parameters.sonarScan }}', true))
-            inputs:
-              SonarQube: "SonarQubeConnect"
-              scannerMode: "CLI"
-              configMode: "manual"
-              cliProjectKey: ${{ parameters.CLIENT_PROJECT_KEY }}
-              cliProjectVersion: $(semVersion)
-              cliSources: "."
-              extraProperties: |
-                sonar.qualitygate.wait=true
-                sonar.qualitygate.timeout=1800
-                sonar.ws.timeout=900
-                sonar.sources=./materials-connect-be/.
-                sonar.java.binaries=./materials-connect-be/.
-                sonar.inclusions=**/src/main/**
-                sonar.exclusions=**/*.yaml,**/*.xml,**/*.xlsx,**/*.xls,**/*.pom,**/*.gradle,**/src/test/*.*,**/Dockerfile,**/*.txt,**/*.js,**/*.so,**/*.dll,**/Dockerfile.*
-                sonar.tests=./materials-connect-be/.
-                sonar.java.test.binaries=./materials-connect-be/.
-                sonar.test.inclusions=**/src/test/**
-                sonar.test.exclusions=**/*.yaml,**/*.xml,**/*.xlsx,**/*.xls,**/*.pom,**/*.gradle,**/src/main/*.*,**/Dockerfile,**/*.txt,**/*.js,**/*.so,**/*.dll,**/Dockerfile.*
-                sonar.scm.exclusions.disabled=true
-                sonar.coverage.jacoco.xmlReportPaths=./materials-connect-be/build/reports/jacoco/coverageMergedReport/coverageMergedReport.xml
+  # inspired by https://gist.github.com/wilbit/4eba5b9bbf9dced260fdde7e8242964c?permalink_comment_id=3960860#gistcomment-3960860
+  - script: |
+      echo 'Before: $(SONARQUBE_SCANNER_PARAMS)'
+      UPDATED_PARAMS=$(echo $SONARQUBE_SCANNER_PARAMS | sed 's/"sonar.pullrequest.[^"]*":"[^"]*"\,//g' | sed 's/"sonar.branch.[^"]*":"[^"]*"\,//g') 
+      echo "##vso[task.setvariable variable=SONARQUBE_SCANNER_PARAMS]$UPDATED_PARAMS"
+      echo 'After: $(SONARQUBE_SCANNER_PARAMS)'
+    displayName: Avoid SonarQube PR analysis
 
-          - script: |
-              FILTERED_PARAMS=$(echo $SONARQUBE_SCANNER_PARAMS | sed 's/"sonar.branch.name":"[^"]*"\,//g')
-              echo "##vso[task.setvariable variable=SONARQUBE_SCANNER_PARAMS]$FILTERED_PARAMS"
-            condition: and(succeeded(), eq('${{ parameters.sonarScan }}', true))
-            displayName: Filter out non-CE sonar parameters
+  - task: SonarQubeAnalyze@6
+    inputs:
+      jdkversion: 'JAVA_HOME_17_X64'
+    condition: and(succeeded(), eq(${{ parameters.sonar }}, true))
 
-          - task: SonarQubeAnalyze@5
-            condition: and(succeeded(), eq('${{ parameters.sonarScan }}', true))
-
-          - task: SonarQubePublish@5
-            condition: and(succeeded(), eq('${{ parameters.sonarScan }}', true), eq('${{ parameters.sonarPublish }}', true))
-            inputs:
-              pollingTimeoutSec: "300"
+  - task: SonarQubePublish@6
+    condition: and(succeeded(), eq(${{ parameters.sonar }}, true))
+    inputs:
+      pollingTimeoutSec: '300'
