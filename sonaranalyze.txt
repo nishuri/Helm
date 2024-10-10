@@ -1,0 +1,388 @@
+2024-10-09T13:42:40.4914074Z ##[debug]Evaluating condition for step: 'SonarQubeAnalyze'
+2024-10-09T13:42:40.4915025Z ##[debug]Evaluating: and(succeeded(), eq(True, True))
+2024-10-09T13:42:40.4915382Z ##[debug]Evaluating and:
+2024-10-09T13:42:40.4915746Z ##[debug]..Evaluating succeeded:
+2024-10-09T13:42:40.4916333Z ##[debug]..=> True
+2024-10-09T13:42:40.4916777Z ##[debug]..Evaluating eq:
+2024-10-09T13:42:40.4917133Z ##[debug]....Evaluating Boolean:
+2024-10-09T13:42:40.4917435Z ##[debug]....=> True
+2024-10-09T13:42:40.4917827Z ##[debug]....Evaluating Boolean:
+2024-10-09T13:42:40.4918123Z ##[debug]....=> True
+2024-10-09T13:42:40.4918413Z ##[debug]..=> True
+2024-10-09T13:42:40.4918681Z ##[debug]=> True
+2024-10-09T13:42:40.4919318Z ##[debug]Expanded: and(True, eq(True, True))
+2024-10-09T13:42:40.4919730Z ##[debug]Result: True
+2024-10-09T13:42:40.4920164Z ##[section]Starting: SonarQubeAnalyze
+2024-10-09T13:42:40.4926057Z ==============================================================================
+2024-10-09T13:42:40.4926452Z Task         : Run Code Analysis
+2024-10-09T13:42:40.4926730Z Description  : Run scanner and upload the results to the SonarQube server.
+2024-10-09T13:42:40.4926923Z Version      : 6.3.2
+2024-10-09T13:42:40.4927018Z Author       : sonarsource
+2024-10-09T13:42:40.4927135Z Help         : This task is not needed for Maven and Gradle projects since the scanner should be run as part of the build.
+
+[More Information](https://docs.sonarsource.com/sonarqube/latest/analyzing-source-code/scanners/sonarqube-extension-for-azure-devops/)
+2024-10-09T13:42:40.4927516Z ==============================================================================
+2024-10-09T13:42:40.5088499Z ##[debug]Using node path: /agent/externals/node16/bin/node
+2024-10-09T13:42:40.5792382Z ##[debug]agent.TempDirectory=/agent/_work/_temp
+2024-10-09T13:42:40.5801509Z ##[debug]loading inputs and endpoints
+2024-10-09T13:42:40.5806376Z ##[debug]loading INPUT_JDKVERSION
+2024-10-09T13:42:40.6111085Z ##[debug]loading ENDPOINT_AUTH_SYSTEMVSSCONNECTION
+2024-10-09T13:42:40.6111933Z ##[debug]loading ENDPOINT_AUTH_SCHEME_SYSTEMVSSCONNECTION
+2024-10-09T13:42:40.6112645Z ##[debug]loading ENDPOINT_AUTH_PARAMETER_SYSTEMVSSCONNECTION_ACCESSTOKEN
+2024-10-09T13:42:40.6113238Z ##[debug]loading SECRET_SYSTEM_ACCESSTOKEN
+2024-10-09T13:42:40.6113788Z ##[debug]loading SECRET_SONAR_ENDPOINT
+2024-10-09T13:42:40.6114305Z ##[debug]loaded 6
+2024-10-09T13:42:40.6114808Z ##[debug]Agent.ProxyUrl=undefined
+2024-10-09T13:42:40.6115321Z ##[debug]Agent.CAInfo=undefined
+2024-10-09T13:42:40.6115838Z ##[debug]Agent.ClientCert=undefined
+2024-10-09T13:42:40.6116370Z ##[debug]Agent.SkipCertValidation=undefined
+2024-10-09T13:42:40.6116899Z ##[debug]Agent.ProxyUrl=undefined
+2024-10-09T13:42:40.6117409Z ##[debug]Agent.CAInfo=undefined
+2024-10-09T13:42:40.6117842Z ##[debug]Agent.ClientCert=undefined
+2024-10-09T13:42:40.6118444Z ##[debug]check path : /agent/_work/_tasks/SonarQubeAnalyze_6d01813a-9589-4b15-8491-8164aeb38055/6.3.2/lib.json
+2024-10-09T13:42:40.6119134Z ##[debug]adding resource file: /agent/_work/_tasks/SonarQubeAnalyze_6d01813a-9589-4b15-8491-8164aeb38055/6.3.2/lib.json
+2024-10-09T13:42:40.6119733Z ##[debug]system.culture=en-US
+2024-10-09T13:42:40.6434580Z ##[debug]jdkversion=JAVA_HOME_17_X64
+2024-10-09T13:42:40.6435303Z ##[debug]SONAR_SCANNER_MODE=CLI
+2024-10-09T13:42:40.6435846Z ##[debug]SONAR_SERVER_VERSION=10.7.0
+2024-10-09T13:42:40.6438986Z ##[debug]JAVA_HOME_17_X64=/usr/lib/jvm/temurin-17-jdk-amd64
+2024-10-09T13:42:40.6439801Z ##[debug]JAVA_HOME_17_X64 was found with value /usr/lib/jvm/temurin-17-jdk-amd64, will switch to it for Sonar scanner...
+2024-10-09T13:42:40.6440597Z ##[debug]JAVA_HOME=/usr/lib/jvm/temurin-11-jdk-amd64
+2024-10-09T13:42:40.6441154Z ##[debug]set JAVA_HOME=/usr/lib/jvm/temurin-17-jdk-amd64
+2024-10-09T13:42:40.6442008Z ##[debug]Processed: ##vso[task.setvariable variable=JAVA_HOME;isOutput=false;issecret=false;]/usr/lib/jvm/temurin-17-jdk-amd64
+2024-10-09T13:42:40.6442628Z ##[debug]SONAR_SCANNER_MODE=CLI
+2024-10-09T13:42:40.6444260Z ##[debug]SONARQUBE_SCANNER_PARAMS={"sonar.host.url":"https://sonarqube-ku7qexnz26vps.azurewebsites.net","sonar.token":***,"sonar.projectKey":"NexusInfra","sonar.projectVersion":"20241009.18","sonar.sources":"./init,./main,./ops","sonar.scanner.metadataFilePath":"/agent/_work/_temp/sonar/1686474/e8a0ebec-2cb1-609e-ec63-5bed2890fef5/report-task.txt","sonar.qualitygate.wait":"true","sonar.qualitygate.timeout":"1800","sonar.ws.timeout":"900","sonar.inclusions":"**/src/main/**","sonar.exclusions":"**//*.tfstate,**/*.tfvars,**/*.yml","sonar.log.level":"INFO","sonar.terraform.provider.azure.version":"3.102.0"}
+2024-10-09T13:42:40.6446529Z ##[debug]SONAR_SCANNER_LOCATION=
+2024-10-09T13:42:40.6447136Z ##[debug]Absolute path for pathSegments: /agent/_work/_tasks/SonarQubeAnalyze_6d01813a-9589-4b15-8491-8164aeb38055/6.3.2,sonar-scanner,bin,sonar-scanner = /agent/_work/_tasks/SonarQubeAnalyze_6d01813a-9589-4b15-8491-8164aeb38055/6.3.2/sonar-scanner/bin/sonar-scanner
+2024-10-09T13:42:40.6447831Z ##[debug]Using scanner at /agent/_work/_tasks/SonarQubeAnalyze_6d01813a-9589-4b15-8491-8164aeb38055/6.3.2/sonar-scanner/bin/sonar-scanner
+2024-10-09T13:42:40.6458360Z ##[debug]which '/agent/_work/_tasks/SonarQubeAnalyze_6d01813a-9589-4b15-8491-8164aeb38055/6.3.2/sonar-scanner/bin/sonar-scanner'
+2024-10-09T13:42:40.6461642Z ##[debug]found: '/agent/_work/_tasks/SonarQubeAnalyze_6d01813a-9589-4b15-8491-8164aeb38055/6.3.2/sonar-scanner/bin/sonar-scanner'
+2024-10-09T13:42:40.6462196Z ##[debug]system.debug=true
+2024-10-09T13:42:40.6462750Z ##[debug]/agent/_work/_tasks/SonarQubeAnalyze_6d01813a-9589-4b15-8491-8164aeb38055/6.3.2/sonar-scanner/bin/sonar-scanner arg: -X
+2024-10-09T13:42:40.6463743Z ##[debug]exec tool: /agent/_work/_tasks/SonarQubeAnalyze_6d01813a-9589-4b15-8491-8164aeb38055/6.3.2/sonar-scanner/bin/sonar-scanner
+2024-10-09T13:42:40.6464210Z ##[debug]arguments:
+2024-10-09T13:42:40.6464490Z ##[debug]   -X
+2024-10-09T13:42:40.6466287Z [command]/agent/_work/_tasks/SonarQubeAnalyze_6d01813a-9589-4b15-8491-8164aeb38055/6.3.2/sonar-scanner/bin/sonar-scanner -X
+2024-10-09T13:42:41.7334046Z 13:42:41.729 INFO  Scanner configuration file: /agent/_work/_tasks/SonarQubeAnalyze_6d01813a-9589-4b15-8491-8164aeb38055/6.3.2/sonar-scanner/conf/sonar-scanner.properties
+2024-10-09T13:42:41.7337820Z 13:42:41.733 INFO  Project root configuration file: NONE
+2024-10-09T13:42:41.7494732Z 13:42:41.749 INFO  SonarScanner CLI 6.1.0.4477
+2024-10-09T13:42:41.7506812Z 13:42:41.750 INFO  Java 17.0.12 Eclipse Adoptium (64-bit)
+2024-10-09T13:42:41.7511536Z 13:42:41.750 INFO  Linux 5.15.0-1073-azure amd64
+2024-10-09T13:42:41.7578814Z 13:42:41.757 DEBUG Scanner max available memory: 7 GB
+2024-10-09T13:42:41.7997175Z 13:42:41.799 DEBUG uname -m returned 'x86_64'
+2024-10-09T13:42:41.8010463Z 13:42:41.800 DEBUG Create: /home/AzDevOps/.sonar/cache
+2024-10-09T13:42:41.8020080Z 13:42:41.801 INFO  User cache: /home/AzDevOps/.sonar/cache
+2024-10-09T13:42:41.8020740Z 13:42:41.801 DEBUG Create: /home/AzDevOps/.sonar/cache/_tmp
+2024-10-09T13:42:42.3964262Z ##[debug]Agent environment resources - Disk: / Available 64715.00 MB out of 118902.00 MB, Memory: Used 1110.00 MB out of 32094.00 MB, CPU: Usage 72.64%
+2024-10-09T13:42:42.5485993Z 13:42:42.547 DEBUG Loaded [440] system trusted certificates
+2024-10-09T13:42:43.1504523Z 13:42:43.149 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/v2/analysis/version
+2024-10-09T13:42:43.3439487Z 13:42:43.343 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/v2/analysis/version (193ms, 12-byte body)
+2024-10-09T13:42:43.3449553Z 13:42:43.344 INFO  JRE provisioning: os[linux], arch[x86_64]
+2024-10-09T13:42:43.3464374Z 13:42:43.346 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/v2/analysis/jres?os=linux&arch=x86_64
+2024-10-09T13:42:43.3586446Z 13:42:43.358 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/v2/analysis/jres?os=linux&arch=x86_64 (12ms, unknown-length body)
+2024-10-09T13:42:43.3894385Z 13:42:43.389 DEBUG Download https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/v2/analysis/jres/9fe68398-f6a1-4c70-993f-72253d2704b0 to /home/AzDevOps/.sonar/cache/_tmp/fileCache10148270747160965403.tmp
+2024-10-09T13:42:43.3896594Z 13:42:43.389 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/v2/analysis/jres/9fe68398-f6a1-4c70-993f-72253d2704b0
+2024-10-09T13:42:43.3996750Z 13:42:43.399 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/v2/analysis/jres/9fe68398-f6a1-4c70-993f-72253d2704b0 (9ms, unknown-length body)
+2024-10-09T13:42:44.8239975Z 13:42:44.823 DEBUG Executing: /home/AzDevOps/.sonar/cache/bcb1b7b8ad68c93093f09b591b7cb17161d39891f7d29d33a586f5a328603707/OpenJDK17U-jre_x64_linux_hotspot_17.0.11_9.tar.gz_unzip/jdk-17.0.11+9-jre/bin/java --version
+2024-10-09T13:42:44.8669417Z 13:42:44.866 DEBUG openjdk 17.0.11 2024-04-16
+2024-10-09T13:42:44.8670031Z 13:42:44.866 DEBUG OpenJDK Runtime Environment Temurin-17.0.11+9 (build 17.0.11+9)
+2024-10-09T13:42:44.8670549Z 13:42:44.866 DEBUG OpenJDK 64-Bit Server VM Temurin-17.0.11+9 (build 17.0.11+9, mixed mode, sharing)
+2024-10-09T13:42:44.8712524Z 13:42:44.870 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/v2/analysis/engine
+2024-10-09T13:42:44.8815079Z 13:42:44.881 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/v2/analysis/engine (10ms, unknown-length body)
+2024-10-09T13:42:44.8827866Z 13:42:44.882 DEBUG Download https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/v2/analysis/engine to /home/AzDevOps/.sonar/cache/_tmp/fileCache11918894934208038066.tmp
+2024-10-09T13:42:44.8829908Z 13:42:44.882 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/v2/analysis/engine
+2024-10-09T13:42:44.8915050Z 13:42:44.891 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/v2/analysis/engine (8ms, unknown-length body)
+2024-10-09T13:42:45.3452961Z 13:42:45.344 INFO  Communicating with SonarQube Server 10.7.0.96327
+2024-10-09T13:42:45.3457394Z 13:42:45.345 DEBUG Work directory: /agent/_work/1/s/.scannerwork
+2024-10-09T13:42:45.3518450Z 13:42:45.351 DEBUG Executing: /home/AzDevOps/.sonar/cache/bcb1b7b8ad68c93093f09b591b7cb17161d39891f7d29d33a586f5a328603707/OpenJDK17U-jre_x64_linux_hotspot_17.0.11_9.tar.gz_unzip/jdk-17.0.11+9-jre/bin/java -jar /home/AzDevOps/.sonar/cache/d5653c126135ff7d09813343eecfaa5f971529fd7e75aa30085a33bd426a5c6c/sonar-scanner-engine-shaded-10.7.0.96327-all.jar
+2024-10-09T13:42:45.5790425Z 13:42:45.578 INFO  Starting SonarScanner Engine...
+2024-10-09T13:42:45.5792159Z 13:42:45.579 INFO  Java 17.0.11 Eclipse Adoptium (64-bit)
+2024-10-09T13:42:45.6250597Z 13:42:45.624 DEBUG JVM max available memory: 7 GB
+2024-10-09T13:42:45.7137707Z 13:42:45.713 DEBUG Community 10.7.0.96327
+2024-10-09T13:42:45.8083244Z 13:42:45.807 DEBUG Sonar User Home: /home/AzDevOps/.sonar
+2024-10-09T13:42:46.0589433Z 13:42:46.058 DEBUG Loaded [440] system trusted certificates
+2024-10-09T13:42:46.2050062Z 13:42:46.204 INFO  Load global settings
+2024-10-09T13:42:46.2133664Z 13:42:46.212 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/settings/values.protobuf
+2024-10-09T13:42:46.3354175Z 13:42:46.334 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/settings/values.protobuf (121ms, 7210-byte body)
+2024-10-09T13:42:46.3546382Z 13:42:46.354 INFO  Load global settings (done) | time=150ms
+2024-10-09T13:42:46.3563703Z 13:42:46.356 INFO  Server id: DC5E791A-AY6ZzCSBhahrqMjovh2r
+2024-10-09T13:42:46.3592563Z 13:42:46.359 DEBUG Create : /home/AzDevOps/.sonar/_tmp
+2024-10-09T13:42:46.3594225Z 13:42:46.359 DEBUG User cache: /home/AzDevOps/.sonar/cache
+2024-10-09T13:42:46.3652430Z 13:42:46.365 INFO  Loading required plugins
+2024-10-09T13:42:46.3654177Z 13:42:46.365 INFO  Load plugins index
+2024-10-09T13:42:46.3660157Z 13:42:46.365 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/plugins/installed
+2024-10-09T13:42:46.3764501Z 13:42:46.376 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/plugins/installed (10ms, unknown-length body)
+2024-10-09T13:42:46.3800546Z 13:42:46.379 INFO  Load plugins index (done) | time=15ms
+2024-10-09T13:42:46.3803939Z 13:42:46.380 INFO  Load/download plugins
+2024-10-09T13:42:46.3820208Z 13:42:46.381 DEBUG Download plugin 'authaad' to '/home/AzDevOps/.sonar/_tmp/fileCache9661050012955297289.tmp'
+2024-10-09T13:42:46.3836032Z 13:42:46.383 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/plugins/download?plugin=authaad
+2024-10-09T13:42:46.3922514Z 13:42:46.391 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/plugins/download?plugin=authaad (8ms, unknown-length body)
+2024-10-09T13:42:46.5491747Z 13:42:46.548 DEBUG Download plugin 'cayc' to '/home/AzDevOps/.sonar/_tmp/fileCache246352813731809606.tmp'
+2024-10-09T13:42:46.5492777Z 13:42:46.549 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/plugins/download?plugin=cayc
+2024-10-09T13:42:46.5714077Z 13:42:46.571 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/plugins/download?plugin=cayc (22ms, unknown-length body)
+2024-10-09T13:42:46.5920518Z 13:42:46.591 DEBUG Download plugin 'iac' to '/home/AzDevOps/.sonar/_tmp/fileCache13147425720612783146.tmp'
+2024-10-09T13:42:46.5922329Z 13:42:46.592 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/plugins/download?plugin=iac
+2024-10-09T13:42:46.6002493Z 13:42:46.599 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/plugins/download?plugin=iac (7ms, unknown-length body)
+2024-10-09T13:42:46.8849325Z 13:42:46.884 DEBUG Download plugin 'jacoco' to '/home/AzDevOps/.sonar/_tmp/fileCache11686108766822774277.tmp'
+2024-10-09T13:42:46.8850231Z 13:42:46.884 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/plugins/download?plugin=jacoco
+2024-10-09T13:42:46.8923716Z 13:42:46.892 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/plugins/download?plugin=jacoco (7ms, unknown-length body)
+2024-10-09T13:42:46.8948971Z 13:42:46.894 DEBUG Download plugin 'text' to '/home/AzDevOps/.sonar/_tmp/fileCache5952746594868747631.tmp'
+2024-10-09T13:42:46.8950864Z 13:42:46.894 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/plugins/download?plugin=text
+2024-10-09T13:42:46.9025859Z 13:42:46.902 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/plugins/download?plugin=text (7ms, unknown-length body)
+2024-10-09T13:42:46.9710626Z 13:42:46.970 DEBUG Download plugin 'xml' to '/home/AzDevOps/.sonar/_tmp/fileCache7917690975161168605.tmp'
+2024-10-09T13:42:46.9711998Z 13:42:46.970 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/plugins/download?plugin=xml
+2024-10-09T13:42:46.9795840Z 13:42:46.978 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/plugins/download?plugin=xml (7ms, unknown-length body)
+2024-10-09T13:42:47.0138240Z 13:42:47.013 INFO  Load/download plugins (done) | time=633ms
+2024-10-09T13:42:47.0138909Z 13:42:47.013 DEBUG Plugins not loaded because they are optional: [csharp, flex, go, web, javasymbolicexecution, java, javascript, kotlin, php, python, ruby, sonarscala, vbnet]
+2024-10-09T13:42:47.0547554Z 13:42:47.054 DEBUG Plugins loaded:
+2024-10-09T13:42:47.0548307Z 13:42:47.054 DEBUG   * Clean as You Code 2.4.0.2018 (cayc)
+2024-10-09T13:42:47.0548648Z 13:42:47.054 DEBUG   * XML Code Quality and Security 2.10.0.4108 (xml)
+2024-10-09T13:42:47.0554912Z 13:42:47.054 DEBUG   * JaCoCo 1.3.0.1538 (jacoco)
+2024-10-09T13:42:47.0556238Z 13:42:47.054 DEBUG   * Azure Active Directory (AAD) Authentication Plug-in for SonarQube 1.3.2 (authaad)
+2024-10-09T13:42:47.0561637Z 13:42:47.055 DEBUG   * IaC Code Quality and Security 1.36.0.12431 (iac)
+2024-10-09T13:42:47.0562372Z 13:42:47.055 DEBUG   * Text Code Quality and Security 2.16.0.4008 (text)
+2024-10-09T13:42:47.1705261Z 13:42:47.169 DEBUG register org.eclipse.jgit.util.FS$FileStoreAttributes$$Lambda$356/0x00007ff0b42afc30@1bbae752 with shutdown hook
+2024-10-09T13:42:47.2531383Z 13:42:47.252 INFO  Process project properties
+2024-10-09T13:42:47.2583089Z 13:42:47.257 INFO  Process project properties (done) | time=5ms
+2024-10-09T13:42:47.2631762Z 13:42:47.262 INFO  Project key: NexusInfra
+2024-10-09T13:42:47.2635185Z 13:42:47.263 INFO  Base dir: /agent/_work/1/s
+2024-10-09T13:42:47.2638951Z 13:42:47.263 INFO  Working dir: /agent/_work/1/s/.scannerwork
+2024-10-09T13:42:47.2639658Z 13:42:47.263 DEBUG Project global encoding: UTF-8, default locale: en
+2024-10-09T13:42:47.2706461Z 13:42:47.270 INFO  Load project settings for component key: 'NexusInfra'
+2024-10-09T13:42:47.2708040Z 13:42:47.270 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/settings/values.protobuf?component=NexusInfra
+2024-10-09T13:42:47.2936122Z 13:42:47.293 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/settings/values.protobuf?component=NexusInfra (22ms, 7223-byte body)
+2024-10-09T13:42:47.2952343Z 13:42:47.295 INFO  Load project settings for component key: 'NexusInfra' (done) | time=25ms
+2024-10-09T13:42:47.3114097Z 13:42:47.310 DEBUG Creating module hierarchy
+2024-10-09T13:42:47.3121415Z 13:42:47.311 DEBUG   Init module 'NexusInfra'
+2024-10-09T13:42:47.3122391Z 13:42:47.311 DEBUG     Base dir: /agent/_work/1/s
+2024-10-09T13:42:47.3123096Z 13:42:47.311 DEBUG     Working dir: /agent/_work/1/s/.scannerwork
+2024-10-09T13:42:47.3123732Z 13:42:47.311 DEBUG     Module global encoding: UTF-8, default locale: en
+2024-10-09T13:42:47.3201880Z 13:42:47.319 INFO  Load quality profiles
+2024-10-09T13:42:47.3208179Z 13:42:47.320 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/qualityprofiles/search.protobuf?project=NexusInfra
+2024-10-09T13:42:47.3584104Z 13:42:47.358 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/qualityprofiles/search.protobuf?project=NexusInfra (37ms, 3401-byte body)
+2024-10-09T13:42:47.3726428Z 13:42:47.372 INFO  Load quality profiles (done) | time=53ms
+2024-10-09T13:42:47.3842438Z 13:42:47.383 INFO  Auto-configuring with CI 'Azure DevOps'
+2024-10-09T13:42:47.3981256Z ##[debug]Agent environment resources - Disk: / Available 64450.00 MB out of 118902.00 MB, Memory: Used 1555.00 MB out of 32094.00 MB, CPU: Usage 42.03%
+2024-10-09T13:42:47.4045055Z 13:42:47.404 INFO  Load active rules
+2024-10-09T13:42:47.4048462Z 13:42:47.404 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=cec92808-61ea-459a-b329-fed397ca6d19&ps=500&p=1
+2024-10-09T13:42:47.4544228Z 13:42:47.453 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=cec92808-61ea-459a-b329-fed397ca6d19&ps=500&p=1 (49ms, 7151-byte body)
+2024-10-09T13:42:47.5237441Z 13:42:47.523 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=ef0bd83e-0346-436a-9157-e7d662515e71&ps=500&p=1
+2024-10-09T13:42:47.5703095Z 13:42:47.569 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=ef0bd83e-0346-436a-9157-e7d662515e71&ps=500&p=1 (46ms, unknown-length body)
+2024-10-09T13:42:47.5740431Z 13:42:47.573 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=f1908c0e-c5ec-4e5e-bbeb-b9e31dfa9627&ps=500&p=1
+2024-10-09T13:42:47.6221393Z 13:42:47.621 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=f1908c0e-c5ec-4e5e-bbeb-b9e31dfa9627&ps=500&p=1 (47ms, unknown-length body)
+2024-10-09T13:42:47.6261431Z 13:42:47.625 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=118d96c1-36aa-43f3-8622-60e002c40eea&ps=500&p=1
+2024-10-09T13:42:47.6497735Z 13:42:47.649 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=118d96c1-36aa-43f3-8622-60e002c40eea&ps=500&p=1 (23ms, 12-byte body)
+2024-10-09T13:42:47.6500651Z 13:42:47.649 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=15105c01-747e-4aa4-a244-67160216a1c1&ps=500&p=1
+2024-10-09T13:42:47.8152749Z 13:42:47.814 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=15105c01-747e-4aa4-a244-67160216a1c1&ps=500&p=1 (164ms, unknown-length body)
+2024-10-09T13:42:47.8425772Z 13:42:47.842 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=058eb7e1-64bb-40a8-a769-ee4016d33607&ps=500&p=1
+2024-10-09T13:42:47.9747456Z 13:42:47.974 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=058eb7e1-64bb-40a8-a769-ee4016d33607&ps=500&p=1 (132ms, unknown-length body)
+2024-10-09T13:42:47.9879675Z 13:42:47.987 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=f1cde95b-8ca2-4db0-8b70-c46b2ca557bf&ps=500&p=1
+2024-10-09T13:42:48.0468408Z 13:42:48.046 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=f1cde95b-8ca2-4db0-8b70-c46b2ca557bf&ps=500&p=1 (58ms, unknown-length body)
+2024-10-09T13:42:48.0491383Z 13:42:48.048 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=60f92ff2-841b-4925-a019-7818c9c5b5a9&ps=500&p=1
+2024-10-09T13:42:48.2452249Z 13:42:48.244 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=60f92ff2-841b-4925-a019-7818c9c5b5a9&ps=500&p=1 (195ms, unknown-length body)
+2024-10-09T13:42:48.2614342Z 13:42:48.261 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=60f92ff2-841b-4925-a019-7818c9c5b5a9&ps=500&p=2
+2024-10-09T13:42:48.3150478Z 13:42:48.314 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=60f92ff2-841b-4925-a019-7818c9c5b5a9&ps=500&p=2 (53ms, 4058-byte body)
+2024-10-09T13:42:48.3176344Z 13:42:48.317 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=f8542b15-bffb-412e-b1e6-fd8fb9c3324e&ps=500&p=1
+2024-10-09T13:42:48.3793407Z 13:42:48.379 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=f8542b15-bffb-412e-b1e6-fd8fb9c3324e&ps=500&p=1 (61ms, unknown-length body)
+2024-10-09T13:42:48.3809838Z 13:42:48.380 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=2d6490dc-eab8-4796-b893-f400a3a448a1&ps=500&p=1
+2024-10-09T13:42:48.4463059Z 13:42:48.446 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=2d6490dc-eab8-4796-b893-f400a3a448a1&ps=500&p=1 (65ms, unknown-length body)
+2024-10-09T13:42:48.4479813Z 13:42:48.447 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=5ae48846-bcd8-466d-8830-d8db8095d876&ps=500&p=1
+2024-10-09T13:42:48.4959793Z 13:42:48.495 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=5ae48846-bcd8-466d-8830-d8db8095d876&ps=500&p=1 (47ms, 7249-byte body)
+2024-10-09T13:42:48.4970120Z 13:42:48.496 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=f02def92-ef7e-43db-b749-0df2f18f53fd&ps=500&p=1
+2024-10-09T13:42:48.5210253Z 13:42:48.520 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=f02def92-ef7e-43db-b749-0df2f18f53fd&ps=500&p=1 (23ms, 12-byte body)
+2024-10-09T13:42:48.5214473Z 13:42:48.521 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=beb9e1a0-fdd5-432a-a049-629d798dbcc5&ps=500&p=1
+2024-10-09T13:42:48.6475642Z 13:42:48.647 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=beb9e1a0-fdd5-432a-a049-629d798dbcc5&ps=500&p=1 (125ms, unknown-length body)
+2024-10-09T13:42:48.6560331Z 13:42:48.655 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=fac9c04d-5d63-40b7-a529-c734f376a46f&ps=500&p=1
+2024-10-09T13:42:48.7129029Z 13:42:48.712 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=fac9c04d-5d63-40b7-a529-c734f376a46f&ps=500&p=1 (56ms, 358-byte body)
+2024-10-09T13:42:48.7130841Z 13:42:48.712 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=3ebdd619-7d56-484a-a153-126da6522291&ps=500&p=1
+2024-10-09T13:42:48.7936362Z 13:42:48.793 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=3ebdd619-7d56-484a-a153-126da6522291&ps=500&p=1 (80ms, unknown-length body)
+2024-10-09T13:42:48.7964217Z 13:42:48.796 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=8e02434b-fb33-44a1-b849-eedd6eb03a31&ps=500&p=1
+2024-10-09T13:42:48.8552841Z 13:42:48.854 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=8e02434b-fb33-44a1-b849-eedd6eb03a31&ps=500&p=1 (58ms, unknown-length body)
+2024-10-09T13:42:48.8561403Z 13:42:48.855 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=88f70f3b-ed3c-43f8-8398-e6f642e416a5&ps=500&p=1
+2024-10-09T13:42:48.8794309Z 13:42:48.879 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=88f70f3b-ed3c-43f8-8398-e6f642e416a5&ps=500&p=1 (23ms, 12-byte body)
+2024-10-09T13:42:48.8795099Z 13:42:48.879 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=49b04b36-01e2-4edc-ab60-73795b866188&ps=500&p=1
+2024-10-09T13:42:48.9200222Z 13:42:48.919 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=49b04b36-01e2-4edc-ab60-73795b866188&ps=500&p=1 (40ms, 7691-byte body)
+2024-10-09T13:42:48.9209395Z 13:42:48.920 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=7905ad0e-36d0-4738-b965-de6c8a25dbc6&ps=500&p=1
+2024-10-09T13:42:48.9902437Z 13:42:48.989 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=7905ad0e-36d0-4738-b965-de6c8a25dbc6&ps=500&p=1 (69ms, unknown-length body)
+2024-10-09T13:42:48.9926488Z 13:42:48.992 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=90152e44-32f7-4dca-8f5c-3d399810d401&ps=500&p=1
+2024-10-09T13:42:49.0566434Z 13:42:49.056 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=90152e44-32f7-4dca-8f5c-3d399810d401&ps=500&p=1 (63ms, unknown-length body)
+2024-10-09T13:42:49.0583401Z 13:42:49.058 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=7ce0abab-0d3b-4221-89fd-485f3b7b3613&ps=500&p=1
+2024-10-09T13:42:49.1070685Z 13:42:49.106 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=7ce0abab-0d3b-4221-89fd-485f3b7b3613&ps=500&p=1 (48ms, unknown-length body)
+2024-10-09T13:42:49.1080626Z 13:42:49.107 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=909d3561-66fc-4c05-b429-37b1650d5ceb&ps=500&p=1
+2024-10-09T13:42:49.2448039Z 13:42:49.244 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=909d3561-66fc-4c05-b429-37b1650d5ceb&ps=500&p=1 (136ms, unknown-length body)
+2024-10-09T13:42:49.2528507Z 13:42:49.252 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=a83121d2-cd24-4f1d-8c2c-842f7c57036f&ps=500&p=1
+2024-10-09T13:42:49.3411339Z 13:42:49.340 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=a83121d2-cd24-4f1d-8c2c-842f7c57036f&ps=500&p=1 (88ms, unknown-length body)
+2024-10-09T13:42:49.3457763Z 13:42:49.345 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=f7afe8b0-7e45-46ce-95fc-6ea847457426&ps=500&p=1
+2024-10-09T13:42:49.4032123Z 13:42:49.402 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=f7afe8b0-7e45-46ce-95fc-6ea847457426&ps=500&p=1 (57ms, unknown-length body)
+2024-10-09T13:42:49.4041588Z 13:42:49.403 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=cc7b6376-81d3-420b-afbe-a6fe8ca37db3&ps=500&p=1
+2024-10-09T13:42:49.4573809Z 13:42:49.457 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=cc7b6376-81d3-420b-afbe-a6fe8ca37db3&ps=500&p=1 (53ms, unknown-length body)
+2024-10-09T13:42:49.4581593Z 13:42:49.457 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=92d1ca8a-f2e6-4eb9-92b2-fd35574a4227&ps=500&p=1
+2024-10-09T13:42:49.6078934Z 13:42:49.607 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/rules/list.protobuf?qprofile=92d1ca8a-f2e6-4eb9-92b2-fd35574a4227&ps=500&p=1 (149ms, unknown-length body)
+2024-10-09T13:42:49.6297413Z 13:42:49.629 INFO  Load active rules (done) | time=2226ms
+2024-10-09T13:42:49.6342240Z 13:42:49.633 INFO  Load analysis cache
+2024-10-09T13:42:49.6344337Z 13:42:49.634 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/analysis_cache/get?project=NexusInfra
+2024-10-09T13:42:49.6528803Z 13:42:49.652 DEBUG <-- 404 Not Found https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/analysis_cache/get?project=NexusInfra (18ms, unknown-length body)
+2024-10-09T13:42:49.6535049Z 13:42:49.653 INFO  Load analysis cache (404) | time=20ms
+2024-10-09T13:42:49.6673726Z 13:42:49.667 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/languages/list
+2024-10-09T13:42:49.6741965Z 13:42:49.673 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/languages/list (7ms, unknown-length body)
+2024-10-09T13:42:49.6970879Z 13:42:49.696 DEBUG Declared patterns of language Kubernetes were converted to sonar.lang.patterns.kubernetes : 
+2024-10-09T13:42:49.6978803Z 13:42:49.697 DEBUG Declared patterns of language CSS were converted to sonar.lang.patterns.css : **/*.css,**/*.less,**/*.scss,**/*.sass
+2024-10-09T13:42:49.6985940Z 13:42:49.697 DEBUG Declared patterns of language Scala were converted to sonar.lang.patterns.scala : **/*.scala
+2024-10-09T13:42:49.6986423Z 13:42:49.698 DEBUG Declared patterns of language JSP were converted to sonar.lang.patterns.jsp : **/*.jsp,**/*.jspf,**/*.jspx
+2024-10-09T13:42:49.6986918Z 13:42:49.698 DEBUG Declared patterns of language JavaScript were converted to sonar.lang.patterns.js : **/*.js,**/*.jsx,**/*.cjs,**/*.mjs,**/*.vue
+2024-10-09T13:42:49.6988274Z 13:42:49.698 DEBUG Declared patterns of language Python were converted to sonar.lang.patterns.py : **/*.py
+2024-10-09T13:42:49.6990802Z 13:42:49.698 DEBUG Declared patterns of language Docker were converted to sonar.lang.patterns.docker : **/Dockerfile,**/*.dockerfile
+2024-10-09T13:42:49.6991341Z 13:42:49.698 DEBUG Declared patterns of language Java were converted to sonar.lang.patterns.java : **/*.java,**/*.jav
+2024-10-09T13:42:49.6993403Z 13:42:49.699 DEBUG Declared patterns of language HTML were converted to sonar.lang.patterns.web : **/*.html,**/*.xhtml,**/*.cshtml,**/*.vbhtml,**/*.aspx,**/*.ascx,**/*.rhtml,**/*.erb,**/*.shtm,**/*.shtml,**/*.cmp,**/*.twig
+2024-10-09T13:42:49.6993937Z 13:42:49.699 DEBUG Declared patterns of language Flex were converted to sonar.lang.patterns.flex : **/*.as
+2024-10-09T13:42:49.7000264Z 13:42:49.699 DEBUG Declared patterns of language XML were converted to sonar.lang.patterns.xml : **/*.xml,**/*.xsd,**/*.xsl,**/*.config
+2024-10-09T13:42:49.7000744Z 13:42:49.699 DEBUG Declared patterns of language JSON were converted to sonar.lang.patterns.json : **/*.json
+2024-10-09T13:42:49.7001558Z 13:42:49.699 DEBUG Declared patterns of language IPython Notebooks were converted to sonar.lang.patterns.ipynb : **/*.ipynb
+2024-10-09T13:42:49.7002344Z 13:42:49.699 DEBUG Declared patterns of language Text were converted to sonar.lang.patterns.text : 
+2024-10-09T13:42:49.7002798Z 13:42:49.699 DEBUG Declared patterns of language VB.NET were converted to sonar.lang.patterns.vbnet : **/*.vb
+2024-10-09T13:42:49.7007829Z 13:42:49.699 DEBUG Declared patterns of language CloudFormation were converted to sonar.lang.patterns.cloudformation : 
+2024-10-09T13:42:49.7008341Z 13:42:49.700 DEBUG Declared patterns of language YAML were converted to sonar.lang.patterns.yaml : **/*.yaml,**/*.yml
+2024-10-09T13:42:49.7013255Z 13:42:49.700 DEBUG Declared patterns of language Go were converted to sonar.lang.patterns.go : **/*.go
+2024-10-09T13:42:49.7013701Z 13:42:49.700 DEBUG Declared patterns of language Kotlin were converted to sonar.lang.patterns.kotlin : **/*.kt,**/*.kts
+2024-10-09T13:42:49.7014216Z 13:42:49.700 DEBUG Declared patterns of language Secrets were converted to sonar.lang.patterns.secrets : 
+2024-10-09T13:42:49.7014620Z 13:42:49.701 DEBUG Declared patterns of language Ruby were converted to sonar.lang.patterns.ruby : **/*.rb
+2024-10-09T13:42:49.7017716Z 13:42:49.701 DEBUG Declared patterns of language C# were converted to sonar.lang.patterns.cs : **/*.cs,**/*.razor
+2024-10-09T13:42:49.7018279Z 13:42:49.701 DEBUG Declared patterns of language PHP were converted to sonar.lang.patterns.php : **/*.php,**/*.php3,**/*.php4,**/*.php5,**/*.phtml,**/*.inc
+2024-10-09T13:42:49.7019092Z 13:42:49.701 DEBUG Declared patterns of language Terraform were converted to sonar.lang.patterns.terraform : **/*.tf
+2024-10-09T13:42:49.7026855Z 13:42:49.702 DEBUG Declared patterns of language AzureResourceManager were converted to sonar.lang.patterns.azureresourcemanager : **/*.bicep
+2024-10-09T13:42:49.7032467Z 13:42:49.702 DEBUG Declared patterns of language TypeScript were converted to sonar.lang.patterns.ts : **/*.ts,**/*.tsx,**/*.cts,**/*.mts
+2024-10-09T13:42:49.7095022Z 13:42:49.709 INFO  Preprocessing files...
+2024-10-09T13:42:49.7210002Z 13:42:49.720 DEBUG loading config FileBasedConfig[$HOME/.config/jgit/config]
+2024-10-09T13:42:49.7215934Z 13:42:49.721 DEBUG readpipe [/usr/bin/git, --version],/usr/bin
+2024-10-09T13:42:49.7290185Z 13:42:49.728 DEBUG readpipe may return 'git version 2.46.2'
+2024-10-09T13:42:49.7290569Z 13:42:49.728 DEBUG remaining output:
+2024-10-09T13:42:49.7290685Z 
+2024-10-09T13:42:49.7296009Z 13:42:49.729 DEBUG readpipe [/usr/bin/git, config, --system, --show-origin, --list, -z],/usr/bin
+2024-10-09T13:42:49.7316565Z 13:42:49.731 DEBUG readpipe may return 'file:/etc/gitconfigsafe.directory'
+2024-10-09T13:42:49.7317259Z 13:42:49.731 DEBUG remaining output:
+2024-10-09T13:42:49.7317406Z 
+2024-10-09T13:42:49.7318814Z 13:42:49.731 DEBUG *file:/etc/gitconfigfilter.lfs.clean
+2024-10-09T13:42:49.7319918Z 13:42:49.731 DEBUG git-lfs clean -- %ffile:/etc/gitconfigfilter.lfs.smudge
+2024-10-09T13:42:49.7320936Z 13:42:49.731 DEBUG git-lfs smudge -- %ffile:/etc/gitconfigfilter.lfs.process
+2024-10-09T13:42:49.7322316Z 13:42:49.732 DEBUG git-lfs filter-processfile:/etc/gitconfigfilter.lfs.required
+2024-10-09T13:42:49.7323304Z 13:42:49.732 DEBUG true
+2024-10-09T13:42:49.7324551Z 13:42:49.732 DEBUG loading config FileBasedConfig[/etc/gitconfig]
+2024-10-09T13:42:49.7335030Z 13:42:49.733 DEBUG loading config FileBasedConfig[$HOME/.config/git/config]
+2024-10-09T13:42:49.7336233Z 13:42:49.733 DEBUG loading config UserConfigFile[/home/AzDevOps/.gitconfig]
+2024-10-09T13:42:49.8280390Z 13:42:49.827 DEBUG 344 non excluded files in this Git repository
+2024-10-09T13:42:49.8713294Z 13:42:49.870 INFO  0 languages detected in 0 preprocessed files
+2024-10-09T13:42:49.8713822Z 13:42:49.871 INFO  312 files ignored because of inclusion/exclusion patterns
+2024-10-09T13:42:49.8714181Z 13:42:49.871 INFO  0 files ignored because of scm ignore settings
+2024-10-09T13:42:49.8728809Z 13:42:49.872 INFO  Loading plugins for detected languages
+2024-10-09T13:42:49.8729492Z 13:42:49.872 DEBUG Detected languages: []
+2024-10-09T13:42:49.8731217Z 13:42:49.872 INFO  Load/download plugins
+2024-10-09T13:42:49.8732860Z 13:42:49.873 INFO  Load/download plugins (done) | time=0ms
+2024-10-09T13:42:49.8736532Z 13:42:49.873 DEBUG Optional language-specific plugins not loaded: [csharp, flex, go, web, javasymbolicexecution, java, javascript, kotlin, php, python, ruby, sonarscala, vbnet]
+2024-10-09T13:42:49.8741170Z 13:42:49.873 DEBUG No plugins loaded
+2024-10-09T13:42:49.9027420Z 13:42:49.902 INFO  Load project repositories
+2024-10-09T13:42:49.9028501Z 13:42:49.902 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/batch/project.protobuf?key=NexusInfra
+2024-10-09T13:42:49.9166890Z 13:42:49.916 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/batch/project.protobuf?key=NexusInfra (13ms, 0-byte body)
+2024-10-09T13:42:49.9202253Z 13:42:49.920 INFO  Load project repositories (done) | time=17ms
+2024-10-09T13:42:49.9279418Z 13:42:49.927 DEBUG Available languages:
+2024-10-09T13:42:49.9284758Z 13:42:49.927 DEBUG   * XML => "xml"
+2024-10-09T13:42:49.9285259Z 13:42:49.927 DEBUG   * Terraform => "terraform"
+2024-10-09T13:42:49.9286203Z 13:42:49.928 DEBUG   * CloudFormation => "cloudformation"
+2024-10-09T13:42:49.9286636Z 13:42:49.928 DEBUG   * Kubernetes => "kubernetes"
+2024-10-09T13:42:49.9289015Z 13:42:49.928 DEBUG   * Docker => "docker"
+2024-10-09T13:42:49.9289401Z 13:42:49.928 DEBUG   * AzureResourceManager => "azureresourcemanager"
+2024-10-09T13:42:49.9290081Z 13:42:49.928 DEBUG   * YAML => "yaml"
+2024-10-09T13:42:49.9290915Z 13:42:49.928 DEBUG   * JSON => "json"
+2024-10-09T13:42:49.9294527Z 13:42:49.929 DEBUG   * Text => "text"
+2024-10-09T13:42:49.9295795Z 13:42:49.929 DEBUG   * Secrets => "secrets"
+2024-10-09T13:42:49.9297100Z 13:42:49.929 INFO  Indexing files...
+2024-10-09T13:42:49.9298120Z 13:42:49.929 INFO  Project configuration:
+2024-10-09T13:42:49.9298961Z 13:42:49.929 INFO    Included sources: **/src/main/**
+2024-10-09T13:42:49.9302072Z 13:42:49.930 INFO    Excluded sources: **//*.tfstate, **/*.tfvars, **/*.yml
+2024-10-09T13:42:49.9316823Z 13:42:49.931 INFO  0 files indexed
+2024-10-09T13:42:49.9322810Z 13:42:49.932 INFO  ------------- Run sensors on module NexusInfra
+2024-10-09T13:42:49.9526515Z 13:42:49.952 INFO  Load metrics repository
+2024-10-09T13:42:49.9535466Z 13:42:49.953 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/metrics/search?ps=500&p=1
+2024-10-09T13:42:49.9666860Z 13:42:49.966 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/metrics/search?ps=500&p=1 (12ms, unknown-length body)
+2024-10-09T13:42:49.9774669Z 13:42:49.977 INFO  Load metrics repository (done) | time=25ms
+2024-10-09T13:42:50.1806238Z 13:42:50.180 DEBUG 'Import external issues report' skipped because one of the required properties is missing
+2024-10-09T13:42:50.1811379Z 13:42:50.180 DEBUG 'XML Sensor' skipped because there is no related file in current project
+2024-10-09T13:42:50.1814430Z 13:42:50.181 DEBUG 'IaC Terraform Sensor' skipped because there is no related file in current project
+2024-10-09T13:42:50.1815653Z 13:42:50.181 DEBUG 'IaC CloudFormation Sensor' skipped because there is no related file in current project
+2024-10-09T13:42:50.1817614Z 13:42:50.181 DEBUG 'IaC Kubernetes Sensor' skipped because there is no related file in current project
+2024-10-09T13:42:50.1819059Z 13:42:50.181 DEBUG 'IaC AzureResourceManager Sensor' skipped because there is no related file in current project
+2024-10-09T13:42:50.1827396Z 13:42:50.182 DEBUG 'Generic Test Executions Report' skipped because one of the required properties is missing
+2024-10-09T13:42:50.1830941Z 13:42:50.182 DEBUG Sensors : JaCoCo XML Report Importer -> Java Config Sensor -> IaC Docker Sensor -> TextAndSecretsSensor
+2024-10-09T13:42:50.1838118Z 13:42:50.183 INFO  Sensor JaCoCo XML Report Importer [jacoco]
+2024-10-09T13:42:50.1847802Z 13:42:50.184 INFO  'sonar.coverage.jacoco.xmlReportPaths' is not defined. Using default locations: target/site/jacoco/jacoco.xml,target/site/jacoco-it/jacoco.xml,build/reports/jacoco/test/jacocoTestReport.xml
+2024-10-09T13:42:50.1852481Z 13:42:50.185 INFO  No report imported, no coverage information will be imported by JaCoCo XML Report Importer
+2024-10-09T13:42:50.1853583Z 13:42:50.185 INFO  Sensor JaCoCo XML Report Importer [jacoco] (done) | time=1ms
+2024-10-09T13:42:50.1854775Z 13:42:50.185 INFO  Sensor Java Config Sensor [iac]
+2024-10-09T13:42:50.1986703Z 13:42:50.198 INFO  0 source files to be analyzed
+2024-10-09T13:42:50.2024427Z 13:42:50.202 INFO  0/0 source files have been analyzed
+2024-10-09T13:42:50.2025026Z 13:42:50.202 INFO  Sensor Java Config Sensor [iac] (done) | time=17ms
+2024-10-09T13:42:50.2036768Z 13:42:50.202 INFO  Sensor IaC Docker Sensor [iac]
+2024-10-09T13:42:50.2661587Z 13:42:50.265 INFO  0 source files to be analyzed
+2024-10-09T13:42:50.2662497Z 13:42:50.265 INFO  0/0 source files have been analyzed
+2024-10-09T13:42:50.2663485Z 13:42:50.266 INFO  Sensor IaC Docker Sensor [iac] (done) | time=63ms
+2024-10-09T13:42:50.2666337Z 13:42:50.266 INFO  Sensor TextAndSecretsSensor [text]
+2024-10-09T13:42:50.2666681Z 13:42:50.266 INFO  Available processors: 8
+2024-10-09T13:42:50.2666990Z 13:42:50.266 INFO  Using 8 threads for analysis.
+2024-10-09T13:42:50.5548647Z 13:42:50.554 INFO  The property "sonar.tests" is not set. To improve the analysis accuracy, we categorize a file as a test file if any of the following is true:
+2024-10-09T13:42:50.5549102Z   * The filename starts with "test"
+2024-10-09T13:42:50.5549435Z   * The filename contains "test." or "tests."
+2024-10-09T13:42:50.5550053Z   * Any directory in the file path is named: "doc", "docs", "test" or "tests"
+2024-10-09T13:42:50.5550391Z   * Any directory in the file path has a name ending in "test" or "tests"
+2024-10-09T13:42:50.5550525Z 
+2024-10-09T13:42:50.5695451Z 13:42:50.569 DEBUG git --version returned: git version 2.46.2
+2024-10-09T13:42:50.5695969Z 13:42:50.569 INFO  Using git CLI to retrieve untracked files
+2024-10-09T13:42:50.5864031Z 13:42:50.585 INFO  Analyzing language associated files and files included via "sonar.text.inclusions" that are tracked by git
+2024-10-09T13:42:50.5865206Z 13:42:50.586 DEBUG There are no files to be analyzed
+2024-10-09T13:42:50.5865958Z 13:42:50.586 INFO  Sensor TextAndSecretsSensor [text] (done) | time=320ms
+2024-10-09T13:42:50.5897702Z 13:42:50.589 INFO  ------------- Run sensors on project
+2024-10-09T13:42:50.6871319Z 13:42:50.686 DEBUG 'Generic Coverage Report' skipped because one of the required properties is missing
+2024-10-09T13:42:50.6871826Z 13:42:50.686 DEBUG 'Import external issues report from SARIF file.' skipped because one of the required properties is missing
+2024-10-09T13:42:50.6872213Z 13:42:50.686 DEBUG 'Java CPD Block Indexer' skipped because there is no related file in current project
+2024-10-09T13:42:50.6875736Z 13:42:50.687 DEBUG Sensors : Zero Coverage Sensor
+2024-10-09T13:42:50.6877204Z 13:42:50.687 INFO  Sensor Zero Coverage Sensor
+2024-10-09T13:42:50.6878708Z 13:42:50.687 INFO  Sensor Zero Coverage Sensor (done) | time=0ms
+2024-10-09T13:42:50.6903150Z 13:42:50.690 INFO  CPD Executor Calculating CPD for 0 files
+2024-10-09T13:42:50.6906313Z 13:42:50.690 INFO  CPD Executor CPD calculation finished (done) | time=0ms
+2024-10-09T13:42:50.6943533Z 13:42:50.694 INFO  SCM revision ID '553cb7402a70b3a76bf718f52de8f0637b724658'
+2024-10-09T13:42:50.7494605Z 13:42:50.749 INFO  Analysis report generated in 56ms, dir size=221.6 kB
+2024-10-09T13:42:50.7558473Z 13:42:50.755 INFO  Analysis report compressed in 6ms, zip size=21.6 kB
+2024-10-09T13:42:50.7559991Z 13:42:50.755 INFO  Analysis report generated in /agent/_work/1/s/.scannerwork/scanner-report
+2024-10-09T13:42:50.7565003Z 13:42:50.755 DEBUG Upload report
+2024-10-09T13:42:50.7584814Z 13:42:50.758 DEBUG --> POST https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/ce/submit?projectKey=NexusInfra (21869-byte body)
+2024-10-09T13:42:50.7923588Z 13:42:50.791 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/ce/submit?projectKey=NexusInfra (33ms, 76-byte body)
+2024-10-09T13:42:50.7956877Z 13:42:50.795 INFO  Analysis report uploaded in 38ms
+2024-10-09T13:42:50.7974295Z 13:42:50.797 DEBUG Report metadata written to /agent/_work/_temp/sonar/1686474/e8a0ebec-2cb1-609e-ec63-5bed2890fef5/report-task.txt
+2024-10-09T13:42:50.7978705Z 13:42:50.797 INFO  ------------- Check Quality Gate status
+2024-10-09T13:42:50.7979065Z 13:42:50.797 INFO  Waiting for the analysis report to be processed (max 1800s)
+2024-10-09T13:42:50.8023839Z 13:42:50.801 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/ce/task?id=a5766b81-e5ef-430a-b017-eb3109ba4b7c
+2024-10-09T13:42:50.8123055Z 13:42:50.811 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/ce/task?id=a5766b81-e5ef-430a-b017-eb3109ba4b7c (14ms, 155-byte body)
+2024-10-09T13:42:52.4009520Z ##[debug]Agent environment resources - Disk: / Available 64450.00 MB out of 118902.00 MB, Memory: Used 1612.00 MB out of 32094.00 MB, CPU: Usage 29.51%
+2024-10-09T13:42:55.8166621Z 13:42:55.816 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/ce/task?id=a5766b81-e5ef-430a-b017-eb3109ba4b7c
+2024-10-09T13:42:55.8322691Z 13:42:55.831 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/ce/task?id=a5766b81-e5ef-430a-b017-eb3109ba4b7c (15ms, 184-byte body)
+2024-10-09T13:42:57.4038984Z ##[debug]Agent environment resources - Disk: / Available 64450.00 MB out of 118902.00 MB, Memory: Used 1605.00 MB out of 32094.00 MB, CPU: Usage 22.56%
+2024-10-09T13:43:00.8330966Z 13:43:00.832 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/ce/task?id=a5766b81-e5ef-430a-b017-eb3109ba4b7c
+2024-10-09T13:43:00.8817760Z 13:43:00.881 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/ce/task?id=a5766b81-e5ef-430a-b017-eb3109ba4b7c (48ms, 184-byte body)
+2024-10-09T13:43:02.4053900Z ##[debug]Agent environment resources - Disk: / Available 64450.00 MB out of 118902.00 MB, Memory: Used 1606.00 MB out of 32094.00 MB, CPU: Usage 18.31%
+2024-10-09T13:43:05.8824879Z 13:43:05.881 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/ce/task?id=a5766b81-e5ef-430a-b017-eb3109ba4b7c
+2024-10-09T13:43:05.9026479Z 13:43:05.902 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/ce/task?id=a5766b81-e5ef-430a-b017-eb3109ba4b7c (20ms, 254-byte body)
+2024-10-09T13:43:05.9029022Z 13:43:05.902 DEBUG --> GET https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/qualitygates/project_status?analysisId=96ede3d3-f504-4c34-a5e5-bfa2bd7f2504
+2024-10-09T13:43:05.9183470Z 13:43:05.918 DEBUG <-- 200 OK https://sonarqube-ku7qexnz26vps.azurewebsites.net/api/qualitygates/project_status?analysisId=96ede3d3-f504-4c34-a5e5-bfa2bd7f2504 (15ms, 104-byte body)
+2024-10-09T13:43:05.9253113Z 13:43:05.925 INFO  QUALITY GATE STATUS: PASSED - View details on https://sonarqube-ku7qexnz26vps.azurewebsites.net/dashboard?id=NexusInfra
+2024-10-09T13:43:05.9276712Z 13:43:05.927 DEBUG Post-jobs : 
+2024-10-09T13:43:05.9315735Z 13:43:05.931 INFO  Analysis total time: 18.853 s
+2024-10-09T13:43:05.9322041Z 13:43:05.931 INFO  SonarScanner Engine completed successfully
+2024-10-09T13:43:05.9349817Z 13:43:05.934 DEBUG Cleanup org.eclipse.jgit.util.FS$FileStoreAttributes$$Lambda$356/0x00007ff0b42afc30@1bbae752 during JVM shutdown
+2024-10-09T13:43:05.9608572Z 13:43:05.960 INFO  EXECUTION SUCCESS
+2024-10-09T13:43:05.9620994Z 13:43:05.961 INFO  Total time: 24.269s
+2024-10-09T13:43:05.9733860Z ##[debug]Exit code 0 received from tool '/agent/_work/_tasks/SonarQubeAnalyze_6d01813a-9589-4b15-8491-8164aeb38055/6.3.2/sonar-scanner/bin/sonar-scanner'
+2024-10-09T13:43:05.9736831Z ##[debug]STDIO streams have closed for tool '/agent/_work/_tasks/SonarQubeAnalyze_6d01813a-9589-4b15-8491-8164aeb38055/6.3.2/sonar-scanner/bin/sonar-scanner'
+2024-10-09T13:43:05.9741303Z ##[debug]set SONARQUBE_SCANNER_PARAMS={"sonar.host.url":"https://sonarqube-ku7qexnz26vps.azurewebsites.net","sonar.token":***,"sonar.projectKey":"NexusInfra","sonar.projectVersion":"20241009.18","sonar.sources":"./init,./main,./ops","sonar.scanner.metadataFilePath":"/agent/_work/_temp/sonar/1686474/e8a0ebec-2cb1-609e-ec63-5bed2890fef5/report-task.txt","sonar.qualitygate.wait":"true","sonar.qualitygate.timeout":"1800","sonar.ws.timeout":"900","sonar.inclusions":"**/src/main/**","sonar.exclusions":"**//*.tfstate,**/*.tfvars,**/*.yml","sonar.log.level":"INFO","sonar.terraform.provider.azure.version":"3.102.0"}
+2024-10-09T13:43:05.9744251Z ##[debug]Processed: ##vso[task.setvariable variable=SONARQUBE_SCANNER_PARAMS;isOutput=false;issecret=false;]{"sonar.host.url":"https://sonarqube-ku7qexnz26vps.azurewebsites.net","sonar.token":***,"sonar.projectKey":"NexusInfra","sonar.projectVersion":"20241009.18","sonar.sources":"./init,./main,./ops","sonar.scanner.metadataFilePath":"/agent/_work/_temp/sonar/1686474/e8a0ebec-2cb1-609e-ec63-5bed2890fef5/report-task.txt","sonar.qualitygate.wait":"true","sonar.qualitygate.timeout":"1800","sonar.ws.timeout":"900","sonar.inclusions":"**/src/main/**","sonar.exclusions":"**//*.tfstate,**/*.tfvars,**/*.yml","sonar.log.level":"INFO","sonar.terraform.provider.azure.version":"3.102.0"}
+2024-10-09T13:43:05.9745356Z ##[debug]Reverting JAVA_HOME to its initial path.
+2024-10-09T13:43:05.9745718Z ##[debug]set JAVA_HOME=/usr/lib/jvm/temurin-11-jdk-amd64
+2024-10-09T13:43:05.9746297Z ##[debug]Processed: ##vso[task.setvariable variable=JAVA_HOME;isOutput=false;issecret=false;]/usr/lib/jvm/temurin-11-jdk-amd64
+2024-10-09T13:43:05.9805107Z ##[section]Finishing: SonarQubeAnalyze
