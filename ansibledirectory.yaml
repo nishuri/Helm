@@ -3,8 +3,13 @@
   hosts: all  # Define the target hosts (use a specific group or 'all' for all hosts in the inventory)
   become: yes  # Use become if you need to perform the task with sudo privileges
   tasks:
-    - name: Ensure the directory /path/to/directory exists
+    - name: create a directory structure 
       file:
-        path: /path/to/directory  # The path of the directory to create
+        path: "{{ item }}"
         state: directory
-        mode: '0755' 
+        mode: '0755'
+        loop:
+        - /Ent/inventory/in/account
+        - /Ent/inventory/in/account/subdir1
+        - /Ent/inventory/in/account/subdir2
+        - /Ent/inventory/in/account/subdir1/subsubdir1
