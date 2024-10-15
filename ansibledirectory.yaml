@@ -1,0 +1,10 @@
+---
+- name: Create a directory on the remote server
+  hosts: all  # Define the target hosts (use a specific group or 'all' for all hosts in the inventory)
+  become: yes  # Use become if you need to perform the task with sudo privileges
+  tasks:
+    - name: Ensure the directory /path/to/directory exists
+      file:
+        path: /path/to/directory  # The path of the directory to create
+        state: directory
+        mode: '0755' 
