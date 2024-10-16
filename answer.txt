@@ -1,0 +1,11 @@
+In Packer templates, when you define a value using `"{{user `...`}}"`, it refers to a Packer user variable that you can pass dynamically when building the image. This allows Packer to expect the value to be passed externally (from a file, environment variable, or command-line input).
+
+If you define the value like `"{{`os_disk_size_gb`}}"` (without `user`), it won't work because Packer won't interpret it as a user-defined variable. Packer expects the `user` keyword for external variables to differentiate between internal and external template variables.
+
+In your case, since you want to variablize `os_disk_size_gb` to pass it from the pipeline, you must use the correct syntax: `"{{user `os_disk_size_gb`}}"`. This ensures that the value is expected to be provided when running Packer (through the pipeline in your case).
+
+Here's a simplified explanation:
+- **`{{user `os_disk_size_gb`}}`** tells Packer that `os_disk_size_gb` is a user variable, and you will provide its value externally (from the pipeline or other sources).
+- **`{{`os_disk_size_gb`}}`** without `user` would lead to an error because Packer won’t know how to resolve that variable.
+
+So, keep `"{{user `os_disk_size_gb`}}"` in your template to ensure the value can be dynamically passed from your pipeline.
