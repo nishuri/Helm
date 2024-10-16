@@ -14,32 +14,30 @@ Code
 
 In Puppet hiredata i have added the following code
 
-squid::acls:
-  'allowed_sites':
-    type: 'dstdomain'
-    entries:
-      - 'lfodown01-b.cloudsink.net'
-      - 'ts01-b.cloudsink.net' 
-      - 'diebold-zsb1.cloud.tanium.com'
-      - 'diebold-zsb2.cloud.tanium.com'
+ ---
+ # RedHat 8 Migration #################################################################################
+ classes:
+   - squid
+  
+ cloudwatchlogs::s3_source: "s3://dn.%{::region}.%{::envtype}.%{::envname}.yum/non-rpm/aws-cloudwatch-el8"
+  
+@@ -50,4 +52,13 @@
+     type: imudp
+     config:
+       port: '514'
+       address: '127.0.0.1'
+       address: '127.0.0.1'
+ 
+ squid::acls:
+   'allowed_sites':
+     type: 'dstdomain'
+     entries:
+       - 'lfodown01-b.cloudsink.net'
+       - 'ts01-b.cloudsink.net' 
+       - 'diebold-zsb1.cloud.tanium.com'
+       - 'diebold-zsb2.cloud.tanium.com'
 
-Added proxy on the server
-export http_proxy="http://localhost:3128"
-export https_proxy="http://localhost:3128"
-export ftp_proxy="http://localhost:3128"
-export no_proxy="localhost,127.0.0.1"
-
-if i run curl or wget its not going through
-
-[root@tooling_hapee-i0d845f30f11e0fae6 manishin]# wget -e use_proxy=yes -e http_proxy=http://localhost:3128 http://diebold-zsb1.cloud.tanium.com
---2024-10-11 12:05:22--  http://diebold-zsb1.cloud.tanium.com/
-Resolving localhost (localhost)... 127.0.0.1
-Connecting to localhost (localhost)|127.0.0.1|:3128... connected.
-Proxy request sent, awaiting response... 503 Service Unavailable
-2024-10-11 12:06:22 ERROR 503: Service Unavailable.
-
-
-Here is my squid.conf file looks like
+Squid conf should look like this currenly i have modified manually to test the configuration.
 
 [root@tooling_hapee-i0d845f30f11e0fae6 manishin]# cat /etc/squid/squid.conf
 #
@@ -63,23 +61,16 @@ acl allowed_sites dstdomain diebold-zsb2.cloud.tanium.com
 acl allowed_sites dstdomain lfodown01-b.cloudsink.net
 acl allowed_sites dstdomain ts01-b.cloudsink.net
 
-# acl fragment for SSL_ports
-acl SSL_ports port 443
-
-# acl fragment for Safe_ports
-acl Safe_ports port 443
-acl Safe_ports port 80
-
 # acl fragment for localnet
 acl localnet src 10.0.0.0/8
 acl localnet src 172.16.0.0/12
 acl localnet src 192.168.0.0/16
 
-# http_access fragment for SSL_ports
-http_access allow SSL_ports
+# Only Allowed sites are allowed
+http_access allow allowed_sites
 
-# http_access fragment for Safe_ports
-http_access allow Safe_ports
+# Deny access other than allowed sites
+http_access deny !allowed_sites
 
 # Our local host is allowed
 http_access allow localhost
@@ -87,12 +78,25 @@ http_access allow localhost
 # Our local networks are allowed
 http_access allow localnet
 
-# http_access fragment for !SSL_ports
-http_access deny !SSL_ports
-
-# http_access fragment for !Safe_ports
-http_access deny !Safe_ports
+# Deny access to all
+http_access deny all
 
 # fragment for http_port 3128
 http_port 3128
 
+### Now i have to apply the following code in puppet hiredata how should i update it.
+
+# acl fragment for allowed_sites
+acl allowed_sites dstdomain diebold-zsb1.cloud.tanium.com
+acl allowed_sites dstdomain diebold-zsb2.cloud.tanium.com
+acl allowed_sites dstdomain lfodown01-b.cloudsink.net
+acl allowed_sites dstdomain ts01-b.cloudsink.net
+
+# Only Allowed sites are allowed
+http_access allow allowed_sites
+
+# Deny access other than allowed sites
+http_access deny !allowed_sites
+
+# Deny access to all
+http_access deny all
