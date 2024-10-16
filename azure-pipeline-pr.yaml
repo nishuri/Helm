@@ -23,6 +23,66 @@ stages:
       - job: syntaxValidation
         displayName: Syntax validation
         timeoutInMinutes: 10
+        variables:
+          managed_image_name: "UbuntuPrivateAgentImage240"
+          os_disk_size_gb: "240"
+        steps:
+          - checkout: self
+            fetchDepth: 0
+
+          - script: |
+              buildNumber="${BUILD_BUILDNUMBER:2:6}"
+              echo $buildNumber
+              echo "##vso[task.setvariable variable=buildRevision;]$(echo $buildNumber)"
+            displayName: "Setting the revision"
+
+          - task: gitversion/setup@0
+            displayName: Install GitVersion
+            inputs:
+              versionSpec: "5.x"
+
+          - task: gitversion/execute@0
+            displayName: Calculate SemVer
+            inputs:
+              name: Version
+              useConfigFile: true
+              updateAssemblyInfo: false
+              configFilePath: "GitVersion-PR.yml"
+
+          - script: echo '##vso[build.updatebuildnumber]Nexus-Private-Agent-BaseImage-$(GitVersion.SemVer)'
+            displayName: "Set Build Number to Semantic Version"
+
+          - script: |
+              echo "##vso[task.setvariable variable=PACKER_LOG;]1"
+              env
+            displayName: Set PACKER_LOG
+
+          - task: replacetokens@5
+            inputs:
+              targetFiles: "ubuntu${{ parameters.buildTarget }}04.json"
+              encoding: "auto"
+              tokenPattern: "default"
+              writeBOM: true
+              actionOnMissing: "fail"
+              keepToken: false
+              actionOnNoFiles: "fail"
+              enableTransforms: false
+              enableRecursion: false
+              useLegacyPattern: false
+              enableTelemetry: true
+
+          - script: packer validate --syntax-only "$(System.DefaultWorkingDirectory)/ubuntu${{ parameters.buildTarget }}04.json"
+            displayName: Validate packer files
+
+            
+- stage: SyntaxValidationAgentImage120
+    jobs:
+      - job: syntaxValidation120
+        displayName: Syntax validation
+        timeoutInMinutes: 10
+        variables:
+          managed_image_name: "UbuntuPrivateAgentImage120"
+          os_disk_size_gb: "120"
         steps:
           - checkout: self
             fetchDepth: 0
