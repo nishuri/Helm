@@ -1,1 +1,72 @@
+parameters:
+  - name: buildTarget
+    type: string
+    default: "20"
 
+variables:
+  buildRevision: ""
+  resourceGroup: "nex-ops-uks"
+  linuxImageName: "UbuntuPrivateAgentImage"
+  linuxImageOsType: "Linux"
+  linuxImagePublisher: "Canonical"
+  linuxImageOffer: "0001-com-ubuntu-server-$[eq(parameters.buildTarget, '22') ? 'jammy' : 'focal']"
+  linuxImageSku: "${{ parameters.buildTarget }}_04-lts"
+  linuxTempDiskName: "nex-ops-privateagentbuild-os"
+  linuxTempNicName: "nex-ops-privateagentbuild-nic"
+  vnetName: "nex-ops-uks-vnet"
+  subnetName: "snet-pipelineagents-001"
+  imageGalleryName: "nexopssig"
+
+stages:
+  - stage: SyntaxValidationAgentImage
+    jobs:
+      - job: syntaxValidation
+        displayName: Syntax validation
+        timeoutInMinutes: 10
+        steps:
+          - checkout: self
+            fetchDepth: 0
+
+          - script: |
+              buildNumber="${BUILD_BUILDNUMBER:2:6}"
+              echo $buildNumber
+              echo "##vso[task.setvariable variable=buildRevision;]$(echo $buildNumber)"
+            displayName: "Setting the revision"
+
+          - task: gitversion/setup@0
+            displayName: Install GitVersion
+            inputs:
+              versionSpec: "5.x"
+
+          - task: gitversion/execute@0
+            displayName: Calculate SemVer
+            inputs:
+              name: Version
+              useConfigFile: true
+              updateAssemblyInfo: false
+              configFilePath: "GitVersion-PR.yml"
+
+          - script: echo '##vso[build.updatebuildnumber]Nexus-Private-Agent-BaseImage-$(GitVersion.SemVer)'
+            displayName: "Set Build Number to Semantic Version"
+
+          - script: |
+              echo "##vso[task.setvariable variable=PACKER_LOG;]1"
+              env
+            displayName: Set PACKER_LOG
+
+          - task: replacetokens@5
+            inputs:
+              targetFiles: "ubuntu${{ parameters.buildTarget }}04.json"
+              encoding: "auto"
+              tokenPattern: "default"
+              writeBOM: true
+              actionOnMissing: "fail"
+              keepToken: false
+              actionOnNoFiles: "fail"
+              enableTransforms: false
+              enableRecursion: false
+              useLegacyPattern: false
+              enableTelemetry: true
+
+          - script: packer validate --syntax-only "$(System.DefaultWorkingDirectory)/ubuntu${{ parameters.buildTarget }}04.json"
+            displayName: Validate packer files
