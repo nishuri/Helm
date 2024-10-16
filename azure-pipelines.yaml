@@ -37,6 +37,64 @@ stages:
       - job: Build
         displayName: Image Generation
         timeoutInMinutes: 600
+        variables:
+          managed_image_name: "UbuntuPrivateAgentImage240"
+          os_disk_size_gb: "240"
+        steps:
+          - script: |
+              buildNumber="${BUILD_BUILDNUMBER:2:6}"
+              echo $buildNumber
+              echo "##vso[task.setvariable variable=buildRevision;]$(echo $buildNumber)"
+            displayName: "Setting the revision"
+
+          - task: gitversion/setup@0
+            displayName: Install GitVersion
+            inputs:
+              versionSpec: "5.x"
+
+          - task: gitversion/execute@0
+            displayName: Calculate SemVer
+            inputs:
+              name: Version
+              useConfigFile: true
+              updateAssemblyInfo: false
+              configFilePath: "GitVersion.yml"
+
+          - script: echo '##vso[build.updatebuildnumber]Nexus-Private-Agent-BaseImage-$(GitVersion.SemVer)'
+            displayName: "Set Build Number to Semantic Version"
+
+          - task: replacetokens@5
+            inputs:
+              targetFiles: "ubuntu${{ parameters.buildTarget }}04.json"
+              encoding: "auto"
+              tokenPattern: "default"
+              writeBOM: true
+              actionOnMissing: "fail"
+              keepToken: false
+              actionOnNoFiles: "fail"
+              enableTransforms: false
+              enableRecursion: false
+              useLegacyPattern: false
+              enableTelemetry: true
+
+          - script: |
+              echo "##vso[task.setvariable variable=PACKER_LOG;]1"
+            displayName: Set PACKER log level
+
+          - task: PackerBuild@1
+            inputs:
+              ConnectedServiceName: "Hexagon MI Nexus Infrastructure - prd - elevated"
+              templateType: "custom"
+              customTemplateLocation: "$(System.DefaultWorkingDirectory)/ubuntu${{ parameters.buildTarget }}04.json"
+
+  - stage: BuildBaseImage
+    jobs:
+      - job: Build
+        displayName: Image Generation
+        timeoutInMinutes: 600
+        variables:
+          managed_image_name: "UbuntuPrivateAgentImage120"
+          os_disk_size_gb: "120"
         steps:
           - script: |
               buildNumber="${BUILD_BUILDNUMBER:2:6}"
