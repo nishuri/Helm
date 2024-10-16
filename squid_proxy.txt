@@ -102,7 +102,9 @@ http_access deny !allowed_sites
 http_access deny all
 
 
-Error: Evaluation Error: Error while evaluating a Method call, Class[Squid]: parameter 'http_access' expects a value of type Undef or Hash, got Tuple (file: /etc/puppetlabs/code/manifests/site.pp, line: 16, column: 37) on node tooling_hapee-i03b6a87dacda57ec4.nonlive.eu-west-1.aws.aevi.com
+
+Error: Evaluation Error: Error while evaluating a Resource Statement, Squid::Http_access[allow_allowed_sites]: has no parameter named 'acl' (file: /etc/puppetlabs/code/modules/squid/manifests/config.pp, line: 65) on node tooling_hapee-i03b6a87dacda57ec4.nonlive.eu-west-1.aws.aevi.com
+
 
 
 squid::http_access:
