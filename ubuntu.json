@@ -9,12 +9,14 @@
     "image_version": "dev",
     "image_os": "ubuntu18",
     "run_validation_diskspace": "false"
+    "managed_image_name": "{{user `managed_image_name`}}",
+    "os_disk_size_gb": "{{user `os_disk_size_gb`}}"
   },
   "builders": [
     {
       "type": "azure-arm",
       "managed_image_resource_group_name": "#{resourceGroup}#",
-      "managed_image_name": "UbuntuPrivateAgentImagev2",
+      "managed_image_name": "{{user `managed_image_name`}}",
       "os_type": "Linux",
       "image_publisher": "Canonical",
       "image_offer": "0001-com-ubuntu-server-focal",
@@ -27,11 +29,11 @@
       "shared_image_gallery_destination": {
         "resource_group": "#{resourceGroup}#",
         "gallery_name": "#{imageGalleryName}#",
-        "image_name": "UbuntuPrivateAgentImagev2",
+        "image_name": "{{user `managed_image_name`}}",
         "image_version": "#{GitVersion.SemVer}##{buildRevision}#",
         "replication_regions": ["uksouth"]
       },
-      "os_disk_size_gb": "240"
+      "os_disk_size_gb": "{{user `os_disk_size_gb`}}"
     }
   ],
   "provisioners": [
