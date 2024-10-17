@@ -8,7 +8,7 @@ Terraform module which creates AWS CloudFront resources with all (or almost all)
 
 ```hcl
 module "cdn" {
-  source = "terraform-aws-modules/cloudfront/aws"
+  source = "nishuri/cloudfront"
 
   aliases = ["cdn.example.com"]
 
