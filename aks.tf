@@ -20,3 +20,22 @@ resource "azurerm_kubernetes_cluster" "example" {
     }
   }
 }
+
+
+Create Automated Backup and Recovery Processes
+
+Description
+
+As a Disaster Recovery (DR) analyst, I want to develop and document robust backup and restore procedures so that we can ensure the integrity and availability of data during a recovery.
+
+Acceptance Criteria
+
+• Backup procedures for all business-critical applications and data are clearly defined.
+
+• Restore procedures are documented, including estimated recovery times.
+
+• Procedures are tested to ensure they work as intended in a simulated disaster scenario.
+
+• Documentation is stored centrally and accessible to relevant teams.
+
+Test Coverage
