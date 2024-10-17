@@ -1,0 +1,16 @@
+Azure Cosmos DB offers two policies to run backups.
+
+Periodic backup
+Continuous backup
+
+We can check on the backup policies which are enabled on our account, We mostly use periodic backup on our Cosmos DB's.
+
+Periodic backup
+This backup mode is the default configuration of any Azure Cosmos DB account. It runs on periodic intervals based on defined configurable periods. You can keep its retention for a month from a data recovery standpoint. 
+It means you can recover any data from its retention time frame by creating a support ticket on the Azure portal to the support team. There is no impact of running this backup on the performance of the cosmos DB account or the provisioned throughput of the cosmos DB account. The backup copies are stored on an Azure storage account which is different than the storage accounts used for Cosmos DB. Backups are copied to the paired region of the Azure region to ensure resiliency.
+
+By default, Periodic backup automatically runs every 4 hours and keeps 2 backup copies at any point of time without any cost. You can change the backup execution interval as well as its retention period to save the backup files on the storage account anytime using the Azure portal. Remember, saving additional backup copies other than 2 copies will be charged additionally.
+
+These configurations need to perform at the cosmos DB account level and then this configuration will apply to all containers stored in that cosmos DB account. Making these changes will cost you additionally so make sure to consider this aspect as well while planning the backups. You cannot control the number of backup copies saved on the storage system rather It depends on the backup interval and backup retention configuration values. You need to find a balance between backup interval and retention so that you don’t need to pay more costs in saving unwanted multiple backup files.
+
+If you have opted for periodic backup as your backup policy for cosmos DB accounts then one thing you must remember is that you cannot restore its backup files, you need to raise an Azure support ticket to restore or recover any data. You need to be aware that data can be restored only if the requested backup copy is from the backup retention period and not outside that retention window.
