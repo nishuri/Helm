@@ -14,3 +14,6 @@ By default, Periodic backup automatically runs every 4 hours and keeps 2 backup 
 If you have opted for periodic backup as your backup policy for cosmos DB accounts then one thing you must remember is that you cannot restore its backup files, you need to raise an Azure support ticket to restore or recover any data. You need to be aware that data can be restored only if the requested backup copy is from the backup retention period and not outside that retention window.
 
 MoreInformation : https://learn.microsoft.com/en-us/azure/cosmos-db/online-backup-and-restore#:~:text=Periodic%20backup%20mode%20%2D%20This%20mode%20is%20the%20default%20backup%20mode%20for%20all%20existing%20accounts.%20In%20this%20mode%2C%20backup%20is%20taken%20at%20a%20periodic%20interval%20and%20the%20data%20is%20restored%20by%20creating%20a%20request%20with%20the%20support%20team.
+
+Restoration Document for periodic Backup:
+The following screenshot illustrates how to create a support request for a container(collection/graph/table) to restore data by using Azure portal. Provide other details such as type of data, purpose of the restore, time when the data was deleted to help us prioritize the request.
