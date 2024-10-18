@@ -7,7 +7,7 @@
         "AWS": "arn:aws:iam::507241528517:root"
       },
       "Action": "s3:PutObject",
-      "Resource": "s3-bucket-arn"
+      "Resource": "arn:aws:s3:::your-bucket-name/prefix/*"
     }
   ]
 }
