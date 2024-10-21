@@ -17,3 +17,17 @@ MoreInformation : https://learn.microsoft.com/en-us/azure/cosmos-db/online-backu
 
 Restoration Document for periodic Backup:
 The following screenshot illustrates how to create a support request for a container(collection/graph/table) to restore data by using Azure portal. Provide other details such as type of data, purpose of the restore, time when the data was deleted to help us prioritize the request.
+
+
+Azure Resources
+App Service
+Cosmos DB
+Function App
+Key Vault
+Logic App
+Blob
+Fluid Relay Service
+Static Web App
+Azure Front Door
+Azure Kubernetes Service
+Azure Container Registry
