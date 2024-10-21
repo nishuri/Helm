@@ -50,12 +50,16 @@ module "cdn" {
 
   default_cache_behavior = {
     target_origin_id       = "something"
-    viewer_protocol_policy = "allow-all"
+    viewer_protocol_policy = "redirect-to-https"
 
-    allowed_methods = ["GET", "HEAD", "OPTIONS"]
+    allowed_methods = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
     cached_methods  = ["GET", "HEAD"]
     compress        = true
-    query_string    = true
+    default_ttl     = 3600
+    max_ttl         = 86400
+    min_ttl         = 0
+    cache_policy_id = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad"
+    origin_request_policy_id = "216a2d-6df8-44a3-9df3-4b5a84be39ad"
   }
 
   ordered_cache_behavior = [
