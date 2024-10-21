@@ -10,12 +10,12 @@ Terraform module which creates AWS CloudFront resources with all (or almost all)
 module "cdn" {
   source = "nishuri/cloudfront"
 
-  aliases = ["cdn.example.com"]
+  aliases = ["cdn.example.com" , "anothercdn.example.com"]
 
-  comment             = "My awesome CloudFront"
+  comment             = "My cloudfrount project"
   enabled             = true
-  is_ipv6_enabled     = true
-  price_class         = "PriceClass_All"
+  is_ipv6_enabled     = false
+  price_class         = "PriceClass_100"
   retain_on_delete    = false
   wait_for_deployment = false
 
@@ -73,6 +73,7 @@ module "cdn" {
   viewer_certificate = {
     acm_certificate_arn = "arn:aws:acm:us-east-1:135367859851:certificate/1032b155-22da-4ae0-9f69-e206f825458b"
     ssl_support_method  = "sni-only"
+    minimum_protocol_version = "TLSv1.2_2021"
   }
 }
 ```
