@@ -18,6 +18,7 @@ module "cdn" {
   price_class         = "PriceClass_100"
   retain_on_delete    = false
   wait_for_deployment = false
+  web_acl_id          = aws_wafv2_web_acl.example.arn
 
   create_origin_access_identity = true
   origin_access_identities = {
