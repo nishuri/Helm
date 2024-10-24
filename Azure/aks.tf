@@ -44,3 +44,11 @@ Test Coverage
 ==> Some builds didn't complete successfully and had errors:
 2024/10/23 16:14:10 machine readable: azure-arm,error []string{"performing CreateOrUpdate: unexpected status 409 (409 Conflict) with error: PropertyChangeNotAllowed: Changing property 'galleryImageVersion.properties.storageProfile.source.id' is not allowed."}
 ==> Builds finished but no artifacts were created.
+
+had this error 
+An image_version must be specified for shared_image_gallery_destination and must follow the Major(int).Minor(int).Patch(int) format
+
+1 error(s) occurred:
+
+* An image_version must be specified for shared_image_gallery_destination and
+must follow the Major(int).Minor(int).Patch(int) format
