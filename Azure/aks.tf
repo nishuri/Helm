@@ -39,3 +39,8 @@ Acceptance Criteria
 • Documentation is stored centrally and accessible to relevant teams.
 
 Test Coverage
+
+
+==> Some builds didn't complete successfully and had errors:
+2024/10/23 16:14:10 machine readable: azure-arm,error []string{"performing CreateOrUpdate: unexpected status 409 (409 Conflict) with error: PropertyChangeNotAllowed: Changing property 'galleryImageVersion.properties.storageProfile.source.id' is not allowed."}
+==> Builds finished but no artifacts were created.
