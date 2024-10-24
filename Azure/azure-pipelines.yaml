@@ -46,7 +46,9 @@ stages:
               buildNumber="${BUILD_BUILDNUMBER:2:6}"
               echo $buildNumber
               echo "##vso[task.setvariable variable=buildRevision;]$(echo $buildNumber)"
-            displayName: "Setting the revision"
+              timestamp=$(date +%Y%m%d%H%M%S)
+              echo "##vso[task.setvariable variable=timestamp;]$timestamp"
+            displayName: "Setting the revision and timestamp"
  
           - task: gitversion/setup@0
             displayName: Install GitVersion
@@ -102,7 +104,9 @@ stages:
               buildNumber="${BUILD_BUILDNUMBER:2:6}"
               echo $buildNumber
               echo "##vso[task.setvariable variable=buildRevision;]$(echo $buildNumber)"
-            displayName: "Setting the revision"
+              timestamp=$(date +%Y%m%d%H%M%S)
+              echo "##vso[task.setvariable variable=timestamp;]$timestamp"
+            displayName: "Setting the revision and timestamp"
  
           - task: gitversion/setup@0
             displayName: Install GitVersion
