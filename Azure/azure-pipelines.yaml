@@ -1,143 +1,208 @@
-parameters:
-  - name: buildTarget
-    type: string
-    default: "20"
-
-schedules:
-  - cron: "0 0 1-7,15-21 * 1"
-    displayName: Every other Monday
+trigger:
     branches:
       include:
-        - main
-      exclude:
-        - win/*
-    always: true
+      - main
 
 pool:
-  name: "NexusPrivateAgents-packer"
-  vmImage: "ubuntu-latest"
+    name: 'NexusPrivateAgents'
+    vmImage: 'ubuntu-latest'
 
 variables:
-  buildRevision: ""
-  resourceGroup: "nex-ops-uks"
-  linuxImageName: "UbuntuPrivateAgentImage"
-  linuxImageOsType: "Linux"
-  linuxImagePublisher: "Canonical"
-  linuxImageOffer: "0001-com-ubuntu-server-$[eq(parameters.buildTarget, '22') ? 'jammy' : 'focal']"
-  linuxImageSku: "${{ parameters.buildTarget }}_04-lts"
-  linuxTempDiskName: "nex-ops-privateagentbuild-os"
-  linuxTempNicName: "nex-ops-privateagentbuild-nic"
-  vnetName: "nex-ops-uks-vnet"
-  subnetName: "snet-pipelineagents-001"
-  imageGalleryName: "nexopssig"
+  GitVersion.SemVer: 'undefined'
+  System.Debug: true
 
 stages:
-  - stage: BuildBaseImage
+  - stage: security_checker
+    displayName: 'Sonar Scan'
     jobs:
-      - job: Build
-        displayName: Image Generation
-        timeoutInMinutes: 600
-        variables:
-          managed_image_name: "UbuntuPrivateAgentImage240"
-          os_disk_size_gb: "240"
+      - job: Analyze
+        continueOnError: true
         steps:
-          - script: |
-              buildNumber="${BUILD_BUILDNUMBER:2:6}"
-              echo $buildNumber
-              echo "##vso[task.setvariable variable=buildRevision;]$(echo $buildNumber)"
-            displayName: "Setting the revision"
-
-          - task: gitversion/setup@0
-            displayName: Install GitVersion
-            inputs:
-              versionSpec: "5.x"
-
-          - task: gitversion/execute@0
-            displayName: Calculate SemVer
-            inputs:
-              name: Version
-              useConfigFile: true
-              updateAssemblyInfo: false
-              configFilePath: "GitVersion.yml"
-
-          - script: echo '##vso[build.updatebuildnumber]Nexus-Private-Agent-BaseImage-$(GitVersion.SemVer)'
-            displayName: "Set Build Number to Semantic Version"
-
-          - task: replacetokens@5
-            inputs:
-              targetFiles: "ubuntu${{ parameters.buildTarget }}04.json"
-              encoding: "auto"
-              tokenPattern: "default"
-              writeBOM: true
-              actionOnMissing: "fail"
-              keepToken: false
-              actionOnNoFiles: "fail"
-              enableTransforms: false
-              enableRecursion: false
-              useLegacyPattern: false
-              enableTelemetry: true
-
-          - script: |
-              echo "##vso[task.setvariable variable=PACKER_LOG;]1"
-            displayName: Set PACKER log level
-
-          - task: PackerBuild@1
-            inputs:
-              ConnectedServiceName: "Hexagon MI Nexus Infrastructure - prd - elevated"
-              templateType: "custom"
-              customTemplateLocation: "$(System.DefaultWorkingDirectory)/ubuntu${{ parameters.buildTarget }}04.json"
-
-  - stage: BuildBaseImage
+          - template: sonar_qube_analyze.yml
+            parameters:
+              semVer: $(Build.BuildNumber)
+              sonar: true
+              SProjectKey: nexus-tf
+              
+  - stage: PreReqs
     jobs:
-      - job: Build
-        displayName: Image Generation
-        timeoutInMinutes: 600
-        variables:
-          managed_image_name: "UbuntuPrivateAgentImage120"
-          os_disk_size_gb: "120"
-        steps:
-          - script: |
-              buildNumber="${BUILD_BUILDNUMBER:2:6}"
-              echo $buildNumber
-              echo "##vso[task.setvariable variable=buildRevision;]$(echo $buildNumber)"
-            displayName: "Setting the revision"
+    - job: GitVersion
+      steps:
+        - task: UseDotNet@2
+          inputs:
+            packageType: 'sdk'
+            version: '3.x'
 
-          - task: gitversion/setup@0
-            displayName: Install GitVersion
-            inputs:
-              versionSpec: "5.x"
+        - task: gitversion/setup@0
+          displayName: Install GitVersion
+          inputs:
+            versionSpec: '5.x'
 
-          - task: gitversion/execute@0
-            displayName: Calculate SemVer
-            inputs:
-              name: Version
-              useConfigFile: true
-              updateAssemblyInfo: false
-              configFilePath: "GitVersion.yml"
+        - task: gitversion/execute@0
+          displayName: Calculate SemVer
+          inputs:
+            name: Version
+            useConfigFile: true
+            updateAssemblyInfo: false
+            configFilePath: 'GitVersion.yml'
 
-          - script: echo '##vso[build.updatebuildnumber]Nexus-Private-Agent-BaseImage-$(GitVersion.SemVer)'
-            displayName: "Set Build Number to Semantic Version"
+        - script: echo '##vso[build.updatebuildnumber]Nexus-Terraform-$(GitVersion.SemVer)'
+          displayName: 'Set Build Number to Semantic Version'
 
-          - task: replacetokens@5
-            inputs:
-              targetFiles: "ubuntu${{ parameters.buildTarget }}04.json"
-              encoding: "auto"
-              tokenPattern: "default"
-              writeBOM: true
-              actionOnMissing: "fail"
-              keepToken: false
-              actionOnNoFiles: "fail"
-              enableTransforms: false
-              enableRecursion: false
-              useLegacyPattern: false
-              enableTelemetry: true
+##########################################################################################################################
+  - template: tf-plan.yml
+    parameters:
+      environment: ops
+      location: uksouth
+      dependsOn: PreReqs
+      workingDirectory: '/ops'
+  - template: tf-apply.yml
+    parameters:
+      environment: ops
+      location: uksouth
+      dependsOn: Terraform_Plan_Nexus_ops_uksouth
+      workingDirectory: '/ops'
 
-          - script: |
-              echo "##vso[task.setvariable variable=PACKER_LOG;]1"
-            displayName: Set PACKER log level
+  - template: ops-aks-crd-provisioning.yml
+    parameters:
+      environment: prd
+      dependsOn: 'Terraform_Apply_Nexus_ops_uksouth'
+      location: uksouth
+      locationshortcode: uks
+      aksumiclientid: '1a43ddd4-7681-4468-8f78-9c226e5cc139'
+##########################################################################################################################   
+  - template: tf-plan.yml
+    parameters:
+      environment: dev
+      location: uksouth
+      dependsOn: Terraform_Apply_Nexus_ops_uksouth
+      workingDirectory: '/main'
+  - template: tf-apply.yml
+    parameters:
+      environment: dev
+      location: uksouth
+      dependsOn: Terraform_Plan_Nexus_dev_uksouth
+      workingDirectory: '/main'
 
-          - task: PackerBuild@1
-            inputs:
-              ConnectedServiceName: "Hexagon MI Nexus Infrastructure - prd - elevated"
-              templateType: "custom"
-              customTemplateLocation: "$(System.DefaultWorkingDirectory)/ubuntu${{ parameters.buildTarget }}04.json"
+  - template: tf-plan.yml
+    parameters:
+      environment: dev
+      location: global
+      dependsOn: Terraform_Apply_Nexus_dev_uksouth
+      workingDirectory: '/global'
+  - template: tf-apply.yml
+    parameters:
+      environment: dev
+      location: global
+      dependsOn: Terraform_Plan_Nexus_dev_global
+      workingDirectory: '/global'
+
+  - template: aks-crd-provisioning.yml
+    parameters:
+      environment: dev
+      dependsOn: 'Terraform_Apply_Nexus_dev_uksouth'
+      location: uksouth
+      locationshortcode: uks
+      aksumiclientid: 'fe40f3f7-b5d1-461b-bde9-eaa94cd54aed'
+##########################################################################################################################   
+  - template: tf-plan.yml
+    parameters:
+      environment: qa
+      location: uksouth
+      dependsOn: Terraform_Apply_Nexus_ops_uksouth
+      workingDirectory: '/main'
+  - template: tf-apply.yml
+    parameters:
+      environment: qa
+      location: uksouth
+      dependsOn: Terraform_Plan_Nexus_qa_uksouth
+      workingDirectory: '/main'
+
+  - template: tf-plan.yml
+    parameters:
+      environment: qa
+      location: global
+      dependsOn: Terraform_Apply_Nexus_qa_uksouth
+      workingDirectory: '/global'
+  - template: tf-apply.yml
+    parameters:
+      environment: qa
+      location: global
+      dependsOn: Terraform_Plan_Nexus_qa_global
+      workingDirectory: '/global'
+
+  - template: aks-crd-provisioning.yml
+    parameters:
+      environment: qa
+      dependsOn: 'Terraform_Apply_Nexus_qa_uksouth'
+      location: uksouth
+      locationshortcode: uks
+      aksumiclientid: 'ac2791c6-a8ce-41be-aabd-dde1b045193c'
+##########################################################################################################################   
+  - template: tf-plan.yml
+    parameters:
+      environment: sit
+      location: uksouth
+      dependsOn: Terraform_Apply_Nexus_ops_uksouth
+      workingDirectory: '/main'
+  - template: tf-apply.yml
+    parameters:
+      environment: sit
+      location: uksouth
+      dependsOn: Terraform_Plan_Nexus_sit_uksouth
+      workingDirectory: '/main'
+
+  - template: tf-plan.yml
+    parameters:
+      environment: sit
+      location: global
+      dependsOn: Terraform_Apply_Nexus_sit_uksouth
+      workingDirectory: '/global'
+  - template: tf-apply.yml
+    parameters:
+      environment: sit
+      location: global
+      dependsOn: Terraform_Plan_Nexus_sit_global
+      workingDirectory: '/global'
+
+  - template: aks-crd-provisioning.yml
+    parameters:
+      environment: sit
+      dependsOn: 'Terraform_Apply_Nexus_sit_uksouth'
+      location: uksouth
+      locationshortcode: uks
+      aksumiclientid: '9bc704fc-b9ed-4d2a-a42b-0ad732000b14'
+##########################################################################################################################   
+  - template: tf-plan.yml
+    parameters:
+      environment: prd
+      location: uksouth
+      dependsOn: Terraform_Apply_Nexus_ops_uksouth
+      workingDirectory: '/main'
+  - template: tf-apply.yml
+    parameters:
+      environment: prd
+      location: uksouth
+      dependsOn: Terraform_Plan_Nexus_prd_uksouth
+      workingDirectory: '/main'
+
+  - template: tf-plan.yml
+    parameters:
+      environment: prd
+      location: global
+      dependsOn: Terraform_Apply_Nexus_prd_uksouth
+      workingDirectory: '/global'
+  - template: tf-apply.yml
+    parameters:
+      environment: prd
+      location: global
+      dependsOn: Terraform_Plan_Nexus_prd_global
+      workingDirectory: '/global'
+
+  - template: aks-crd-provisioning.yml
+    parameters:
+      environment: prd
+      dependsOn: 'Terraform_Apply_Nexus_prd_uksouth'
+      location: uksouth
+      locationshortcode: uks
+      aksumiclientid: 'c709e449-3640-437d-93c1-5690b4f7f326
