@@ -52,3 +52,6 @@ An image_version must be specified for shared_image_gallery_destination and must
 
 * An image_version must be specified for shared_image_gallery_destination and
 must follow the Major(int).Minor(int).Patch(int) format
+
+
+https://www.communicationsquare.com/news/migrating-azure-resources-from-one-subscription-to-another/
