@@ -85,3 +85,5 @@ We can create replica in different region and each region in a geo-replicated re
 If deletion happens on the ACR itself, then all replicas will be deleted as well and that is unrecoverable.
 
 Like for all resources we can create a delete resource lock to prevent accidental deletion
+
+https://github.com/MicrosoftDocs/azure-docs/blob/main/articles/app-service/manage-disaster-recovery.md
