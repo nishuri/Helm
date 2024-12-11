@@ -1,0 +1,130 @@
+Module - 1
+Introduction to Azure DevOps
+
+This module provides an overview of Azure DevOps, including its core services and how to start with pipelines.
+
+Topics
+
+1. What is Azure DevOps?
+
+An overview of Azure DevOps services and its ecosystem.
+
+2. Azure Boards
+
+Introduction to project management using Azure Boards.
+
+3. Azure Repos
+
+Managing code repositories with Azure Repos.
+
+4. Azure Pipelines
+
+Automating builds, tests, and deployments with Azure Pipelines.
+
+5. Creating Pipelines in Azure DevOps
+
+Step-by-step guide to setting up your first pipeline.
+
+Module - 2
+
+Agile Project Management with Azure Boards
+
+Topics
+
+1. Agile Project Management Best Practices
+
+Implementing agile methodologies using Azure Boards.
+
+2. Basic Concepts of Azure Boards
+
+Understanding work items, sprints, and scrum features.
+
+3. Connecting Boards to GitHub
+
+Integrating Azure Boards with GitHub repositories.
+
+4. Work Items and Sprints
+
+Managing tasks and sprints in Azure Boards for agile development.
+
+5. Azure Boards Integrations
+
+Enhancing Azure Boards with integrations for extended functionalities.
+
+Module - 3
+
+Version Control with Azure Repos
+
+Topics
+
+1. Introduction to Azure Repos
+
+Overview and key concepts of using Azure Repos for source control.
+
+2. Branches and Cloning in Azure Repos
+
+Managing branches and cloning repositories for development workflows.
+
+3. Import Code from GitHub
+
+Steps to import existing codebases from GitHub into Azure Repos.
+
+4. Search Your Code in Repos
+
+Utilising search functionalities within Azure Repos for code management.
+
+5. Azure Repos Integrations
+
+Extending Azure Repos capabilities with external integrations
+
+Module - 4
+
+Continuous Integration/Deployment with Azure Pipelines
+
+Topics
+
+1. Deploying with Azure Pipelines
+
+Strategies for deploying applications using Azure Pipelines.
+
+2. CI Triggers and YAML Basics
+
+Configuring continuous integration triggers and understanding YAML for pipeline configuration.
+
+3. Setting Up CI Build
+
+Creating a continuous integration build process with Azure Pipelines.
+
+4. Adding Tests to the Pipeline
+
+Incorporating testing into the CI/CD pipeline for quality assurance.
+
+5. Agents and Tasks
+
+Understanding agents and tasks within Azure Pipelines for build and deployment processes
+
+Module - 5
+
+Azure Test Plans & Artifacts
+
+Topics
+
+1. Working with Packages in Azure Artifacts
+
+Managing dependencies and packages with Azure Artifacts.
+
+2. Connection Feeds and Views in Artifacts
+
+Configuring feeds for package sharing and views for package management.
+
+3. Connecting Azure Artifacts to Azure Pipelines
+
+Automating package deployment with Azure Pipelines integration.
+
+4. What are Azure Test Plans?
+
+Introduction to planning, executing, and tracking tests with Azure Test Plans.
+
+5. Testing Web Apps
+
+Strategies and best practices for testing web applications using Azure Test Plans
