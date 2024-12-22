@@ -60,7 +60,7 @@ variables:
   description: "Select deploy environment example (dev,q12,prd) with prod-toggle"
   APP_OU: "poh"
 
-KBS_PRD_REGION:
+K8S_PRD_REGION:
   value: "NA"
   options:
     - "e1"
@@ -93,8 +93,8 @@ gitlab-diagnostics:
     tmoLog "Logging out the Pipeline Varibales"
     tmoLog "$TRIGGER_DEPLOY_VERSION" "debug"
     tmoLog "$ENVIRONMENT_NAME" "debug"
-    tmoLog "$KBS_CLUSTER" "debug"
-    tmoLog "$KBS_NS" "debug"
+    tmoLog "$K8S_CLUSTER" "debug"
+    tmoLog "$K8S_NS" "debug"
     tmoLog "$PROFILE_NAME" "debug"
     tmoLog "LATEST_COMMIT_SHA value is ${LATEST_COMMIT_SHA}"
 
@@ -114,29 +114,28 @@ get-config-commit-sha:
   stage: pre-build
   extends: get-latest-commit-sha
   variables:
-    KBS_CLUSTER: "$(KBS_CLUSTER)"
-    KBS_SERVER_URL: "${KBS_SERVER_URL}"
+    K8S_CLUSTER: "$(K8S_CLUSTER)"
+    K8S_SERVER_URL: "${K8S_SERVER_URL}"
     CONFIG_PROJECT_ID: 52556372
-    KBS_NS: "$(KBS_NS)"
-    KBS_API_LOGIN_URL: "https://api.conducktor.t-mobile.com/api/v3.1/login?provider=aad"
-    CONFIG_CONTEXT: "poh-$(ENVIRONMENT_NAME)-$(KBS_CLUSTER)"
+    K8S_NS: "$(K8S_NS)"
+    K8S_API_LOGIN_URL: "https://api.conducktor.t-mobile.com/api/v3.1/login?provider=aad"
+    CONFIG_CONTEXT: "poh-$(ENVIRONMENT_NAME)-$(K8S_CLUSTER)"
     CONFIG_REPO_URL: tmobile/digital/poh/poh-config-maps.git
-BRANCH: tmo/main
-GREEN_APP_UI_NAME: "${HELM_APP_NAME}-green"
-BLUE_APP_UI_NAME: "${HELM_APP_NAME}-blue"
+    BRANCH: tmo/main
+    GREEN_APP_UI_NAME: "${HELM_APP_NAME}-green"
+    BLUE_APP_UI_NAME: "${HELM_APP_NAME}-blue"
 
 artifacts:
   dotenv: $GLOBAL_DOTENV
   reports:
     expire_in: 2 weeks
     name: $(ENVIRONMENT_NAME)
-
 reference [.get-offlinehost, script]
 script:
-  tmoLog "KBS_SERVER_URL: $KBS_SERVER_URL" "info"
-  tmoLog "KBS_CLUSTER: $KBS_CLUSTER" "info"
-  tmoLog "KBS_CONFIG_CONTEXT: $KBS_CONFIG_CONTEXT" "info"
-  tmoLog "KBS_NS: $KBS_NS" "info"
+  tmoLog "K8S_SERVER_URL: $K8S_SERVER_URL" "info"
+  tmoLog "K8S_CLUSTER: $K8S_CLUSTER" "info"
+  tmoLog "K8S_CONFIG_CONTEXT: $K8S_CONFIG_CONTEXT" "info"
+  tmoLog "K8S_NS: $K8S_NS" "info"
 
 reference [.get-latest-commit-sha, script]
 rules:
@@ -197,18 +196,18 @@ stack-info-prod:
     - installPackage Liq
   extends: .stack_info
   variables:
-    PRD_KBS_NS: "poh-prd-dd-prd"
+    PRD_K8S_NS: "poh-prd-dd-prd"
     PRD_ENV_BLUE: "${HELM_APP_NAME}-blue"
     PRD_ENV_GREEN: "${HELM_APP_NAME}-green"
     DUMMY_SERVICE: "dummy-service"
-    PRD_E1_KBS_CLUSTER: "dd-prd-e1"
-    PRD_E1_KBS_SERVER_URL: "https://east.prd.dd.master.kube.t-mobile.com:6443"
-    PRD_E1_KBS_NS: "poh-prd-dd-prd-e1"
-    PRD_E1_KBS_CONFIG_CONTEXT: "dd-prd-e1"
-    PRD_KBS_SERVER_URL: "https://prd.dd.master.kube.t-mobile.com:6443"
-    PRD_KBS_CONFIG_CONTEXT: "dd-prd"
-    PRD_KBS_CLUSTER: "dd-prd"
-    KBS_API_LOGIN_URL: "https://api.conducktor.t-mobile.com/api/v3.1/login?provider=aad"
+    PRD_E1_K8S_CLUSTER: "dd-prd-e1"
+    PRD_E1_K8S_SERVER_URL: "https://east.prd.dd.master.kube.t-mobile.com:6443"
+    PRD_E1_K8S_NS: "poh-prd-dd-prd-e1"
+    PRD_E1_K8S_CONFIG_CONTEXT: "dd-prd-e1"
+    PRD_K8S_SERVER_URL: "https://prd.dd.master.kube.t-mobile.com:6443"
+    PRD_K8S_CONFIG_CONTEXT: "dd-prd"
+    PRD_K8S_CLUSTER: "dd-prd"
+    K8S_API_LOGIN_URL: "https://api.conducktor.t-mobile.com/api/v3.1/login?provider=aad"
 
 environment:
   name: $(ENVIRONMENT_NAME)
@@ -228,18 +227,18 @@ swap-offline-online-prod:
     - installPackage jq
   extends: .swap_onlineoffline
   variables:
-    PRD_KBS_NS: "poh-prd-dd-prd"
-    PRD_E1_KBS_NS: "poh-prd-dd-prd-e1"
-    KBS_ENV_BLUE: "${HELM_APP_NAME}-blue"
+    PRD_K8S_NS: "poh-prd-dd-prd"
+    PRD_E1_K8S_NS: "poh-prd-dd-prd-e1"
+    K8S_ENV_BLUE: "${HELM_APP_NAME}-blue"
     BLUE_APP_UI_NAME: "${HELM_APP_NAME}-blue"
     GREEN_APP_UI_NAME: "${HELM_APP_NAME}-green"
-    KBS_ENV_GREEN: "${HELM_APP_NAME}-green"
+    K8S_ENV_GREEN: "${HELM_APP_NAME}-green"
     DUMMY_SERVICE: "dummy-service"
-    PRD_E1_KBS_SERVER_URL: "https://east.prd.dd.master.kube.t-mobile.com:6443"
-    PRD_E1_KBS_CLUSTER: "dd-prd-e1"
-    PRD_E1_KBS_NS: "poh-prd-dd-prd-e1"
-    PRD_E1_KBS_CONFIG_CONTEXT: "dd-prd-e1"
-    KBS_API_LOGIN_URL: "https://api.conducktor.t-mobile.com/api/v3.1/login?provider=aad"
+    PRD_E1_K8S_SERVER_URL: "https://east.prd.dd.master.kube.t-mobile.com:6443"
+    PRD_E1_K8S_CLUSTER: "dd-prd-e1"
+    PRD_E1_K8S_NS: "poh-prd-dd-prd-e1"
+    PRD_E1_K8S_CONFIG_CONTEXT: "dd-prd-e1"
+    K8S_API_LOGIN_URL: "https://api.conducktor.t-mobile.com/api/v3.1/login?provider=aad"
 
 environment:
   name: $(ENVIRONMENT_NAME)
@@ -257,9 +256,9 @@ deploy-service:
   variables:
     DOCKER_TAG: "$CI_REGISTRY_IMAGE:${TRIGGER_DEPLOY_VERSION}"
     HELM_DEBUG: "true"
-    KBS_CREATE_NAME_PULL_SECRET: "true"
+    K8S_CREATE_NAME_PULL_SECRET: "true"
     APP_UI_NAME: eos
-    KBS_IMAGE_PULL_SECRET_NAME: gitlab-registry
+    K8S_IMAGE_PULL_SECRET_NAME: gitlab-registry
     HELM_CHARTS_DIR: "./k8s/"
     HELM_VALUES: "./k8s/values.yaml"
     INGRESS_CLASS: "internal"
@@ -289,7 +288,7 @@ register:
     OPTOS_REGISTER_LABELS: "$OPTOS_DEPLOY_TYPE"
   when: on_success
 
-if: ($CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH) && ($ENVIRONMENT_NAME == "prd" && $KBS_PRD_REGION == "e1")
+if: ($CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH) && ($ENVIRONMENT_NAME == "prd" && $K8S_PRD_REGION == "e1")
 variables:
   OPTOS_DEPLOY_TYPE: "$OPTOS_DEPLOY_TYPE"
   OPTOS_ENDPOINT: "https://$(FQ_APP_NAME).offline.dd-prd-e1.kube.t-mobile.com"
@@ -298,7 +297,7 @@ variables:
   OPTOS_REGISTER_LABELS: "$OPTOS_DEPLOY_TYPE"
 when: on_success
 
-if: ($CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH) && ($ENVIRONMENT_NAME == "prd" && $KBS_PRD_REGION == "w2")
+if: ($CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH) && ($ENVIRONMENT_NAME == "prd" && $K8S_PRD_REGION == "w2")
 variables:
   OPTOS_DEPLOY_TYPE: "$OPTOS_DEPLOY_TYPE"
   OPTOS_ENDPOINT: "https://$(FQ_APP_NAME).offline.dd-prd.kube.t-mobile.com"
@@ -391,10 +390,3 @@ set-variables-non-trunk:
       - echo "TRIGGER_DEPLOY_VERSION is not set"
       - exit 1
     fi
-
-
-
-
-
-
-
