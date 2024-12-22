@@ -1,0 +1,400 @@
+include:
+  project: 'tmobile/templates'
+
+# Common
+file: '/gitlab-ci/.tmo.global.common.gitlab-ci.yml'
+file: '/gitlab-ci/.tmo.function.mavenBuild.gitlab-ci.yml'
+file: '/gitlab-ci/.tmo.function.docker.gitlab-ci.yml'
+file: '/gitlab-ci/.tmo.function.helm-deploy.gitlab-ci.yml'
+file: '/gitlab-ci/.tmo.job.tag-git.gitlab-ci.yml'
+file: '/gitlab-ci/.tmo.function.sonar.gitlab-ci.yml'
+file: '/gitlab-ci/.tmo.function.pristine.cd.gitlab-ci.yml'
+
+# Sets variables based on the RUN PIPELINE inputs
+project: tmobile/digital/pnp/templates
+
+file: 'gitlab-ci/jobs/.tmo.job.diagnostics.yml'
+file: 'gitlab-ci/functions/.tmo.function.get-latest-commit-sha.yml'
+file: 'gitlab-ci/pipelines/poh/poh-prod/.helm_deploy_rules.yml'
+file: 'gitlab-ci/pipelines/poh/poh-prod/.swap_onlineoffline.yml'
+file: 'gitlab-ci/pipelines/poh/poh-prod/.stack_info.yml'
+file: 'gitlab-ci/pipelines/poh/.tmo.function.setVariables.yml'
+file: 'gitlab-ci/functions/.tmo.function.OfflineHost.yml'
+
+workflow:
+  rules:
+    if: $CI_COMMIT_REF_NAME = $CI_DEFAULT_BRANCH
+    if: '$CI_PIPELINE_SOURCE = "merge_request_event"'
+    if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
+   when:never
+   if: $CI_COMMIT_BRANCH
+
+stages:
+  - pre-build
+  - build
+  - package
+  - test
+  - register
+  - deploy
+  - post-deploy
+
+variables:
+  ENVIRONMENT_NAME:
+    value: "dev"
+    options:
+      - "dev"
+      - "pl1"
+      - "pl2"
+      - "ql1"
+      - "q12"
+      - "q13"
+      - "q14"
+      - "q15"
+      - "q16"
+      - "q17"
+      - "stg"
+      - "prd"
+      - "stack-info"
+      - "prod-toggle"
+
+  description: "Select deploy environment example (dev,q12,prd) with prod-toggle"
+  APP_OU: "poh"
+
+KBS_PRD_REGION:
+  value: "NA"
+  options:
+    - "e1"
+    - "w2"
+    - "NA"
+
+TRIGGER_DEPLOY_VERSION:
+  description: "Select the k8s prd region to be deploy"
+  value: ""
+  description: "Pass the complete 'TRIGGER_DEPLOY_VERSION' of the application Image e.g. 1.0.1234567.abcdefg."
+
+CONFIG_COMMIT_SHA:
+  value: ""
+  description: "pass the POH-CONFIG-MAPS repo COMMIT SHORT SHA to be deployed or leave blank for latest COMMIT SHA or add USE-EXISTING-CONFIG"
+
+DEPLOY_ONLY:
+  value: "no"
+  options:
+    - "no"
+    - "yes"
+  description: "Set to 'yes', if you are triggering the pipeline from RUN PIPELINE."
+
+MAVEN_VERSION: 3.8.3-openjdk-17
+HELM_VERSION: v3.14.1
+
+gitlab-diagnostics:
+  stage: test
+  extends: diagnostics
+  script:
+    tmoLog "Logging out the Pipeline Varibales"
+    tmoLog "$TRIGGER_DEPLOY_VERSION" "debug"
+    tmoLog "$ENVIRONMENT_NAME" "debug"
+    tmoLog "$KBS_CLUSTER" "debug"
+    tmoLog "$KBS_NS" "debug"
+    tmoLog "$PROFILE_NAME" "debug"
+    tmoLog "LATEST_COMMIT_SHA value is ${LATEST_COMMIT_SHA}"
+
+set-variables:
+  stage: tmo
+  extends: diagnostics
+  script:
+  artifacts:
+    reports:
+      dotenv: $GLOBAL_DOTENV
+      rules:
+        if: $CI_COMMIT_REF_NAME == "feature/plb-standalone-testing"
+        when: never
+        when: on_success
+
+get-config-commit-sha:
+  stage: pre-build
+  extends: get-latest-commit-sha
+  variables:
+    KBS_CLUSTER: "$(KBS_CLUSTER)"
+    KBS_SERVER_URL: "${KBS_SERVER_URL}"
+    CONFIG_PROJECT_ID: 52556372
+    KBS_NS: "$(KBS_NS)"
+    KBS_API_LOGIN_URL: "https://api.conducktor.t-mobile.com/api/v3.1/login?provider=aad"
+    CONFIG_CONTEXT: "poh-$(ENVIRONMENT_NAME)-$(KBS_CLUSTER)"
+    CONFIG_REPO_URL: tmobile/digital/poh/poh-config-maps.git
+BRANCH: tmo/main
+GREEN_APP_UI_NAME: "${HELM_APP_NAME}-green"
+BLUE_APP_UI_NAME: "${HELM_APP_NAME}-blue"
+
+artifacts:
+  dotenv: $GLOBAL_DOTENV
+  reports:
+    expire_in: 2 weeks
+    name: $(ENVIRONMENT_NAME)
+
+reference [.get-offlinehost, script]
+script:
+  tmoLog "KBS_SERVER_URL: $KBS_SERVER_URL" "info"
+  tmoLog "KBS_CLUSTER: $KBS_CLUSTER" "info"
+  tmoLog "KBS_CONFIG_CONTEXT: $KBS_CONFIG_CONTEXT" "info"
+  tmoLog "KBS_NS: $KBS_NS" "info"
+
+reference [.get-latest-commit-sha, script]
+rules:
+  - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH && $ENVIRONMENT_NAME != "prod-toggle" && $ENVIRONMENT_NAME != "stack-info"
+    when: on_success
+  - when: never
+
+build:
+  stage: build
+  extends: .maven-build
+  variables:
+    MAVEN_BUILD_ARGS: "-f pom.xml clean install -Drevision ${TRIGGER_DEPLOY_VERSION}"
+  JACOCO_COVERAGE_REPORT: "yes"
+  BUILD_ARTIFACTS: "$CI_PROJECT_DIR/target"
+
+cache:
+  key: pom.xml
+  paths:
+    - $CI_PROJECT_DIR/.m2
+  policy: pull-push
+
+script:
+  reference [.maven-build, script]
+
+name: '$CI_COMMIT_REF_SLUG-$CI_PIPELINE_IID'
+artifacts:
+  paths:
+    - '**/target/*'
+  reports:
+    dotenv: $GLOBAL_DOTENV
+    expire_in: 30 days
+expire_in: 30 days
+dotenv: $GLOBAL_DOTENV
+rules:
+  - if: $CI_PIPELINE_SOURCE == "schedule" || $DEPLOY_ONLY == "yes"
+    when: on_success
+  - when: never
+
+publish-docker:
+  stage: package
+  extends: .docker-package
+  variables:
+  DOCKER_TAG: "$CI_REGISTRY_IMAGE:${TRIGGER_DEPLOY_VERSION}"
+  DOCKER_BUILD_ARGS: "-f Dockerfile"
+
+rules:
+  - if: $CI_PIPELINE_SOURCE == "schedule" || $DEPLOY_ONLY == "yes"
+    when: never
+  - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH || $CI_COMMIT_REF_NAME == "feature/plb-standalone-testing" && $DEPLOY_ONLY == "no"
+    when: never
+  - when: on_success
+
+stack-info-prod:
+  stage: deploy
+  image: alpine
+  script:
+    - apk add bash
+    - installPackage Liq
+  extends: .stack_info
+  variables:
+    PRD_KBS_NS: "poh-prd-dd-prd"
+    PRD_ENV_BLUE: "${HELM_APP_NAME}-blue"
+    PRD_ENV_GREEN: "${HELM_APP_NAME}-green"
+    DUMMY_SERVICE: "dummy-service"
+    PRD_E1_KBS_CLUSTER: "dd-prd-e1"
+    PRD_E1_KBS_SERVER_URL: "https://east.prd.dd.master.kube.t-mobile.com:6443"
+    PRD_E1_KBS_NS: "poh-prd-dd-prd-e1"
+    PRD_E1_KBS_CONFIG_CONTEXT: "dd-prd-e1"
+    PRD_KBS_SERVER_URL: "https://prd.dd.master.kube.t-mobile.com:6443"
+    PRD_KBS_CONFIG_CONTEXT: "dd-prd"
+    PRD_KBS_CLUSTER: "dd-prd"
+    KBS_API_LOGIN_URL: "https://api.conducktor.t-mobile.com/api/v3.1/login?provider=aad"
+
+environment:
+  name: $(ENVIRONMENT_NAME)
+
+rules:
+  - if: $CI_PIPELINE_SOURCE == "schedule" || $DEPLOY_ONLY == "yes"
+    when: never
+  - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH && $DEPLOY_ONLY == "yes" && $ENVIRONMENT_NAME != "stack-info"
+    when: on_success
+  - when: never
+
+swap-offline-online-prod:
+  stage: deploy
+  image: alpine
+  script:
+    - apk add bash
+    - installPackage jq
+  extends: .swap_onlineoffline
+  variables:
+    PRD_KBS_NS: "poh-prd-dd-prd"
+    PRD_E1_KBS_NS: "poh-prd-dd-prd-e1"
+    KBS_ENV_BLUE: "${HELM_APP_NAME}-blue"
+    BLUE_APP_UI_NAME: "${HELM_APP_NAME}-blue"
+    GREEN_APP_UI_NAME: "${HELM_APP_NAME}-green"
+    KBS_ENV_GREEN: "${HELM_APP_NAME}-green"
+    DUMMY_SERVICE: "dummy-service"
+    PRD_E1_KBS_SERVER_URL: "https://east.prd.dd.master.kube.t-mobile.com:6443"
+    PRD_E1_KBS_CLUSTER: "dd-prd-e1"
+    PRD_E1_KBS_NS: "poh-prd-dd-prd-e1"
+    PRD_E1_KBS_CONFIG_CONTEXT: "dd-prd-e1"
+    KBS_API_LOGIN_URL: "https://api.conducktor.t-mobile.com/api/v3.1/login?provider=aad"
+
+environment:
+  name: $(ENVIRONMENT_NAME)
+
+rules:
+  - if: $CI_PIPELINE_SOURCE == "schedule" || $DEPLOY_ONLY == "yes"
+    when: never
+  - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH && $DEPLOY_ONLY == "yes" && $ENVIRONMENT_NAME != "stack-info"
+    when: on_success
+  - when: never
+
+deploy-service:
+  extends: .helm_deploy
+  stage: deploy
+  variables:
+    DOCKER_TAG: "$CI_REGISTRY_IMAGE:${TRIGGER_DEPLOY_VERSION}"
+    HELM_DEBUG: "true"
+    KBS_CREATE_NAME_PULL_SECRET: "true"
+    APP_UI_NAME: eos
+    KBS_IMAGE_PULL_SECRET_NAME: gitlab-registry
+    HELM_CHARTS_DIR: "./k8s/"
+    HELM_VALUES: "./k8s/values.yaml"
+    INGRESS_CLASS: "internal"
+    GREEN_APP_UI_NAME: "$.{HELM_APP_NAME}-green"
+   BLUE_APP_UI_NAME: "${HELM_APP_NAME}-blue"
+
+script:
+  reference [.get-latest-rules, rules]
+  reference [.get-offlinehost, script]
+environment:
+  name: "${ENVIRONMENT_NAME}"
+
+register:
+  extends: .register
+  stage: register
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" || $CI_PIPELINE_SOURCE == "schedule"
+      when: never
+    - if: ($CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH) && ($ENVIRONMENT_NAME == "dev" || $ENVIRONMENT_NAME == "q11" || $ENVIRONMENT_NAME == "q12")
+      when: on_success
+    - when: never
+  variables:
+    OPTOS_DEPLOY_TYPE: "$OPTOS_DEPLOY_TYPE"
+    PRISTINE_DEPENDENCY_FILE: "$(CI_PROJECT_DIR)/${HELM_APP_NAME}-dependency.yml"
+    OPTOS_VERSION: "$TRIGGER_DEPLOY_VERSION"
+    OPTOS_ENDPOINT: "https://${FQ_APP_NAME}.dd-stg.kube.t-mobile.com"
+    OPTOS_REGISTER_LABELS: "$OPTOS_DEPLOY_TYPE"
+  when: on_success
+
+if: ($CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH) && ($ENVIRONMENT_NAME == "prd" && $KBS_PRD_REGION == "e1")
+variables:
+  OPTOS_DEPLOY_TYPE: "$OPTOS_DEPLOY_TYPE"
+  OPTOS_ENDPOINT: "https://$(FQ_APP_NAME).offline.dd-prd-e1.kube.t-mobile.com"
+  PRISTINE_DEPENDENCY_FILE: "$(CI_PROJECT_DIR)/${HELM_APP_NAME}-dependency.yml"
+  OPTOS_VERSION: "$TRIGGER_DEPLOY_VERSION" #The version of your application
+  OPTOS_REGISTER_LABELS: "$OPTOS_DEPLOY_TYPE"
+when: on_success
+
+if: ($CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH) && ($ENVIRONMENT_NAME == "prd" && $KBS_PRD_REGION == "w2")
+variables:
+  OPTOS_DEPLOY_TYPE: "$OPTOS_DEPLOY_TYPE"
+  OPTOS_ENDPOINT: "https://$(FQ_APP_NAME).offline.dd-prd.kube.t-mobile.com"
+  PRISTINE_DEPENDENCY_FILE: "$(CI_PROJECT_DIR)/${HELM_APP_NAME}-dependency.yml"
+  OPTOS_VERSION: "$TRIGGER_DEPLOY_VERSION" #The version of your application
+  OPTOS_REGISTER_LABELS: "$OPTOS_DEPLOY_TYPE"
+when: on_success
+
+environment:
+  name: "${ENVIRONMENT_NAME}"
+
+create-tag:
+  stage: post-deploy
+  extends: tag-git-commit
+  variables:
+    GIT_TAG: '${CI_PIPELINE_ID}-rc'
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule" || $DEPLOY_ONLY == "yes"
+      when: never
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH && $DEPLOY_ONLY == "no"
+      when: on_success
+    - when: never
+if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH && $DEPLOY_ONLY == "yes"
+when: never
+when: never
+
+sonar-scan:
+  stage: test
+  extends: .direct-sonar
+  cache:
+    key: "$CI_COMMIT_REF_SLUG"
+    paths:
+      - .sonar
+  script:
+    export SONAR_USER_HOME=$CI_PROJECT_DIR
+    reference [.direct-sonar, script]
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule" || $DEPLOY_ONLY == "yes"
+      when: never
+    - when: on_success
+
+container_secret_scanner:
+  extends: .container-secret-scan-gitguardian
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule" || $DEPLOY_ONLY == "yes"
+      when: never
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH && $DEPLOY_ONLY == "no"
+      when: on_success
+    - when: never
+
+schedule_container_secret_scanner:
+  extends: .container-secret-scan-gitguardian
+  rules:
+if: $CI_PIPELINE_SOURCE == "schedule" || $DEPLOY_ONLY == "yes"
+when: never
+when: on_success
+
+container_secret_scanner:
+  extends: .container-secret-scan-gitguardian
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule" || $DEPLOY_ONLY == "yes"
+      when: never
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH && $DEPLOY_ONLY == "no"
+      when: on_success
+    - when: never
+
+schedule_container_secret_scanner:
+  extends: .container-secret-scan-gitguardian
+  rules:
+    - when: never
+
+container_scanning:
+  stage: test
+  allow_failure: true
+  variables:
+    CS_IMAGE: "$CI_REGISTRY_IMAGE:1.0.${CI_PIPELINE_ID}.${CI_COMMIT_SHORT_SHA}"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule" || $DEPLOY_ONLY == "yes"
+      when: never
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH || $CI_COMMIT_REF_NAME == "feature/plb-standalone-testing" && $DEPLOY_ONLY == "no"
+      when: on_success
+    - when: never
+
+## Non-trunk jobs ##
+
+set-variables-non-trunk:
+  stage: tmo
+  script:
+    - if [ -z "$TRIGGER_DEPLOY_VERSION" ]; then
+      - echo "TRIGGER_DEPLOY_VERSION is not set"
+      - exit 1
+    fi
+
+
+
+
+
+
+
