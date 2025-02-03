@@ -1,0 +1,48 @@
+---
+- name: Generate SSH key with passphrase and set permissions
+  hosts: localhost
+  connection: local
+  vars:
+    ssh_private_key_filepath: "{{ ssh_private_key_filepath }}"
+    ssh_public_key_filepath: "{{ ssh_public_key_filepath }}"
+    ssh_passphrase: "{{ ssh_passphrase }}"
+  tasks:
+    - name: Generate private key
+      community.crypto.openssl_privatekey:
+        path: "{{ ssh_private_key_filepath }}"
+        type: RSA
+        size: 4096
+        passphrase: "{{ ssh_passphrase }}"
+        cipher: auto
+        state: present
+        force: false
+      register: private_key
+
+    - name: Add PEM headers to the private key
+      copy:
+        dest: "{{ ssh_private_key_filepath }}"
+        content: |
+          -----BEGIN RSA PRIVATE KEY-----
+          {{ lookup('file', ssh_private_key_filepath) | b64encode }}
+          -----END RSA PRIVATE KEY-----
+      when: private_key.changed
+
+    - name: Generate public key
+      community.crypto.openssl_publickey:
+        path: "{{ ssh_public_key_filepath }}"
+        privatekey_path: "{{ ssh_private_key_filepath }}"
+        privatekey_passphrase: "{{ ssh_passphrase }}"
+        state: present
+        force: false
+        format: "OpenSSH"
+      when: private_key.changed
+
+    - name: Set permissions for private key
+      file:
+        path: "{{ ssh_private_key_filepath }}"
+        mode: '400'
+
+    - name: Set permissions for public key
+      file:
+        path: "{{ ssh_public_key_filepath }}"
+        mode: '600'
