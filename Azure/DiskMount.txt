@@ -17,3 +17,12 @@ Sample Output
 
 open the /etc/fstab 
 UUID=33333333-3b3b-3c3c-3d3d-3e3e3e3e3e3e   /app   xfs   defaults,nofail   1   2
+
+===========================================================================================================================
+Mount Files Shares on Linux
+===========================================================================================================================
+sudo apt-get install cifs-utils
+
+example
+sudo mount -t cifs //storagecli777.file.core.windows.net/linuxshare02 /mnt/linuxshare02 -o vers=3.0,username=storageaccountname,password=WnyV7MN7ECkijf79O7SqjIRoeTHIu8vXMvzvnrtj4JewFhGae==,dir_mode=0777,file_mode=0777,serverino
+
