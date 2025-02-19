@@ -1,0 +1,5 @@
+kubectl apply -f otel-config.yaml
+
+kubectl apply -f otel-deployment.yaml
+
+kubectl apply -f otel-service.yaml
