@@ -15,6 +15,10 @@ spec:
       containers:
       - name: otel-collector
         image: otel/opentelemetry-collector-contrib:latest
+        ports:  # <--- Add this section
+        - containerPort: 4317  # OTLP gRPC port
+          name: otlp-grpc
+        - containerPort: 4318  # OTLP HTTP port
         volumeMounts:
         - name: otel-config
           mountPath: /etc/otel
