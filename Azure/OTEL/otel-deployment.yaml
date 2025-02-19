@@ -15,14 +15,41 @@ spec:
       containers:
       - name: otel-collector
         image: otel/opentelemetry-collector-contrib:latest
-        ports: 
-        - containerPort: 4317  # OTLP gRPC port
-          name: otlp-grpc
-        - containerPort: 4318  # OTLP HTTP port
+        args:
+          - "--config=/etc/otel/config.yaml"
+        ports:
+          - name: otlp-grpc
+            containerPort: 4317
+            protocol: TCP
+          - name: otlp-http
+            containerPort: 4318
+            protocol: TCP
         volumeMounts:
-        - name: otel-config
-          mountPath: /etc/otel
-          readOnly: true
+          - name: otel-config
+            mountPath: /etc/otel
+            readOnly: true
+        resources:
+          limits:
+            cpu: "1"
+            memory: "512Mi"
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 13133
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 13133
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
       volumes:
         - name: otel-config
           configMap:
