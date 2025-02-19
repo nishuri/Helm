@@ -1,0 +1,19 @@
+# otel-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: otel-collector-service
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true"  # For internal IP
+spec:
+  type: LoadBalancer
+  loadBalancerIP: "10.0.0.100"  # Replace with your static IP
+  ports:
+  - port: 4317
+    name: otlp-grpc
+    targetPort: 4317
+  - port: 4318
+    name: otlp-http
+    targetPort: 4318
+  selector:
+    app: otel-collector
