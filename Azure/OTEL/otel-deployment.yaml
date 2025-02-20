@@ -2,15 +2,19 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: otel-collector
+  labels:
+    app: opentelemetry
+    component: otel-collector
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: otel-collector
+      app: opentelemetry
   template:
     metadata:
       labels:
-        app: otel-collector
+        app: opentelemetry
+        component: otel-collector
     spec:
       containers:
       - name: otel-collector
@@ -53,7 +57,7 @@ spec:
       volumes:
         - name: otel-config
           configMap:
-            name: otel-collector-config
+            name: otel-collector-conf
             items:
               - key: config.yaml
                 path: config.yaml
