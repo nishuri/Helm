@@ -1,7 +1,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: otel-collector-config
+  name: otel-collector-conf
+  labels:
+    app: opentelemetry
+    component: otel-collector-conf
 data:
   config.yaml: |
     receivers:
