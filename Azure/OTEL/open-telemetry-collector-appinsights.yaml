@@ -73,9 +73,6 @@ spec:
           - name: otlp-http
             containerPort: 4318
             protocol: TCP
-          - name: health
-            containerPort: 13133
-            protocol: TCP
         volumeMounts:
           - name: otel-config
             mountPath: /etc/otel
