@@ -3,3 +3,5 @@ kubectl apply -f otel-config.yaml
 kubectl apply -f otel-deployment.yaml
 
 kubectl apply -f otel-service.yaml
+
+kubectl get events -n default --field-selector involvedObject.name=checkoutservice-7db49c4d49-7cv5d
