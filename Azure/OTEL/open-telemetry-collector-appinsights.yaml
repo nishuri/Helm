@@ -1,0 +1,108 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: otel-collector-conf
+  labels:
+    app: opentelemetry
+    component: otel-collector-conf
+data:
+  config.yaml: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+          http:
+    processors:
+      batch:
+    exporters:
+      azuremonitor:
+        instrumentation_key: "APPINSIGHTS_INSTRUMENTATION_KEY"
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: [batch]
+          exporters: [azuremonitor]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: otel-collector-service
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true"  # For internal IP
+spec:
+  type: LoadBalancer
+  loadBalancerIP: "10.0.0.100"  # Replace with your static IP
+  ports:
+  - port: 4317
+    name: otlp-grpc
+    targetPort: 4317
+  - port: 4318
+    name: otlp-http
+    targetPort: 4318
+  selector:
+    app: otel-collector
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: otel-collector
+  labels:
+    app: opentelemetry
+    component: otel-collector
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opentelemetry
+  template:
+    metadata:
+      labels:
+        app: opentelemetry
+        component: otel-collector
+    spec:
+      containers:
+      - name: otel-collector
+        image: otel/opentelemetry-collector-contrib:latest
+        command:
+          - "--config=/etc/otel/config.yaml"
+        ports:
+          - name: otlp-grpc
+            containerPort: 4317
+            protocol: TCP
+          - name: otlp-http
+            containerPort: 4318
+            protocol: TCP
+        volumeMounts:
+          - name: otel-config
+            mountPath: /etc/otel
+            readOnly: true
+        resources:
+          limits:
+            cpu: "1"
+            memory: "512Mi"
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 13133
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 13133
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
+      volumes:
+        - name: otel-config
+          configMap:
+            name: otel-collector-conf
+            items:
+              - key: config.yaml
+                path: config.yaml
