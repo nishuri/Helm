@@ -41,7 +41,7 @@ spec:
     name: otlp-http
     targetPort: 4318
   selector:
-    app: otel-collector
+    app: opentelemetry
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -64,7 +64,7 @@ spec:
       containers:
       - name: otel-collector
         image: otel/opentelemetry-collector-contrib:latest
-        command:
+        args:
           - "--config=/etc/otel/config.yaml"
         ports:
           - name: otlp-grpc
@@ -72,6 +72,9 @@ spec:
             protocol: TCP
           - name: otlp-http
             containerPort: 4318
+            protocol: TCP
+          - name: health
+            containerPort: 13133
             protocol: TCP
         volumeMounts:
           - name: otel-config
