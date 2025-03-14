@@ -6,7 +6,7 @@
   "baseBranches": ["main"],
   "commitMessageSuffix": "[skip ci]",
   "dependencyDashboard": true,
-  "recreateClosed": false,
+  "recreateWhen": always,
   "platformAutomerge": false,
   "packageRules": [
     {
