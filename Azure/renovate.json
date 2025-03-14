@@ -1,0 +1,65 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "baseBranches": ["main"],
+  "commitMessageSuffix": "[skip ci]",
+  "dependencyDashboard": true,
+  "recreateClosed": false,
+  "platformAutomerge": false,
+  "packageRules": [
+    {
+      "description": "Group all minor/patch updates",
+      "matchPackagePatterns": ["*"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "Non-major dependencies",
+      "groupSlug": "all-minor-patch",
+      "automerge": true,
+      "automergeType": "branch",
+      "stabilityDays": 3
+    },
+    {
+      "description": "Separate PRs for major updates",
+      "matchPackagePatterns": ["*"],
+      "matchUpdateTypes": ["major"],
+      "groupName": "Major version updates",
+      "stabilityDays": 7,
+      "prCreation": "not-pending",
+      "dependencyDashboardApproval": true
+    },
+    {
+      "description": "Block internal package auto-updates",
+      "matchPackagePatterns": ["^@internal/"],
+      "enabled": false,
+      "dependencyDashboardApproval": true
+    },
+    {
+      "description": "Per-repo overrides example",
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["react", "typescript"],
+      "allowedVersions": "<18.0.0 || >17.0.0 <18.0.0",
+      "matchUpdateTypes": ["major"],
+      "enabled": false
+    }
+  ],
+  "ignoreDeps": [],
+  "ignorePaths": [],
+  "prHourlyLimit": 2,
+  "prConcurrentLimit": 5,
+  "rangeStrategy": "bump",
+  "branchPrefix": "renovate/",
+  "semanticCommits": "enabled",
+  "semanticCommitType": "chore",
+  "semanticCommitScope": "deps",
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": ["^internal-packages\\.txt$"],
+      "matchStrings": [
+        "^(?<depName>@internal/\\S+)\\s+(?<currentValue>\\S+)$"
+      ],
+      "datasourceTemplate": "npm"
+    }
+  ]
+}
