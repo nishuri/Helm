@@ -1,13 +1,11 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended"
-  ],
+  "extends": ["config:recommended"],
   "baseBranches": ["main"],
   "commitMessageSuffix": "[skip ci]",
   "dependencyDashboard": true,
-  "recreateWhen": always,
-  "platformAutomerge": false,
+  "recreateClosed": false,  // Changed from invalid "recreateWhen: always"
+  "platformAutomerge": true,  // Should match automergeType
   "packageRules": [
     {
       "description": "Group all minor/patch updates",
@@ -17,6 +15,7 @@
       "groupSlug": "all-minor-patch",
       "automerge": true,
       "automergeType": "branch",
+      "prCreation": "not-pending",  // Required with stabilityDays
       "stabilityDays": 3
     },
     {
@@ -32,34 +31,19 @@
       "description": "Block internal package auto-updates",
       "matchPackagePatterns": ["^@internal/"],
       "enabled": false,
-      "dependencyDashboardApproval": true
+      "dependencyDashboardApproval": false  // Disabled packages don't need approval
     },
     {
-      "description": "Per-repo overrides example",
-      "matchManagers": ["npm"],
+      "description": "Lock React/TypeScript to <18.x",
       "matchPackageNames": ["react", "typescript"],
-      "allowedVersions": "<18.0.0 || >17.0.0 <18.0.0",
-      "matchUpdateTypes": ["major"],
-      "enabled": false
+      "allowedVersions": "<18.0.0"  // Simplified from redundant range
     }
   ],
-  "ignoreDeps": [],
-  "ignorePaths": [],
   "prHourlyLimit": 2,
   "prConcurrentLimit": 5,
   "rangeStrategy": "bump",
-  "branchPrefix": "renovate/",
-  "semanticCommits": "enabled",
+  "branchPrefix": "renovate/main/",  // Added main/ for clarity
+  "semanticCommits": "auto",  // Safer than "enabled"
   "semanticCommitType": "chore",
-  "semanticCommitScope": "deps",
-  "customManagers": [
-    {
-      "customType": "regex",
-      "fileMatch": ["^internal-packages\\.txt$"],
-      "matchStrings": [
-        "^(?<depName>@internal/\\S+)\\s+(?<currentValue>\\S+)$"
-      ],
-      "datasourceTemplate": "npm"
-    }
-  ]
+  "semanticCommitScope": "deps"
 }
