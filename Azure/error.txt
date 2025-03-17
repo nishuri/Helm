@@ -1,0 +1,220 @@
+2025-03-17T08:50:00.8770527Z ##[section]Starting: Run Renovate
+2025-03-17T08:50:00.8779590Z ==============================================================================
+2025-03-17T08:50:00.8779916Z Task         : Bash
+2025-03-17T08:50:00.8780069Z Description  : Run a Bash script on macOS, Linux, or Windows
+2025-03-17T08:50:00.8780286Z Version      : 3.250.1
+2025-03-17T08:50:00.8780460Z Author       : Microsoft Corporation
+2025-03-17T08:50:00.8780646Z Help         : https://docs.microsoft.com/azure/devops/pipelines/tasks/utility/bash
+2025-03-17T08:50:00.8780902Z ==============================================================================
+2025-03-17T08:50:01.0895650Z Generating script.
+2025-03-17T08:50:01.0908425Z ========================== Starting Command Output ===========================
+2025-03-17T08:50:01.0917376Z [command]/usr/bin/bash /home/vsts/work/_temp/956b5420-c694-4855-9761-edb29e879e7e.sh
+2025-03-17T08:50:33.2189035Z npm warn exec The following package was not found and will be installed: renovate@37.440.7
+2025-03-17T08:52:25.5520786Z DEBUG: Using RE2 regex engine
+2025-03-17T08:52:25.5533217Z DEBUG: Parsing configs
+2025-03-17T08:52:25.5539420Z DEBUG: Checking for config file in config.js
+2025-03-17T08:52:25.5852088Z DEBUG: File config
+2025-03-17T08:52:25.5852906Z        "config": {
+2025-03-17T08:52:25.5853787Z          "platform": "azure",
+2025-03-17T08:52:25.5854105Z          "onboarding": true,
+2025-03-17T08:52:25.5854337Z          "endpoint": "https://dev.azure.com/hexagonmi",
+2025-03-17T08:52:25.5854549Z          "token": "***********",
+2025-03-17T08:52:25.5854720Z          "repositories": [
+2025-03-17T08:52:25.5854910Z            "MI-Genesis/NexusCoreCreditService",
+2025-03-17T08:52:25.5855127Z            "MI-Genesis/NexusCoreFileGatewaySdk"
+2025-03-17T08:52:25.5855279Z          ],
+2025-03-17T08:52:25.5855577Z          "extends": ["config:best-practices", "group:monorepos"],
+2025-03-17T08:52:25.5855851Z          "prConcurrentLimit": 10,
+2025-03-17T08:52:25.5856017Z          "prHourlyLimit": 10,
+2025-03-17T08:52:25.5856332Z          "commitMessagePrefix": "fix(deps): ",
+2025-03-17T08:52:25.5876636Z          "hostRules": [
+2025-03-17T08:52:25.5876825Z            {
+2025-03-17T08:52:25.5877025Z              "hostType": "npm",
+2025-03-17T08:52:25.5877221Z              "matchHost": "pkgs.dev.azure.com",
+2025-03-17T08:52:25.5877408Z              "username": "apikey",
+2025-03-17T08:52:25.5877580Z              "password": "***********"
+2025-03-17T08:52:25.5877724Z            }
+2025-03-17T08:52:25.5877869Z          ],
+2025-03-17T08:52:25.5878146Z          "commitMessageSuffix": "[skip ci]",
+2025-03-17T08:52:25.5878325Z          "baseBranches": ["main"],
+2025-03-17T08:52:25.5878484Z          "enabledManagers": ["npm"],
+2025-03-17T08:52:25.5878756Z          "defaultRegistryUrls": [
+2025-03-17T08:52:25.5878973Z            "https://registry.npmjs.org/",
+2025-03-17T08:52:25.5879215Z            "https://pkgs.dev.azure.com/hexagonmi/MI-Genesis/_packaging/NexusPlatform/npm/registry/"
+2025-03-17T08:52:25.5879406Z          ],
+2025-03-17T08:52:25.5879568Z          "packageRules": [
+2025-03-17T08:52:25.5879712Z            {
+2025-03-17T08:52:25.5879856Z              "matchRepositories": [
+2025-03-17T08:52:25.5880475Z                "MI-Genesis/NexusCoreCreditService",
+2025-03-17T08:52:25.5880680Z                "MI-Genesis/NexusCoreFileGatewaySdk"
+2025-03-17T08:52:25.5880839Z              ],
+2025-03-17T08:52:25.5881007Z              "matchUpdateTypes": ["minor", "patch"],
+2025-03-17T08:52:25.5881204Z              "labels": ["Renovate-Dependencies-Update"],
+2025-03-17T08:52:25.5881389Z              "branchPrefix": "dependencies/",
+2025-03-17T08:52:25.5881723Z              "commitMessagePrefix": "fix(deps): ",
+2025-03-17T08:52:25.5881999Z              "prBody": "[Template]"
+2025-03-17T08:52:25.5882148Z            }
+2025-03-17T08:52:25.5882286Z          ]
+2025-03-17T08:52:25.5882419Z        }
+2025-03-17T08:52:25.5883310Z DEBUG: CLI config
+2025-03-17T08:52:25.5883842Z        "config": {}
+2025-03-17T08:52:25.5884386Z DEBUG: Env config
+2025-03-17T08:52:25.5885039Z        "config": {"hostRules": [], "platform": "azure", "token": "***********"}
+2025-03-17T08:52:25.5885346Z DEBUG: Combined config
+2025-03-17T08:52:25.5885674Z        "config": {
+2025-03-17T08:52:25.5886026Z          "platform": "azure",
+2025-03-17T08:52:25.5886320Z          "onboarding": true,
+2025-03-17T08:52:25.5886666Z          "endpoint": "https://dev.azure.com/hexagonmi",
+2025-03-17T08:52:25.5886987Z          "token": "***********",
+2025-03-17T08:52:25.5887285Z          "repositories": [
+2025-03-17T08:52:25.5887608Z            "MI-Genesis/NexusCoreCreditService",
+2025-03-17T08:52:25.5887986Z            "MI-Genesis/NexusCoreFileGatewaySdk"
+2025-03-17T08:52:25.5888269Z          ],
+2025-03-17T08:52:25.5888627Z          "extends": ["config:best-practices", "group:monorepos"],
+2025-03-17T08:52:25.5889003Z          "prConcurrentLimit": 10,
+2025-03-17T08:52:25.5889301Z          "prHourlyLimit": 10,
+2025-03-17T08:52:25.5889596Z          "commitMessagePrefix": "fix(deps): ",
+2025-03-17T08:52:25.5893695Z          "hostRules": [
+2025-03-17T08:52:25.5894389Z            {
+2025-03-17T08:52:25.5894900Z              "hostType": "npm",
+2025-03-17T08:52:25.5895441Z              "matchHost": "pkgs.dev.azure.com",
+2025-03-17T08:52:25.5896022Z              "username": "apikey",
+2025-03-17T08:52:25.5896361Z              "password": "***********"
+2025-03-17T08:52:25.5896655Z            }
+2025-03-17T08:52:25.5897023Z          ],
+2025-03-17T08:52:25.5897421Z          "commitMessageSuffix": "[skip ci]",
+2025-03-17T08:52:25.5897799Z          "baseBranches": ["main"],
+2025-03-17T08:52:25.5898331Z          "enabledManagers": ["npm"],
+2025-03-17T08:52:25.5898627Z          "defaultRegistryUrls": [
+2025-03-17T08:52:25.5899025Z            "https://registry.npmjs.org/",
+2025-03-17T08:52:25.5899480Z            "https://pkgs.dev.azure.com/hexagonmi/MI-Genesis/_packaging/NexusPlatform/npm/registry/"
+2025-03-17T08:52:25.5899769Z          ],
+2025-03-17T08:52:25.5900193Z          "packageRules": [
+2025-03-17T08:52:25.5900578Z            {
+2025-03-17T08:52:25.5900978Z              "matchRepositories": [
+2025-03-17T08:52:25.5901421Z                "MI-Genesis/NexusCoreCreditService",
+2025-03-17T08:52:25.5901919Z                "MI-Genesis/NexusCoreFileGatewaySdk"
+2025-03-17T08:52:25.5902217Z              ],
+2025-03-17T08:52:25.5902636Z              "matchUpdateTypes": ["minor", "patch"],
+2025-03-17T08:52:25.5903031Z              "labels": ["Renovate-Dependencies-Update"],
+2025-03-17T08:52:25.5903416Z              "branchPrefix": "dependencies/",
+2025-03-17T08:52:25.5903822Z              "commitMessagePrefix": "fix(deps): ",
+2025-03-17T08:52:25.5904173Z              "prBody": "[Template]"
+2025-03-17T08:52:25.5904542Z            }
+2025-03-17T08:52:25.5904938Z          ]
+2025-03-17T08:52:25.5905427Z        }
+2025-03-17T08:52:25.5905840Z DEBUG: Adding trailing slash to endpoint
+2025-03-17T08:52:25.5906258Z DEBUG: Enabling forkProcessing while in non-autodiscover mode
+2025-03-17T08:52:25.6017085Z DEBUG: Found valid git version: 2.48.1
+2025-03-17T08:52:25.6018652Z DEBUG: Setting global hostRules
+2025-03-17T08:52:25.6041027Z DEBUG: Adding password authentication for pkgs.dev.azure.com (hostType=npm) to hostRules
+2025-03-17T08:52:25.6085644Z DEBUG: Adding token authentication for dev.azure.com (hostType=azure) to hostRules
+2025-03-17T08:52:25.6097344Z DEBUG: Using baseDir: /tmp/renovate
+2025-03-17T08:52:25.6104679Z DEBUG: Using cacheDir: /tmp/renovate/cache
+2025-03-17T08:52:25.6109773Z DEBUG: Using containerbaseDir: /tmp/renovate/cache/containerbase
+2025-03-17T08:52:25.6115412Z DEBUG: Initializing Renovate internal cache into /tmp/renovate/cache/renovate/renovate-cache-v1
+2025-03-17T08:52:25.6118141Z DEBUG: Commits limit = null
+2025-03-17T08:52:25.6119617Z DEBUG: Setting global hostRules
+2025-03-17T08:52:25.6133621Z DEBUG: Adding password authentication for pkgs.dev.azure.com (hostType=npm) to hostRules
+2025-03-17T08:52:25.6136169Z DEBUG: Adding token authentication for dev.azure.com (hostType=azure) to hostRules
+2025-03-17T08:52:25.6143932Z DEBUG: validatePresets()
+2025-03-17T08:52:27.0149197Z DEBUG: Reinitializing hostRules for repo
+2025-03-17T08:52:27.0153293Z DEBUG: Clearing hostRules
+2025-03-17T08:52:27.0153512Z DEBUG: Adding password authentication for pkgs.dev.azure.com (hostType=npm) to hostRules
+2025-03-17T08:52:27.0155637Z DEBUG: Adding token authentication for dev.azure.com (hostType=azure) to hostRules
+2025-03-17T08:52:27.0182539Z  INFO: Repository started (repository=MI-Genesis/NexusCoreCreditService)
+2025-03-17T08:52:27.0184788Z        "renovateVersion": "37.440.7"
+2025-03-17T08:52:27.0244152Z DEBUG: Using localDir: /tmp/renovate/repos/azure/MI-Genesis/NexusCoreCreditService (repository=MI-Genesis/NexusCoreCreditService)
+2025-03-17T08:52:27.0244897Z DEBUG: PackageFiles.clear() - Package files deleted (repository=MI-Genesis/NexusCoreCreditService)
+2025-03-17T08:52:27.0245525Z DEBUG: initRepo("MI-Genesis/NexusCoreCreditService") (repository=MI-Genesis/NexusCoreCreditService)
+2025-03-17T08:52:28.3487031Z DEBUG: Repository details (repository=MI-Genesis/NexusCoreCreditService)
+2025-03-17T08:52:28.3489166Z        "repositoryDetails": {
+2025-03-17T08:52:28.3489335Z          "id": "4037eb5c-d045-41e5-8b1b-ea2678940eab",
+2025-03-17T08:52:28.3489509Z          "name": "NexusCoreCreditService",
+2025-03-17T08:52:28.3489728Z          "url": "https://dev.azure.com/hexagonmi/e2c20100-24d5-47f1-976a-24d5ada56982/_apis/git/repositories/4037eb5c-d045-41e5-8b1b-ea2678940eab",
+2025-03-17T08:52:28.3489937Z          "project": {
+2025-03-17T08:52:28.3490089Z            "id": "e2c20100-24d5-47f1-976a-24d5ada56982",
+2025-03-17T08:52:28.3490246Z            "name": "MI-Genesis",
+2025-03-17T08:52:28.3650017Z            "description": "Digital transformation results in the disruption of traditional industries and processes as lines between physical and virtual worlds converge. COVID has accelerated this trend for many customers and increased the pressure to work collaboratively and automate processes. Customers seek to improve the efficiency of end-to-end workflows and to transform their businesses via open productivity platforms.\n\nWith project Genesis, Hexagon’s emerging Manufacturing Intelligence platform, we will amplify the value of our portfolio via an open and connected platform. This platform will enable agile feedback loops and cross-discipline collaboration across the whole manufacturing value chain and it will create the necessary gravitas to attract customers and third parties alike.\n\nIt will, moreover, foster sustainability, via smart solutions and workflows that optimize manufacturing processes and by helping our customers to leverage HMI’s complete portfolio to innovate and tackle even the hardest engineering and manufacturing challenges.\n\nGenesis is more than a platform. It is our catalyst for becoming more portfolio-centric and for driving engineering excellence, development efficiency, and reuse across the organization.\nGenesis is everyone’s platform!",
+2025-03-17T08:52:28.3651241Z            "url": "https://dev.azure.com/hexagonmi/_apis/projects/e2c20100-24d5-47f1-976a-24d5ada56982",
+2025-03-17T08:52:28.3651433Z            "state": "wellFormed",
+2025-03-17T08:52:28.3651653Z            "revision": 1924,
+2025-03-17T08:52:28.3652099Z            "visibility": 0,
+2025-03-17T08:52:28.3652289Z            "lastUpdateTime": "2024-09-23T13:07:35.130Z"
+2025-03-17T08:52:28.3652463Z          },
+2025-03-17T08:52:28.3652606Z          "defaultBranch": "refs/heads/main",
+2025-03-17T08:52:28.3652752Z          "size": 1752287,
+2025-03-17T08:52:28.3652927Z          "remoteUrl": "https://**redacted**@dev.azure.com/hexagonmi/MI-Genesis/_git/NexusCoreCreditService",
+2025-03-17T08:52:28.3653167Z          "sshUrl": "git@ssh.dev.azure.com:v3/hexagonmi/MI-Genesis/NexusCoreCreditService",
+2025-03-17T08:52:28.3653389Z          "webUrl": "https://dev.azure.com/hexagonmi/MI-Genesis/_git/NexusCoreCreditService",
+2025-03-17T08:52:28.3653564Z          "isDisabled": false,
+2025-03-17T08:52:28.3653705Z          "isInMaintenance": false
+2025-03-17T08:52:28.3653835Z        }
+2025-03-17T08:52:28.3654196Z DEBUG: MI-Genesis/NexusCoreCreditService owner = ?owner? (repository=MI-Genesis/NexusCoreCreditService)
+2025-03-17T08:52:28.3654431Z DEBUG: MI-Genesis/NexusCoreCreditService default branch = main (repository=MI-Genesis/NexusCoreCreditService)
+2025-03-17T08:52:28.5128550Z DEBUG: Resetting npmrc (repository=MI-Genesis/NexusCoreCreditService)
+2025-03-17T08:52:28.5131954Z DEBUG: Resetting npmrc (repository=MI-Genesis/NexusCoreCreditService)
+2025-03-17T08:52:28.5137673Z DEBUG: checkOnboarding() (repository=MI-Genesis/NexusCoreCreditService)
+2025-03-17T08:52:28.5152917Z DEBUG: isOnboarded() (repository=MI-Genesis/NexusCoreCreditService)
+2025-03-17T08:52:28.5154186Z DEBUG: getPrList() (repository=MI-Genesis/NexusCoreCreditService)
+2025-03-17T08:52:29.0958193Z DEBUG: Retrieved Pull Requests count: 112 (repository=MI-Genesis/NexusCoreCreditService)
+2025-03-17T08:52:29.0960104Z DEBUG: getPrList() (repository=MI-Genesis/NexusCoreCreditService)
+2025-03-17T08:52:29.0962917Z DEBUG: findFile(renovate.json) (repository=MI-Genesis/NexusCoreCreditService)
+2025-03-17T08:52:29.0968752Z DEBUG: Initializing git repository into /tmp/renovate/repos/azure/MI-Genesis/NexusCoreCreditService (repository=MI-Genesis/NexusCoreCreditService)
+2025-03-17T08:52:29.0976198Z DEBUG: Performing blobless clone (repository=MI-Genesis/NexusCoreCreditService)
+2025-03-17T08:52:30.1448395Z DEBUG: git clone completed (repository=MI-Genesis/NexusCoreCreditService)
+2025-03-17T08:52:30.1452477Z        "durationMs": 1047
+2025-03-17T08:52:30.1582070Z DEBUG: latest repository commit (repository=MI-Genesis/NexusCoreCreditService)
+2025-03-17T08:52:30.1582506Z        "latestCommit": {
+2025-03-17T08:52:30.1582714Z          "hash": "1844e1d84938410633a38ffffaab97fd3f04b82c",
+2025-03-17T08:52:30.1582997Z          "date": "2025-03-13T17:14:58Z",
+2025-03-17T08:52:30.1583266Z          "message": "Merged PR 227981: chore(deps): update dependency @babel/core to v7.26.10",
+2025-03-17T08:52:30.1583464Z          "refs": "HEAD -> main, origin/main, origin/HEAD",
+2025-03-17T08:52:30.1593993Z          "body": "This PR contains the following updates:\n\n| Package | Type | Update | Change |\n|---|---|---|---|\n| [@babel/core](https://babel.dev/docs/en/next/babel-core) ([source](https://github.com/babel/babel/tree/HEAD/packages/babel-core)) | devDependencies | patch | [`7.26.9` -> `7.26.10`](https://renovatebot.com/diffs/npm/@babel%2fcore/7.26.9/7.26.10) |\n\n> :exclamation: **Important**\n>\n> Release Notes retrieval for this PR were skipped because no github.com credentials were available.\n> If you are self-hosted, please see [this instruction](https://github.com/renovatebot/renovate/blob/master/docs/usage/examples/self-hosting.md#githubcom-token-for-release-notes).\n\n---\n\n### Configuration\n\n📅 **Schedule**: Branch creation - At any time (no schedule defined), Automerge - At any time (no schedule defined).\n\n🚦 **Automerge**: Disabled by config. Please merge this manually once you are satisfied.\n\n♻ **Rebasing**: Whenever PR becomes conflicted, or rename PR to start with \"rebase!\".\n\n🔕 **Ignore**: Close this PR and you won't be reminded about this update again.\n\n---\n\nThis PR has been generated by [Renovate Bot](https://github.com/renovatebot/renovate).\n",
+2025-03-17T08:52:30.1595340Z          "author_name": "SADULA Naresh",
+2025-03-17T08:52:30.1595519Z          "author_email": "naresh.sadula@hexagon.com"
+2025-03-17T08:52:30.1595674Z        }
+2025-03-17T08:52:30.1648787Z DEBUG: Config file exists, fileName: renovate.json (repository=MI-Genesis/NexusCoreCreditService)
+2025-03-17T08:52:30.1649115Z DEBUG: Repo is onboarded (repository=MI-Genesis/NexusCoreCreditService)
+2025-03-17T08:52:30.1726436Z DEBUG: Found renovate.json config file (repository=MI-Genesis/NexusCoreCreditService)
+2025-03-17T08:52:30.1747693Z DEBUG: Repository config (repository=MI-Genesis/NexusCoreCreditService)
+2025-03-17T08:52:30.1747979Z        "fileName": "renovate.json",
+2025-03-17T08:52:30.1748173Z        "config": {"$schema": "https://docs.renovatebot.com/renovate-schema.json"}
+2025-03-17T08:52:30.1757159Z DEBUG: migrateAndValidate() (repository=MI-Genesis/NexusCoreCreditService)
+2025-03-17T08:52:30.1757740Z DEBUG: No config migration necessary (repository=MI-Genesis/NexusCoreCreditService)
+2025-03-17T08:52:31.5593372Z DEBUG: Setting hostRules from config (repository=MI-Genesis/NexusCoreCreditService)
+2025-03-17T08:52:31.5783587Z DEBUG: Found repo ignorePaths (repository=MI-Genesis/NexusCoreCreditService)
+2025-03-17T08:52:31.5784311Z        "ignorePaths": [
+2025-03-17T08:52:31.5784515Z          "**/node_modules/**",
+2025-03-17T08:52:31.5784663Z          "**/bower_components/**",
+2025-03-17T08:52:31.5784811Z          "**/vendor/**",
+2025-03-17T08:52:31.5784962Z          "**/examples/**",
+2025-03-17T08:52:31.5785107Z          "**/__tests__/**",
+2025-03-17T08:52:31.5785244Z          "**/test/**",
+2025-03-17T08:52:31.5785385Z          "**/tests/**",
+2025-03-17T08:52:31.5785511Z          "**/__fixtures__/**"
+2025-03-17T08:52:31.5785639Z        ]
+2025-03-17T08:52:31.5894954Z DEBUG: No vulnerability alerts found (repository=MI-Genesis/NexusCoreCreditService)
+2025-03-17T08:52:31.5917966Z  WARN: findIssue() is not implemented (repository=MI-Genesis/NexusCoreCreditService)
+2025-03-17T08:52:31.5942426Z DEBUG: baseBranches (repository=MI-Genesis/NexusCoreCreditService)
+2025-03-17T08:52:31.5942708Z        "baseBranches": ["main"]
+2025-03-17T08:52:31.5942974Z DEBUG: baseBranch: main (repository=MI-Genesis/NexusCoreCreditService, baseBranch=main)
+2025-03-17T08:52:31.5961359Z DEBUG: extract() (repository=MI-Genesis/NexusCoreCreditService, baseBranch=main)
+2025-03-17T08:52:31.5993412Z DEBUG: Setting current branch to main (repository=MI-Genesis/NexusCoreCreditService, baseBranch=main)
+2025-03-17T08:52:31.6375720Z DEBUG: latest commit (repository=MI-Genesis/NexusCoreCreditService, baseBranch=main)
+2025-03-17T08:52:31.6376266Z        "branchName": "main",
+2025-03-17T08:52:31.6605882Z        "latestCommitDate": "2025-03-13T17:14:58Z"
+2025-03-17T08:52:31.6606225Z DEBUG: Using file match: (^|/)package\.json$ for manager npm (repository=MI-Genesis/NexusCoreCreditService, baseBranch=main)
+2025-03-17T08:52:31.6664844Z DEBUG: Matched 1 file(s) for manager npm: package.json (repository=MI-Genesis/NexusCoreCreditService, baseBranch=main)
+2025-03-17T08:52:31.6667314Z DEBUG: npm file package.json has name "@nexusplatform/nexus-core-credit-service" (repository=MI-Genesis/NexusCoreCreditService, baseBranch=main)
+2025-03-17T08:52:31.6790907Z DEBUG: Detecting pnpm Workspaces (repository=MI-Genesis/NexusCoreCreditService, baseBranch=main)
+2025-03-17T08:52:31.6820795Z DEBUG: Detecting workspaces (repository=MI-Genesis/NexusCoreCreditService, baseBranch=main)
+2025-03-17T08:52:31.6821388Z DEBUG: Finding locked versions (repository=MI-Genesis/NexusCoreCreditService, baseBranch=main)
+2025-03-17T08:52:31.8638840Z DEBUG: yarn.lock yarn.lock is has no __metadata so is yarn 1 (repository=MI-Genesis/NexusCoreCreditService, baseBranch=main)
+2025-03-17T08:52:31.8643260Z DEBUG: manager extract durations (ms) (repository=MI-Genesis/NexusCoreCreditService, baseBranch=main)
+2025-03-17T08:52:31.8645969Z        "managers": {"npm": 202}
+2025-03-17T08:52:31.8648586Z DEBUG: Found npm package files (repository=MI-Genesis/NexusCoreCreditService, baseBranch=main)
+2025-03-17T08:52:31.8651629Z DEBUG: Found 1 package file(s) (repository=MI-Genesis/NexusCoreCreditService, baseBranch=main)
+2025-03-17T08:52:31.8655035Z  INFO: Dependency extraction complete (repository=MI-Genesis/NexusCoreCreditService, baseBranch=main)
+2025-03-17T08:52:31.8657662Z        "stats": {
+2025-03-1
