@@ -4,8 +4,8 @@
   "baseBranches": ["main"],
   "commitMessageSuffix": "[skip ci]",
   "dependencyDashboard": true,
-  "recreateClosed": false,  // Changed from invalid "recreateWhen: always"
-  "platformAutomerge": true,  // Should match automergeType
+  "recreateClosed": false,
+  "platformAutomerge": true, 
   "packageRules": [
     {
       "description": "Group all minor/patch updates",
