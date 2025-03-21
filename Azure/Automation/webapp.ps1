@@ -5,6 +5,8 @@ param (
         [string]$resourceGroupName,
         [Parameter(Mandatory=$true)]
         [string[]]$webAppNames
+        [Parameter(Mandatory=$true)]
+        [string]$functionAppName
     )
 
     # Setting your Azure subscription
@@ -26,6 +28,16 @@ param (
     }
 }
 
-# az functionapp show --name MyFunctionApp --resource-group MyResourceGroup
-# az functionapp start --name MyFunctionApp --resource-group MyResourceGroup
-# az functionapp stop --name MyFunctionApp --resource-group MyResourceGroup
+# Get the status of the function app
+
+$functionAppStatus = az functionapp show --name $functionAppName --resource-group $resourceGroupName --query "state" --output tsv
+
+# Check the status and start the function app if necessary
+if ($functionAppStatus -eq "Stopped") {
+    az functionapp start --name $functionAppName --resource-group $resourceGroupName
+    Write-Output "Azure Function App $functionAppName started successfully."
+} elseif ($functionAppStatus -eq "Running") {
+    Write-Output "Azure Function App $functionAppName is already running."
+} else {
+    Write-Output "Azure Function App $functionAppName is in an unknown state: $functionAppStatus"
+}
