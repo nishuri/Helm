@@ -1,3 +1,4 @@
+
 trigger: none
 
 schedules:
@@ -19,7 +20,7 @@ stages:
 - stage: dev
   displayName: 'Start and Stop Dev Environment'
   variables:
-   - name: subscriptionId
+  - name: subscriptionId
     value: 'your-subscription-id'
   - name: resourceGroupName
     value: 'YourResourceGroupName'
@@ -29,9 +30,8 @@ stages:
       WebApp2
   jobs:
   - job: Dev_Webapp
-    displayname: 'Start or Stop Dev Webapp
     steps:
-     - task: AzurePowerShell@5
+    - task: AzurePowerShell@5
       displayName: 'Powershell task'
       inputs:
         azureSubscription: '${{ parameters.ServiceConn }}'
@@ -45,7 +45,6 @@ stages:
   displayName: 'Start and Stop test Environment'
   jobs:
   - job: test_Webapp
-    displayname: 'Start or Stop test Webapp
     variables:
     - name: subscriptionId
       value: 'your-test-subscription-id'
@@ -56,7 +55,7 @@ stages:
         testWebApp1
         testWebApp2
     steps:
-     - task: AzurePowerShell@5
+    - task: AzurePowerShell@5
       displayName: 'Powershell task'
       inputs:
         azureSubscription: '${{ parameters.ServiceConn }}'
@@ -67,7 +66,6 @@ stages:
         pwsh: true
 
   - job: uat_Webapp
-    displayname: 'Start or Stop uat Webapp
     variables:
     - name: subscriptionId
       value: 'your-uat-subscription-id'
@@ -78,7 +76,7 @@ stages:
         uatWebApp1
         uatWebApp2
     steps:
-     - task: AzurePowerShell@5
+    - task: AzurePowerShell@5
       displayName: 'Powershell task'
       inputs:
         azureSubscription: '${{ parameters.ServiceConn }}'
@@ -92,7 +90,6 @@ stages:
   displayName: 'Start and Stop prod Environment'
   jobs:
   - job: preprod_Webapp
-    displayname: 'Start or Stop prod Webapp
     variables:
     - name: subscriptionId
       value: 'your-preprod-subscription-id'
@@ -103,7 +100,7 @@ stages:
         PreProdWebApp1
         PreProdWebApp2
     steps:
-     - task: AzurePowerShell@5
+    - task: AzurePowerShell@5
       displayName: 'Powershell task'
       inputs:
         azureSubscription: '${{ parameters.ServiceConn }}'
@@ -114,7 +111,6 @@ stages:
         pwsh: true
 
   - job: prod_Webapp
-    displayname: 'Start or Stop prod Webapp
     variables:
     - name: subscriptionId
       value: 'your-prod-subscription-id'
@@ -125,7 +121,7 @@ stages:
         ProdWebApp1
         ProdWebApp2
     steps:
-     - task: AzurePowerShell@5
+    - task: AzurePowerShell@5
       displayName: 'Powershell task'
       inputs:
         azureSubscription: '${{ parameters.ServiceConn }}'
