@@ -1,16 +1,53 @@
 trigger: none
 
 schedules:
-  - cron: "0 19 * * 1-5"
+  - cron: "0 7 * * Mon-Fri"
+    displayName: "Start WebApp at 7 AM (Mon-Fri)"
+    branches:
+      include:
+        - main
+    always: true
+    
+  - cron: "0 19 * * Mon-Fri"
     displayName: "Stop WebApp at 7 PM (Mon-Fri)"
     branches:
       include:
         - main
     always: true
 
-  - cron: "0 7 * * 1-5"
-    displayName: "Start WebApp at 7 AM (Mon-Fri)"
-    branches:
-      include:
-        - main
-    always: true
+stages:
+- stage: dev
+  displayName: 'Start and Stop Dev Environment'
+  variables:
+  - group: dev
+  jobs:
+  - job: Dev_Webapp
+    displayname: 'Start or Stop Dev Webapp
+    steps:
+     - task: AzurePowerShell@5
+      displayName: 'Powershell task'
+      inputs:
+        azureSubscription: '${{ parameters.ServiceConn }}'
+        ScriptType: 'FilePath'
+        ScriptPath: 'webapp.ps1'
+        ScriptArguments: '-subscriptionId $(subscriptionId) -resourceGroupName $(resourceGroupName) -webAppName $(webAppName)'
+        azurePowerShellVersion: 'LatestVersion'
+        pwsh: true
+
+- stage: prod
+  displayName: 'Start and Stop prod Environment'
+  variables:
+  - group: prod
+  jobs:
+  - job: prod_Webapp
+    displayname: 'Start or Stop prod Webapp
+    steps:
+     - task: AzurePowerShell@5
+      displayName: 'Powershell task'
+      inputs:
+        azureSubscription: '${{ parameters.ServiceConn }}'
+        ScriptType: 'FilePath'
+        ScriptPath: 'webapp.ps1'
+        ScriptArguments: '-subscriptionId $(subscriptionId) -resourceGroupName $(resourceGroupName) -webAppName $(webAppName)'
+        azurePowerShellVersion: 'LatestVersion'
+        pwsh: true
