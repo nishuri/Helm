@@ -1,0 +1,16 @@
+trigger: none
+
+schedules:
+  - cron: "0 19 * * 1-5"
+    displayName: "Stop WebApp at 7 PM (Mon-Fri)"
+    branches:
+      include:
+        - main
+    always: true
+
+  - cron: "0 7 * * 1-5"
+    displayName: "Start WebApp at 7 AM (Mon-Fri)"
+    branches:
+      include:
+        - main
+    always: true
