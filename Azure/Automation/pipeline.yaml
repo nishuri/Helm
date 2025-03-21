@@ -41,6 +41,53 @@ stages:
         azurePowerShellVersion: 'LatestVersion'
         pwsh: true
 
+- stage: test
+  displayName: 'Start and Stop test Environment'
+  jobs:
+  - job: test_Webapp
+    displayname: 'Start or Stop test Webapp
+    variables:
+    - name: subscriptionId
+      value: 'your-test-subscription-id'
+    - name: resourceGroupName
+      value: 'YourtestResourceGroupName'
+    - name: webAppNames
+      value: |
+        testWebApp1
+        testWebApp2
+    steps:
+     - task: AzurePowerShell@5
+      displayName: 'Powershell task'
+      inputs:
+        azureSubscription: '${{ parameters.ServiceConn }}'
+        ScriptType: 'FilePath'
+        ScriptPath: 'webapp.ps1'
+        ScriptArguments: '-subscriptionId $(subscriptionId) -resourceGroupName $(resourceGroupName) -webAppNames $(webAppNames)'
+        azurePowerShellVersion: 'LatestVersion'
+        pwsh: true
+
+  - job: uat_Webapp
+    displayname: 'Start or Stop uat Webapp
+    variables:
+    - name: subscriptionId
+      value: 'your-uat-subscription-id'
+    - name: resourceGroupName
+      value: 'YouruatResourceGroupName'
+    - name: webAppNames
+      value: |
+        uatWebApp1
+        uatWebApp2
+    steps:
+     - task: AzurePowerShell@5
+      displayName: 'Powershell task'
+      inputs:
+        azureSubscription: '${{ parameters.ServiceConn }}'
+        ScriptType: 'FilePath'
+        ScriptPath: 'webapp.ps1'
+        ScriptArguments: '-subscriptionId $(subscriptionId) -resourceGroupName $(resourceGroupName) -webAppNames $(webAppNames)'
+        azurePowerShellVersion: 'LatestVersion'
+        pwsh: true
+
 - stage: prod
   displayName: 'Start and Stop prod Environment'
   jobs:
