@@ -45,26 +45,26 @@ stages:
   displayName: 'Start and Stop prod Environment'
   jobs:
   - job: preprod_Webapp
-  displayname: 'Start or Stop prod Webapp
-  variables:
-  - name: subscriptionId
-    value: 'your-preprod-subscription-id'
-  - name: resourceGroupName
-    value: 'YourPreProdResourceGroupName'
-  - name: webAppNames
-    value: |
-      PreProdWebApp1
-      PreProdWebApp2
-  steps:
-   - task: AzurePowerShell@5
-    displayName: 'Powershell task'
-    inputs:
-      azureSubscription: '${{ parameters.ServiceConn }}'
-      ScriptType: 'FilePath'
-      ScriptPath: 'webapp.ps1'
-      ScriptArguments: '-subscriptionId $(subscriptionId) -resourceGroupName $(resourceGroupName) -webAppNames $(webAppNames)'
-      azurePowerShellVersion: 'LatestVersion'
-      pwsh: true
+    displayname: 'Start or Stop prod Webapp
+    variables:
+    - name: subscriptionId
+      value: 'your-preprod-subscription-id'
+    - name: resourceGroupName
+      value: 'YourPreProdResourceGroupName'
+    - name: webAppNames
+      value: |
+        PreProdWebApp1
+        PreProdWebApp2
+    steps:
+     - task: AzurePowerShell@5
+      displayName: 'Powershell task'
+      inputs:
+        azureSubscription: '${{ parameters.ServiceConn }}'
+        ScriptType: 'FilePath'
+        ScriptPath: 'webapp.ps1'
+        ScriptArguments: '-subscriptionId $(subscriptionId) -resourceGroupName $(resourceGroupName) -webAppNames $(webAppNames)'
+        azurePowerShellVersion: 'LatestVersion'
+        pwsh: true
 
   - job: prod_Webapp
     displayname: 'Start or Stop prod Webapp
