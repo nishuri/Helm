@@ -28,6 +28,8 @@ stages:
     value: |
       WebApp1
       WebApp2
+  - name: functionAppName
+    value: 'YourFunctionAppName'
   jobs:
   - job: Dev_Webapp
     steps:
@@ -37,7 +39,7 @@ stages:
         azureSubscription: '${{ parameters.ServiceConn }}'
         ScriptType: 'FilePath'
         ScriptPath: 'webapp.ps1'
-        ScriptArguments: '-subscriptionId $(subscriptionId) -resourceGroupName $(resourceGroupName) -webAppNames $(webAppNames)'
+        ScriptArguments: '-subscriptionId $(subscriptionId) -resourceGroupName $(resourceGroupName) -webAppNames $(webAppNames) -functionAppName $(functionAppName)'
         azurePowerShellVersion: 'LatestVersion'
         pwsh: true
 
@@ -54,6 +56,8 @@ stages:
       value: |
         testWebApp1
         testWebApp2
+    - name: functionAppName
+      value: 'YourFunctionAppName'
     steps:
     - task: AzurePowerShell@5
       displayName: 'Powershell task'
@@ -61,7 +65,7 @@ stages:
         azureSubscription: '${{ parameters.ServiceConn }}'
         ScriptType: 'FilePath'
         ScriptPath: 'webapp.ps1'
-        ScriptArguments: '-subscriptionId $(subscriptionId) -resourceGroupName $(resourceGroupName) -webAppNames $(webAppNames)'
+        ScriptArguments: '-subscriptionId $(subscriptionId) -resourceGroupName $(resourceGroupName) -webAppNames $(webAppNames) -functionAppName $(functionAppName)'
         azurePowerShellVersion: 'LatestVersion'
         pwsh: true
 
@@ -75,6 +79,8 @@ stages:
       value: |
         uatWebApp1
         uatWebApp2
+    - name: functionAppName
+      value: 'YourFunctionAppName'
     steps:
     - task: AzurePowerShell@5
       displayName: 'Powershell task'
@@ -82,7 +88,7 @@ stages:
         azureSubscription: '${{ parameters.ServiceConn }}'
         ScriptType: 'FilePath'
         ScriptPath: 'webapp.ps1'
-        ScriptArguments: '-subscriptionId $(subscriptionId) -resourceGroupName $(resourceGroupName) -webAppNames $(webAppNames)'
+        ScriptArguments: '-subscriptionId $(subscriptionId) -resourceGroupName $(resourceGroupName) -webAppNames $(webAppNames) -functionAppName $(functionAppName)'
         azurePowerShellVersion: 'LatestVersion'
         pwsh: true
 
@@ -99,6 +105,8 @@ stages:
       value: |
         PreProdWebApp1
         PreProdWebApp2
+    - name: functionAppName
+      value: 'YourFunctionAppName'
     steps:
     - task: AzurePowerShell@5
       displayName: 'Powershell task'
@@ -106,7 +114,7 @@ stages:
         azureSubscription: '${{ parameters.ServiceConn }}'
         ScriptType: 'FilePath'
         ScriptPath: 'webapp.ps1'
-        ScriptArguments: '-subscriptionId $(subscriptionId) -resourceGroupName $(resourceGroupName) -webAppNames $(webAppNames)'
+        ScriptArguments: '-subscriptionId $(subscriptionId) -resourceGroupName $(resourceGroupName) -webAppNames $(webAppNames) -functionAppName $(functionAppName)'
         azurePowerShellVersion: 'LatestVersion'
         pwsh: true
 
@@ -120,6 +128,8 @@ stages:
       value: |
         ProdWebApp1
         ProdWebApp2
+    - name: functionAppName
+      value: 'YourFunctionAppName'
     steps:
     - task: AzurePowerShell@5
       displayName: 'Powershell task'
@@ -127,6 +137,6 @@ stages:
         azureSubscription: '${{ parameters.ServiceConn }}'
         ScriptType: 'FilePath'
         ScriptPath: 'webapp.ps1'
-        ScriptArguments: '-subscriptionId $(subscriptionId) -resourceGroupName $(resourceGroupName) -webAppNames $(webAppNames)'
+        ScriptArguments: '-subscriptionId $(subscriptionId) -resourceGroupName $(resourceGroupName) -webAppNames $(webAppNames) -functionAppName $(functionAppName)'
         azurePowerShellVersion: 'LatestVersion'
         pwsh: true
