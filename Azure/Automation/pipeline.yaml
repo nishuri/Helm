@@ -20,6 +20,10 @@ stages:
   displayName: 'Start and Stop Dev Environment'
   variables:
   - group: dev
+  - name: webAppNames
+    value: |
+      WebApp1
+      WebApp2
   jobs:
   - job: Dev_Webapp
     displayname: 'Start or Stop Dev Webapp
@@ -30,7 +34,7 @@ stages:
         azureSubscription: '${{ parameters.ServiceConn }}'
         ScriptType: 'FilePath'
         ScriptPath: 'webapp.ps1'
-        ScriptArguments: '-subscriptionId $(subscriptionId) -resourceGroupName $(resourceGroupName) -webAppName $(webAppName)'
+        ScriptArguments: '-subscriptionId $(subscriptionId) -resourceGroupName $(resourceGroupName) -webAppNames $(webAppNames)'
         azurePowerShellVersion: 'LatestVersion'
         pwsh: true
 
@@ -38,6 +42,10 @@ stages:
   displayName: 'Start and Stop prod Environment'
   variables:
   - group: prod
+  - name: webAppNames
+    value: |
+      WebApp1
+      WebApp2
   jobs:
   - job: prod_Webapp
     displayname: 'Start or Stop prod Webapp
@@ -48,6 +56,6 @@ stages:
         azureSubscription: '${{ parameters.ServiceConn }}'
         ScriptType: 'FilePath'
         ScriptPath: 'webapp.ps1'
-        ScriptArguments: '-subscriptionId $(subscriptionId) -resourceGroupName $(resourceGroupName) -webAppName $(webAppName)'
+        ScriptArguments: '-subscriptionId $(subscriptionId) -resourceGroupName $(resourceGroupName) -webAppNames $(webAppNames)'
         azurePowerShellVersion: 'LatestVersion'
         pwsh: true
