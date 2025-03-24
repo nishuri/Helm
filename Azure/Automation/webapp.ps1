@@ -9,11 +9,11 @@ param (
         [string]$functionAppName
     )
 
-    # Setting your Azure subscription
-    az account set --subscription $subscriptionId
+# Setting your Azure subscription
+az account set --subscription $subscriptionId
 
-    # Get the current hour
-    $currentHour = (Get-Date).Hour
+# Get the current hour
+$currentHour = (Get-Date).Hour
 
 foreach ($webAppName in $webAppNames) {
     # Get the status of the web app
