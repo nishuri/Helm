@@ -12,11 +12,11 @@ param (
 # Setting your Azure subscription
 az account set --subscription $subscriptionId
 
-# Get the current hour
+# Get the current hour and current day
 $currentHour = (Get-Date).Hour
+$currentDay = (Get-Date).DayOfWeek
 
 foreach ($webAppName in $webAppNames) {
-    # Get the status of the web app
     $webAppStatus = az webapp show --name $webAppName --resource-group $resourceGroupName --query "state" --output tsv
 
     if ($currentHour -eq 7) {
@@ -27,7 +27,6 @@ foreach ($webAppName in $webAppNames) {
             Write-Output "Azure Web App $webAppName is already running."
         }
     } elseif ($currentHour -eq 19) {
-        # Check the status at 7 PM
         if ($webAppStatus -eq "Running") {
             az webapp stop --name $webAppName --resource-group $resourceGroupName
             Write-Output "Azure Web App $webAppName stopped successfully."
@@ -43,12 +42,24 @@ foreach ($webAppName in $webAppNames) {
 
 $functionAppStatus = az functionapp show --name $functionAppName --resource-group $resourceGroupName --query "state" --output tsv
 
-# Check the status and start the function app if necessary
-if ($functionAppStatus -eq "Stopped") {
-    az functionapp start --name $functionAppName --resource-group $resourceGroupName
-    Write-Output "Azure Function App $functionAppName started successfully."
-} elseif ($functionAppStatus -eq "Running") {
-    Write-Output "Azure Function App $functionAppName is already running."
+if ($currentDay -eq 'Monday') {
+    if ($currentHour -eq 7) {
+        if ($functionAppStatus -eq "Stopped") {
+            az functionapp start --name $functionAppName --resource-group $resourceGroupName
+            Write-Output "Azure Function App $functionAppName started successfully."
+        } else {
+            Write-Output "Azure Function App $functionAppName is already running."
+        }
+    } elseif ($currentHour -eq 19) {
+        if ($functionAppStatus -eq "Running") {
+            az functionapp stop --name $functionAppName --resource-group $resourceGroupName
+            Write-Output "Azure Function App $functionAppName stopped successfully."
+        } else {
+            Write-Output "Azure Function App $functionAppName is already stopped."
+        }
+    } else {
+        Write-Output "Current time is not 7 AM or 7 PM on Monday."
+    }
 } else {
-    Write-Output "Azure Function App $functionAppName is in an unknown state: $functionAppStatus"
+    Write-Output "Today is not Monday. Function App status will not be changed."
 }
