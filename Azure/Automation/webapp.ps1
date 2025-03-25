@@ -63,6 +63,5 @@ if ($currentDay -eq 'Monday') {
         Write-Output "Current time is not 7 AM or 7 PM on Monday. The function app status cannot be changed."
     }
 } else {
-    Write-Output "Current status of Azure Function App $functionAppName: $functionAppStatus"
     Write-Output "Today is not Monday. Function App status will not be changed. It will automatically start or stop the function app at 7AM and 7PM on Monday"
 }
