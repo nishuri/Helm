@@ -4,7 +4,7 @@ param (
         [Parameter(Mandatory=$true)]
         [string]$resourceGroupName,
         [Parameter(Mandatory=$true)]
-        [string[]]$webAppNames
+        [string[]]$webAppNames,
         [Parameter(Mandatory=$true)]
         [string]$functionAppName
     )
@@ -18,7 +18,8 @@ $currentDay = (Get-Date).DayOfWeek
 
 foreach ($webAppName in $webAppNames) {
     $webAppStatus = az webapp show --name $webAppName --resource-group $resourceGroupName --query "state" --output tsv
-
+    Write-Output "Current status of Azure Web App $webAppName: $webAppStatus"
+    
     if ($currentHour -eq 7) {
         if ($webAppStatus -eq "Stopped") {
             az webapp start --name $webAppName --resource-group $resourceGroupName
@@ -34,13 +35,14 @@ foreach ($webAppName in $webAppNames) {
             Write-Output "Azure Web App $webAppName is already stopped."
         }
     } else {
-        Write-Output "Current time is not 7 AM or 7 PM."
+        Write-Output "Current time is not 7 AM or 7 PM. WebApp status will not be changed. It will automatically start or stop the webapp at 7AM and 7PM on Monday to Friday"
     }
 }
 
 # Get the status of the function app
 
 $functionAppStatus = az functionapp show --name $functionAppName --resource-group $resourceGroupName --query "state" --output tsv
+Write-Output "Current status of Azure Function App $functionAppName: $functionAppStatus"
 
 if ($currentDay -eq 'Monday') {
     if ($currentHour -eq 7) {
@@ -58,8 +60,9 @@ if ($currentDay -eq 'Monday') {
             Write-Output "Azure Function App $functionAppName is already stopped."
         }
     } else {
-        Write-Output "Current time is not 7 AM or 7 PM on Monday."
+        Write-Output "Current time is not 7 AM or 7 PM on Monday. The function app status cannot be changed."
     }
 } else {
-    Write-Output "Today is not Monday. Function App status will not be changed."
+    Write-Output "Current status of Azure Function App $functionAppName: $functionAppStatus"
+    Write-Output "Today is not Monday. Function App status will not be changed. It will automatically start or stop the function app at 7AM and 7PM on Monday"
 }
