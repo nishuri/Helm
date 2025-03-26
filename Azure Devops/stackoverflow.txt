@@ -1,0 +1,88 @@
+trigger: none
+
+schedules:
+  - cron: "0 7 * * Mon-Fri"
+    displayName: "Start WebApp at 7 AM (Mon-Fri)"
+    branches:
+      include:
+        - main
+    always: true
+    
+  - cron: "0 19 * * Mon-Fri"
+    displayName: "Stop WebApp at 7 PM (Mon-Fri)"
+    branches:
+      include:
+        - main
+    always: true
+
+stages:
+- stage: dev
+  displayName: 'Start and Stop Dev Environment'
+  variables:
+  - name: subscriptionId
+    value: '89bc3160-da6b-4145-b11d-e364986037a3'
+  - name: resourceGroupName
+    value: 's148d01-vyed'
+  - name: webAppNames
+    value: |
+      - 's148d01-as-vyed-admin-01'
+      - 's148d01-as-vyed-pub-01'
+  - name: functionAppName
+    value: 's148d01-fa-vyed-01'
+  jobs:
+  - job: Dev_Webapp
+    steps:
+    - task: AzurePowerShell@5
+      displayName: 'Powershell task'
+      inputs:
+        azureSubscription: s148d.azdo-deployment-dfe-gov
+        ScriptType: filePath
+        ScriptPath: $(Build.SourcesDirectory)/scripts/s148Autoschdulers.ps1
+        ScriptArguments: '-subscriptionId "$(subscriptionId)" -resourceGroupName "$(resourceGroupName)" -webAppNames "$(webAppNames)" -functionAppName "$(functionAppName)"'
+        azurePowerShellVersion: 'LatestVersion'
+        pwsh: true
+
+
+
+
+Output 
+
+
+
+
+
+Starting: Powershell task
+==============================================================================
+Task         : Azure PowerShell
+Description  : Run a PowerShell script within an Azure environment
+Version      : 5.252.0
+Author       : Microsoft Corporation
+Help         : https://aka.ms/azurepowershelltroubleshooting
+==============================================================================
+Generating script.
+Formatted command: . '/home/vsts/work/1/s/scripts/s148Autoschdulers.ps1' -subscriptionId "89bc3160-da6b-4145-b11d-e364986037a3" -resourceGroupName "s148d01-vyed" -webAppNames "- 's148d01-as-vyed-admin-01'
+- 's148d01-as-vyed-pub-01'
+" -functionAppName "s148d01-fa-vyed-01"
+/usr/bin/pwsh -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Unrestricted -Command . '/home/vsts/work/_temp/3e1608a1-6ae4-48a1-9056-f34660231aed.ps1'
+File saved!
+Import-Module -Name /usr/share/az_12.1.0/Az.Accounts/4.0.2/Az.Accounts.psd1 -Global
+Clear-AzContext -Scope Process
+Clear-AzContext -Scope CurrentUser -Force -ErrorAction SilentlyContinue
+Connect-AzAccount -ServicePrincipal -Tenant 9c7d9dd3-840c-4b3f-818e-552865082e16 -Credential System.Management.Automation.PSCredential -Environment AzureCloud @processScope
+ Set-AzContext -SubscriptionId 89bc3160-da6b-4145-b11d-e364986037a3 -TenantId 9c7d9dd3-840c-4b3f-818e-552865082e16
+ERROR: The subscription of '89bc3160-da6b-4145-b11d-e364986037a3' doesn't exist in cloud 'AzureCloud'.
+ERROR: Please run 'az login' to setup account.
+Azure Web App '- 's148d01-as-vyed-admin-01'
+- 's148d01-as-vyed-pub-01'
+' is currently: 
+The current time is not 7 AM or 7 PM. WebApp status will remain unchanged. It will automatically start and stop at 7 AM and 7 PM from Monday to Friday.
+ERROR: Please run 'az login' to setup account.
+Azure Function App 's148d01-fa-vyed-01' is currently: 
+The Function App status will remain unchanged. It will automatically start and stop at 7 AM and 7 PM on every Monday .
+
+/usr/bin/pwsh -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Unrestricted -Command . '/home/vsts/work/_tasks/AzurePowerShell_72a1931b-effb-4d2e-8fd8-f8472a07cb62/5.252.0/RemoveAzContext.ps1'
+Disconnect-AzAccount -Scope CurrentUser -ErrorAction Stop
+Disconnect-AzAccount -Scope Process -ErrorAction Stop
+Clear-AzContext -Scope Process -ErrorAction Stop
+
+Finishing: Powershell task
