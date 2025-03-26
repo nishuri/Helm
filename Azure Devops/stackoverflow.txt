@@ -20,7 +20,7 @@ stages:
   displayName: 'Start and Stop Dev Environment'
   variables:
   - name: subscriptionId
-    value: '89bc3160-da6b-4145-b11d-e364986037a3'
+    value: '12345678-abcd-6789-1122-ab12bc34de56ef'
   - name: resourceGroupName
     value: 's148d01-vyed'
   - name: webAppNames
@@ -60,7 +60,7 @@ Author       : Microsoft Corporation
 Help         : https://aka.ms/azurepowershelltroubleshooting
 ==============================================================================
 Generating script.
-Formatted command: . '/home/vsts/work/1/s/scripts/s148Autoschdulers.ps1' -subscriptionId "89bc3160-da6b-4145-b11d-e364986037a3" -resourceGroupName "s148d01-vyed" -webAppNames "- 's148d01-as-vyed-admin-01'
+Formatted command: . '/home/vsts/work/1/s/scripts/s148Autoschdulers.ps1' -subscriptionId "12345678-abcd-6789-1122-ab12bc34de56ef" -resourceGroupName "s148d01-vyed" -webAppNames "- 's148d01-as-vyed-admin-01'
 - 's148d01-as-vyed-pub-01'
 " -functionAppName "s148d01-fa-vyed-01"
 /usr/bin/pwsh -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Unrestricted -Command . '/home/vsts/work/_temp/3e1608a1-6ae4-48a1-9056-f34660231aed.ps1'
@@ -69,8 +69,8 @@ Import-Module -Name /usr/share/az_12.1.0/Az.Accounts/4.0.2/Az.Accounts.psd1 -Glo
 Clear-AzContext -Scope Process
 Clear-AzContext -Scope CurrentUser -Force -ErrorAction SilentlyContinue
 Connect-AzAccount -ServicePrincipal -Tenant 9c7d9dd3-840c-4b3f-818e-552865082e16 -Credential System.Management.Automation.PSCredential -Environment AzureCloud @processScope
- Set-AzContext -SubscriptionId 89bc3160-da6b-4145-b11d-e364986037a3 -TenantId 9c7d9dd3-840c-4b3f-818e-552865082e16
-ERROR: The subscription of '89bc3160-da6b-4145-b11d-e364986037a3' doesn't exist in cloud 'AzureCloud'.
+ Set-AzContext -SubscriptionId 12345678-abcd-6789-1122-ab12bc34de56ef -TenantId 9c8d7ee3-987c-123c-888e-552865082e16
+ERROR: The subscription '12345678-abcd-6789-1122-ab12bc34de56ef' doesn't exist in cloud 'AzureCloud'.
 ERROR: Please run 'az login' to setup account.
 Azure Web App '- 's148d01-as-vyed-admin-01'
 - 's148d01-as-vyed-pub-01'
