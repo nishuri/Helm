@@ -25,17 +25,17 @@ foreach ($webAppName in $webAppNames) {
             az webapp start --name $webAppName --resource-group $resourceGroupName
             Write-Output "Azure Web App $webAppName started successfully."
         } else {
-            Write-Output "Azure Web App $webAppName is already running."
+            Write-Output "Azure Web App $webAppName is already running : No Action Taken"
         }
     } elseif ($currentHour -eq 19) {
         if ($webAppStatus -eq "Running") {
             az webapp stop --name $webAppName --resource-group $resourceGroupName
             Write-Output "Azure Web App $webAppName stopped successfully."
         } else {
-            Write-Output "Azure Web App $webAppName is already stopped."
+            Write-Output "Azure Web App $webAppName is already stopped: No Action Taken!"
         }
     } else {
-        Write-Output "Current time is not 7 AM or 7 PM. WebApp status will not be changed. It will automatically start or stop the webapp at 7AM and 7PM on Monday to Friday"
+        Write-Output "This is an automated script scheduled to run at 7AM and 7PM (Mon-Fri) to start and stop VYED web applications. Please do not invoked it manually."
     }
 }
 
@@ -52,16 +52,9 @@ if ($currentDay -eq 'Monday') {
         } else {
             Write-Output "Azure Function App $functionAppName is already running."
         }
-    } elseif ($currentHour -eq 19) {
-        if ($functionAppStatus -eq "Running") {
-            az functionapp stop --name $functionAppName --resource-group $resourceGroupName
-            Write-Output "Azure Function App $functionAppName stopped successfully."
-        } else {
-            Write-Output "Azure Function App $functionAppName is already stopped."
-        }
     } else {
-        Write-Output "Current time is not 7 AM or 7 PM on Monday. The function app status cannot be changed."
+        Write-Output "Current time is not 7 AM on Monday. The function app status cannot be changed."
     }
 } else {
-    Write-Output "Today is not Monday. Function App status will not be changed. It will automatically start or stop the function app at 7AM and 7PM on Monday"
+    Write-Output "Today is not Monday. Function App status will not be changed. It will automatically start the VYED function app at 7AM on Monday"
 }
