@@ -12,6 +12,11 @@ param (
 # Setting your Azure subscription
 az account set --subscription $subscriptionId
 
+# # Convert CSV string to an array if necessary.
+# if ($webAppNames -is [string]) {
+#     $webAppNames = $webAppNames -split ',\s*'
+# }
+
 # Get the current hour and current day
 $currentHour = (Get-Date).Hour
 $currentDay = (Get-Date).DayOfWeek
