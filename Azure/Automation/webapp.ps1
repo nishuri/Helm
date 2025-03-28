@@ -49,6 +49,13 @@ foreach ($webAppName in $webAppNames) {
 $functionAppStatus = az functionapp show --name $functionAppName --resource-group $resourceGroupName --query "state" --output tsv
 Write-Output "Current status of Azure Function App $functionAppName: $functionAppStatus"
 
+if ($functionAppStatus -eq "Running") {
+    az functionapp stop --name $functionAppName --resource-group $resourceGroupName
+    Write-Output "Azure Function App $functionAppName stopped successfully."
+} else {
+    Write-Output "Azure Function App $functionAppName is already stopped."
+}
+
 if ($currentDay -eq 'Monday') {
     if ($currentHour -eq 7) {
         if ($functionAppStatus -eq "Stopped") {
