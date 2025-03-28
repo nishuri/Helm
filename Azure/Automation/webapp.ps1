@@ -56,5 +56,5 @@ if ($currentDay -eq 'Monday') {
         Write-Output "Current time is not 7 AM on Monday. The function app status cannot be changed."
     }
 } else {
-    Write-Output "Today is not Monday. Function App status will not be changed. It will automatically start the VYED function app at 7AM on Monday"
+    Write-Output "Today is not Monday. Function App status will not be changed. This script will automatically start the VYED function app at 7AM on Monday"
 }
