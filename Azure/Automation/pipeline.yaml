@@ -1,142 +1,84 @@
+name: "Start and Stop Vyed Applications-$(Build.QueuedTime:yyyyMMdd-HHmmss)"
+appendCommitMessageToRunName: false 
 
 trigger: none
 
 schedules:
-  - cron: "0 7 * * Mon-Fri"
+  - cron: "0 6 * * Mon-Fri"
     displayName: "Start WebApp at 7 AM (Mon-Fri)"
     branches:
       include:
-        - main
+        - Development-Dileep
     always: true
     
-  - cron: "0 19 * * Mon-Fri"
+  - cron: "0 18 * * Mon-Fri"
     displayName: "Stop WebApp at 7 PM (Mon-Fri)"
     branches:
       include:
-        - main
+        - Development-Dileep
     always: true
 
 stages:
 - stage: dev
   displayName: 'Start and Stop Dev Environment'
   variables:
-  - name: subscriptionId
-    value: 'your-subscription-id'
-  - name: resourceGroupName
-    value: 'YourResourceGroupName'
-  - name: webAppNames
-    value: |
-      WebApp1
-      WebApp2
-  - name: functionAppName
-    value: 'YourFunctionAppName'
+  - group: s148-vyed-dev
   jobs:
   - job: Dev_Webapp
     steps:
-    - task: AzurePowerShell@5
+    - task: AzureCLI@2
       displayName: 'Powershell task'
       inputs:
-        azureSubscription: '${{ parameters.ServiceConn }}'
-        ScriptType: 'FilePath'
-        ScriptPath: 'webapp.ps1'
-        ScriptArguments: '-subscriptionId $(subscriptionId) -resourceGroupName $(resourceGroupName) -webAppNames $(webAppNames) -functionAppName $(functionAppName)'
-        azurePowerShellVersion: 'LatestVersion'
-        pwsh: true
+        azureSubscription: 's148d.azdo-deployment-dfe-gov'
+        scriptType: 'pscore'
+        scriptLocation: 'scriptPath'
+        ScriptPath: $(Build.SourcesDirectory)/scripts/s148VYEDAutoStartStopApp.ps1
+        arguments: '-subscriptionId "$(devSubscriptionId)" -resourceGroupName "$(devResourceGroupName)" -webAppNames @("$(devAdminWebApp)", "$(devPubWebApp)") -functionAppName "$(devFunctionAppName)"'
 
 - stage: test
-  displayName: 'Start and Stop test Environment'
+  displayName: 'Start and Stop Test Environment'
+  variables:
+  - group: s148-vyed-test
   jobs:
-  - job: test_Webapp
-    variables:
-    - name: subscriptionId
-      value: 'your-test-subscription-id'
-    - name: resourceGroupName
-      value: 'YourtestResourceGroupName'
-    - name: webAppNames
-      value: |
-        testWebApp1
-        testWebApp2
-    - name: functionAppName
-      value: 'YourFunctionAppName'
+  - job: Test_Webapp
     steps:
-    - task: AzurePowerShell@5
+    - task: AzureCLI@2
       displayName: 'Powershell task'
       inputs:
-        azureSubscription: '${{ parameters.ServiceConn }}'
-        ScriptType: 'FilePath'
-        ScriptPath: 'webapp.ps1'
-        ScriptArguments: '-subscriptionId $(subscriptionId) -resourceGroupName $(resourceGroupName) -webAppNames $(webAppNames) -functionAppName $(functionAppName)'
-        azurePowerShellVersion: 'LatestVersion'
-        pwsh: true
+        azureSubscription: 's148t.azdo-deployment-dfe-gov'
+        scriptType: 'pscore'
+        scriptLocation: 'scriptPath'
+        ScriptPath: $(Build.SourcesDirectory)/scripts/s148VYEDAutoStartStopApp.ps1
+        arguments: '-subscriptionId "$(testSubscriptionId)" -resourceGroupName "$(testResourceGroupName)" -webAppNames @("$(testAdminWebApp)", "$(testPubWebApp)") -functionAppName "$(testFunctionAppName)"'
 
-  - job: uat_Webapp
-    variables:
-    - name: subscriptionId
-      value: 'your-uat-subscription-id'
-    - name: resourceGroupName
-      value: 'YouruatResourceGroupName'
-    - name: webAppNames
-      value: |
-        uatWebApp1
-        uatWebApp2
-    - name: functionAppName
-      value: 'YourFunctionAppName'
-    steps:
-    - task: AzurePowerShell@5
-      displayName: 'Powershell task'
-      inputs:
-        azureSubscription: '${{ parameters.ServiceConn }}'
-        ScriptType: 'FilePath'
-        ScriptPath: 'webapp.ps1'
-        ScriptArguments: '-subscriptionId $(subscriptionId) -resourceGroupName $(resourceGroupName) -webAppNames $(webAppNames) -functionAppName $(functionAppName)'
-        azurePowerShellVersion: 'LatestVersion'
-        pwsh: true
-
-- stage: prod
-  displayName: 'Start and Stop prod Environment'
+- stage: Uat
+  displayName: 'Start and Stop Uat Environment'
+  variables:
+  - group: s148-vyed-uat
   jobs:
-  - job: preprod_Webapp
-    variables:
-    - name: subscriptionId
-      value: 'your-preprod-subscription-id'
-    - name: resourceGroupName
-      value: 'YourPreProdResourceGroupName'
-    - name: webAppNames
-      value: |
-        PreProdWebApp1
-        PreProdWebApp2
-    - name: functionAppName
-      value: 'YourFunctionAppName'
+  - job: Uat_Webapp
     steps:
-    - task: AzurePowerShell@5
+    - task: AzureCLI@2
       displayName: 'Powershell task'
       inputs:
-        azureSubscription: '${{ parameters.ServiceConn }}'
-        ScriptType: 'FilePath'
-        ScriptPath: 'webapp.ps1'
-        ScriptArguments: '-subscriptionId $(subscriptionId) -resourceGroupName $(resourceGroupName) -webAppNames $(webAppNames) -functionAppName $(functionAppName)'
-        azurePowerShellVersion: 'LatestVersion'
-        pwsh: true
+        azureSubscription: 's148t.azdo-deployment-dfe-gov'
+        scriptType: 'pscore'
+        scriptLocation: 'scriptPath'
+        ScriptPath: $(Build.SourcesDirectory)/scripts/s148VYEDAutoStartStopApp.ps1
+        arguments: '-subscriptionId "$(uatSubscriptionId)" -resourceGroupName "$(uatResourceGroupName)" -webAppNames @("$(uatAdminWebApp)", "$(uatPubWebApp)") -functionAppName "$(uatFunctionAppName)"'
 
-  - job: prod_Webapp
-    variables:
-    - name: subscriptionId
-      value: 'your-prod-subscription-id'
-    - name: resourceGroupName
-      value: 'YourProdResourceGroupName'
-    - name: webAppNames
-      value: |
-        ProdWebApp1
-        ProdWebApp2
-    - name: functionAppName
-      value: 'YourFunctionAppName'
+- stage: Pre_prod
+  displayName: 'Start and Stop Pre_prod Environment'
+  variables:
+  - group: s148-vyed-pre-prod
+  jobs:
+  - job: Pre_prod_Webapp
     steps:
-    - task: AzurePowerShell@5
+    - task: AzureCLI@2
       displayName: 'Powershell task'
       inputs:
-        azureSubscription: '${{ parameters.ServiceConn }}'
-        ScriptType: 'FilePath'
-        ScriptPath: 'webapp.ps1'
-        ScriptArguments: '-subscriptionId $(subscriptionId) -resourceGroupName $(resourceGroupName) -webAppNames $(webAppNames) -functionAppName $(functionAppName)'
-        azurePowerShellVersion: 'LatestVersion'
-        pwsh: true
+        azureSubscription: 's148p.azdo-deployment-dfe-gov'
+        scriptType: 'pscore'
+        scriptLocation: 'scriptPath'
+        ScriptPath: $(Build.SourcesDirectory)/scripts/s148VYEDAutoStartStopApp.ps1
+        arguments: '-subscriptionId "$(preprodSubscriptionId)" -resourceGroupName "$(preprodResourceGroupName)" -webAppNames @("$(preprodAdminWebApp)", "$(preprodPubWebApp)") -functionAppName "$(preprodFunctionAppName)"'
