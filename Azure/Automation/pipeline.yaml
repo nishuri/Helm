@@ -1,7 +1,5 @@
-name: "Start and Stop Vyed Applications-$(Build.QueuedTime:yyyyMMdd-HHmmss)"
-appendCommitMessageToRunName: false 
-
 trigger: none
+appendCommitMessageToRunName: false 
 
 schedules:
   - cron: "0 6 * * Mon-Fri"
@@ -19,6 +17,29 @@ schedules:
     always: true
 
 stages:
+- stage: Set_Description
+  jobs:
+  - job: Set_Description_Job
+    steps:
+    - task: PowerShell@2
+      displayName: 'Set Dynamic Description'
+      inputs:
+        targetType: 'inline'
+        script: |
+          $currentHour = (Get-Date).Hour
+          $description = ""
+
+          if ($currentHour -eq 12) {
+            $description = "Started Vyed applications - $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+          } elseif ($currentHour -eq 18) {
+            $description = "Stopped Vyed applications - $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+          } else {
+            $description = "Start and Stop Vyed applications - $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+          }
+          Write-Output "##vso[build.updatebuildnumber]$description"
+
+
+
 - stage: dev
   displayName: 'Start and Stop Dev Environment'
   variables:
