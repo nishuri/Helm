@@ -1,0 +1,30 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "baseBranches": ["main"],
+  "commitMessageSuffix": "[skip ci]",
+  "recreateClosed": false,
+  "platformAutomerge": true,
+  "packageRules": [
+    {
+      "description": "Group all minor/patch updates",
+      "matchPackagePatterns": ["*"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "Non-major dependencies",
+      "automerge": true,
+      "stabilityDays": 3
+    },
+    {
+      "description": "Separate PRs for major updates",
+      "matchPackagePatterns": ["*"],
+      "matchUpdateTypes": ["major"],
+      "groupName": "Major version updates",
+      "stabilityDays": 7
+    },
+    {
+      "description": "Block internal package auto-updates",
+      "matchPackagePatterns": ["^@internal/"],
+      "enabled": false
+    }
+  ]
+}
