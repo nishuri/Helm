@@ -11,7 +11,6 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
-  # Authenticate with Azure Artifacts (generates .npmrc)
   - task: npmAuthenticate@0
     displayName: 'Authenticate with Azure Artifacts'
     inputs:
@@ -26,13 +25,12 @@ steps:
     env:
       TOKEN: $(System.AccessToken)
 
-  # Enable pnpm before Renovate runs
+    #Step to enable pnpm before Renovate runs
   - bash: |
       corepack enable
       corepack prepare pnpm@9.15.9 --activate
     displayName: 'Enable pnpm for Renovate'
 
-  # Run Renovate with correct .npmrc and environment
   - bash: |
       git config --global user.email 'bot@renovateapp.com'
       git config --global user.name 'Renovate Bot'
