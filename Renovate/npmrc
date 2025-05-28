@@ -1,0 +1,7 @@
+registry=https://pkgs.dev.azure.com/hexagonmi/MI-Genesis/_packaging/NexusPlatform/npm/registry/
+always-auth=true
+@hexfluidplatform:registry=https://pkgs.dev.azure.com/hexagonmi/MI-Genesis/_packaging/HexPlatform/npm/registry/
+@hexfluid:registry=https://pkgs.dev.azure.com/hexagonmi/MI-Genesis/_packaging/HexFluidIntro/npm/registry/
+@nexusplatform:registry=https://pkgs.dev.azure.com/hexagonmi/_packaging/nexus-public/npm/registry/
+@types:registry=https://registry.npmjs.org/
+@fluid-experimental:registry=https://registry.npmjs.org/
