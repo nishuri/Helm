@@ -1,0 +1,39 @@
+schedules:
+  - cron: '0 3 * * 3'
+    displayName: 'Weekly on Wednesday at 3 AM UTC'
+    branches:
+      include: [main]
+    always: true
+
+trigger: none
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+  - task: npmAuthenticate@0
+    displayName: 'Authenticate with Azure Artifacts'
+    inputs:
+      workingFile: .npmrc
+
+  # Manually set NPM Token for Renovate
+  - script: |
+      echo "//pkgs.dev.azure.com/hexagonmi/MI-Genesis/_packaging/NexusPlatform/npm/registry/:_authToken=${TOKEN}" >> ~/.npmrc
+    displayName: "Ensure NPM Auth Token"
+
+    #Step to enable pnpm before Renovate runs
+  - bash: |
+      corepack enable
+      corepack prepare pnpm@9.15.9 --activate
+    displayName: 'Enable pnpm for Renovate'
+
+  - bash: |
+      git config --global user.email 'bot@renovateapp.com'
+      git config --global user.name 'Renovate Bot'
+      npx --userconfig .npmrc renovate
+    displayName: 'Run Renovate'
+    env:
+      LOG_LEVEL: DEBUG
+      RENOVATE_PLATFORM: azure
+      RENOVATE_TOKEN: $(RENOVATE_TOKEN)
+      TOKEN: $(System.AccessToken)
