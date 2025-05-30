@@ -1,0 +1,206 @@
+parameters:
+  - name: buildTarget
+    type: string
+    default: "22"
+ 
+schedules:
+  - cron: "0 0 1-7,15-21 * 1"
+    displayName: Every other Monday
+    branches:
+      include:
+        - main
+      exclude:
+        - win/*
+    always: true
+ 
+pool:
+  name: "NexusPrivateAgents-packer"
+  vmImage: "ubuntu-latest"
+ 
+variables:
+  buildRevision: ""
+  resourceGroup: "nex-ops-uks"
+  linuxImageOsType: "Linux"
+  linuxImagePublisher: "Canonical"
+  linuxImageOffer: "0001-com-ubuntu-server-$[eq(parameters.buildTarget, '22') ? 'jammy' : 'focal']"
+  linuxImageSku: "${{ parameters.buildTarget }}_04-lts"
+  linuxTempDiskName: "nex-ops-privateagentbuild-os"
+  linuxTempNicName: "nex-ops-privateagentbuild-nic"
+  vnetName: "nex-ops-uks-vnet"
+  subnetName: "snet-pipelineagents-001"
+  imageGalleryName: "nexopssig"
+ 
+stages:
+  - stage: BuildBaseImage22
+    displayName: Build Base Image 22
+    variables:
+      linuxImageName: "UbuntuPrivateAgentImagev22"
+      image_name: "UbuntuPrivateAgentImagev22"
+      os_disk_size_gb: "240"
+    jobs:
+      - job: Build
+        displayName: Image Generation
+        timeoutInMinutes: 600
+        steps:
+          - script: |
+              buildNumber="${BUILD_BUILDNUMBER:2:6}"
+              echo "build Number:${BUILD_BUILDNUMBER}"
+              echo $buildNumber
+              echo "##vso[task.setvariable variable=buildRevision;]$(echo $buildNumber)"
+            displayName: "Setting the revision"
+ 
+          - task: gitversion/setup@0
+            displayName: Install GitVersion
+            inputs:
+              versionSpec: "5.x"
+ 
+          - task: gitversion/execute@0
+            displayName: Calculate SemVer
+            inputs:
+              name: Version
+              useConfigFile: true
+              updateAssemblyInfo: false
+              configFilePath: "GitVersion.yml"
+ 
+          - script: echo '##vso[build.updatebuildnumber]Nexus-Private-Agent-BaseImage-$(GitVersion.SemVer)'
+            displayName: "Set Build Number to Semantic Version"
+ 
+          - task: replacetokens@5
+            inputs:
+              targetFiles: "ubuntu${{ parameters.buildTarget }}04.json"
+              encoding: "auto"
+              tokenPattern: "default"
+              writeBOM: true
+              actionOnMissing: "fail"
+              keepToken: false
+              actionOnNoFiles: "fail"
+              enableTransforms: false
+              enableRecursion: false
+              useLegacyPattern: false
+              enableTelemetry: true
+ 
+          - script: |
+              echo "##vso[task.setvariable variable=PACKER_LOG;]1"
+            displayName: Set PACKER log level
+ 
+          - task: PackerBuild@1
+            inputs:
+              ConnectedServiceName: "Hexagon MI Nexus Infrastructure - prd - elevated"
+              templateType: "custom"
+              customTemplateLocation: "$(System.DefaultWorkingDirectory)/ubuntu${{ parameters.buildTarget }}04.json"
+
+  - stage: BuildBaseImage
+    displayName: Build Base Image
+    variables:
+      linuxImageName: "UbuntuPrivateAgentImagev2"
+      image_name: "UbuntuPrivateAgentImagev2"
+      os_disk_size_gb: "240"
+    jobs:
+      - job: Build
+        displayName: Image Generation
+        timeoutInMinutes: 600
+        steps:
+          - script: |
+              buildNumber="${BUILD_BUILDNUMBER:2:6}"
+              echo "build Number:${BUILD_BUILDNUMBER}"
+              echo $buildNumber
+              echo "##vso[task.setvariable variable=buildRevision;]$(echo $buildNumber)"
+            displayName: "Setting the revision"
+ 
+          - task: gitversion/setup@0
+            displayName: Install GitVersion
+            inputs:
+              versionSpec: "5.x"
+ 
+          - task: gitversion/execute@0
+            displayName: Calculate SemVer
+            inputs:
+              name: Version
+              useConfigFile: true
+              updateAssemblyInfo: false
+              configFilePath: "GitVersion.yml"
+ 
+          - script: echo '##vso[build.updatebuildnumber]Nexus-Private-Agent-BaseImage-$(GitVersion.SemVer)'
+            displayName: "Set Build Number to Semantic Version"
+ 
+          - task: replacetokens@5
+            inputs:
+              targetFiles: "ubuntu${{ parameters.buildTarget }}04.json"
+              encoding: "auto"
+              tokenPattern: "default"
+              writeBOM: true
+              actionOnMissing: "fail"
+              keepToken: false
+              actionOnNoFiles: "fail"
+              enableTransforms: false
+              enableRecursion: false
+              useLegacyPattern: false
+              enableTelemetry: true
+ 
+          - script: |
+              echo "##vso[task.setvariable variable=PACKER_LOG;]1"
+            displayName: Set PACKER log level
+ 
+          - task: PackerBuild@1
+            inputs:
+              ConnectedServiceName: "Hexagon MI Nexus Infrastructure - prd - elevated"
+              templateType: "custom"
+              customTemplateLocation: "$(System.DefaultWorkingDirectory)/ubuntu${{ parameters.buildTarget }}04.json"
+  - stage: BuildBaseImageWithSmallDisk
+    displayName: Build Base Image with Small Disk
+    dependsOn: []
+    variables:
+      image_name: "UbuntuPrivateAgentImage"
+      os_disk_size_gb: "120"
+      linuxImageName: "UbuntuPrivateAgentImage"
+    jobs:
+      - job: Build
+        displayName: Image Generation
+        timeoutInMinutes: 600
+        steps:
+          - script: |
+              buildNumber="${BUILD_BUILDNUMBER:2:6}"
+              echo "build Number:${BUILD_BUILDNUMBER}"
+              echo $buildNumber
+              echo "##vso[task.setvariable variable=buildRevision;]$(echo $buildNumber)"
+            displayName: "Setting the revision"
+ 
+          - task: gitversion/setup@0
+            displayName: Install GitVersion
+            inputs:
+              versionSpec: "5.x"
+ 
+          - task: gitversion/execute@0
+            displayName: Calculate SemVer
+            inputs:
+              name: Version
+              useConfigFile: true
+              updateAssemblyInfo: false
+              configFilePath: "GitVersion.yml"
+ 
+          - script: echo '##vso[build.updatebuildnumber]Nexus-Private-Agent-BaseImage-$(GitVersion.SemVer)'
+            displayName: "Set Build Number to Semantic Version"
+ 
+          - task: replacetokens@5
+            inputs:
+              targetFiles: "ubuntu${{ parameters.buildTarget }}04.json"
+              encoding: "auto"
+              tokenPattern: "default"
+              writeBOM: true
+              actionOnMissing: "fail"
+              keepToken: false
+              actionOnNoFiles: "fail"
+              enableTransforms: false
+              enableRecursion: false
+              useLegacyPattern: false
+              enableTelemetry: true
+ 
+          - script: |
+              echo "##vso[task.setvariable variable=PACKER_LOG;]1"
+            displayName: Set PACKER log level
+ 
+          - task: PackerBuild@1
+            inputs:
+              ConnectedServiceName: "Hexagon MI Nexus Infrastructure - prd - elevated"
+              templateType: "custom"
+              customTemplateLocation: "$(System.DefaultWorkingDirectory)/ubuntu${{ parameters.buildTarget }}04.json"
