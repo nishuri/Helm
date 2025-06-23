@@ -2,7 +2,7 @@
 param factoryName string
 
 @description('Location for the Data Factory')
-param location string
+param location string = resourceGroup().location
 
 @description('Managed Identity type for the Data Factory (SystemAssigned or None)')
 @allowed([
