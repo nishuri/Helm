@@ -25,7 +25,7 @@ stages:
           az deployment sub what-if \
             --location $(location) \
             --template-file main.bicep \
-            --parameters resourceGroupName=$(resourceGroupName) factoryName=$(factoryName) location=$(location)
+            --parameters resourceGroupName=$(resourceGroupName) factoryName=$(factoryName) location=$(location) resourceTags='{"Account Code":"Z00DS000A","Analysis Code":"2431104","Cost Centre":"10420751","Environment":"Dev","Owner":"Fowler, Greg","Parent Business":"Business Intelligence","Portfolio":"Education and Skills Funding Agency","Product":"View Your Education Data","Service":"Business Intelligence","Service Offering":"View Your Education Data"}'
       displayName: 'Bicep What-If Analysis'
 
 - stage: DeployADF
@@ -50,5 +50,5 @@ stages:
                 az deployment sub create \
                  --location $(location) \
                  --template-file main.bicep \
-                 --parameters resourceGroupName=$(resourceGroupName) factoryName=$(factoryName) location=$(location)
+                 --parameters resourceGroupName=$(resourceGroupName) factoryName=$(factoryName) location=$(location) resourceTags='{"Account Code":"Z00DS000A","Analysis Code":"2431104","Cost Centre":"10420751","Environment":"Dev","Owner":"Fowler, Greg","Parent Business":"Business Intelligence","Portfolio":"Education and Skills Funding Agency","Product":"View Your Education Data","Service":"Business Intelligence","Service Offering":"View Your Education Data"}'
             displayName: 'Deploy ADF using Bicep'
