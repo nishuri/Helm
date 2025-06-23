@@ -47,7 +47,7 @@ stages:
               scriptLocation: 'inlineScript'
               inlineScript: |
                 echo "Deploying Azure Data Factory..."
-                az deployment group create \
+                az deployment sub create \
                  --location $(location) \
                  --template-file main.bicep \
                  --parameters resourceGroupName=$(resourceGroupName) factoryName=$(factoryName) location=$(location)
