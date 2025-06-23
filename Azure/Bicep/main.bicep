@@ -9,6 +9,9 @@ param factoryName string
 @description('Location for both the Resource Group and the Data Factory')
 param location string
 
+@description('Tags to be applied to both the Resource Group and Data Factory')
+param tags object
+
 @description('Managed Identity type for the Data Factory (SystemAssigned or None)')
 @allowed([
   'SystemAssigned'
@@ -20,6 +23,7 @@ param identityType string = 'SystemAssigned'
 resource rg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: resourceGroupName
   location: location
+  tags: tags
 }
 
 // Deploy Data Factory into the Resource Group via a module
@@ -30,5 +34,6 @@ module dataFactoryModule 'datafactory.bicep' = {
     factoryName: factoryName
     location: location
     identityType: identityType
+    tags: tags
   }
 }
