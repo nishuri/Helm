@@ -3,7 +3,8 @@ trigger:
 
 variables:
   resourceGroup: 'your-existing-rg-name'
-  factoryName: 'myADFFactory'                       
+  factoryName: 'myADFFactory'
+  location: 'eastus'    
 
 stages:
 - stage: ValidateBicep
@@ -21,10 +22,10 @@ stages:
         scriptLocation: 'inlineScript'
         inlineScript: |
           echo "Running What-If Deployment for Bicep..."
-          az deployment group what-if \
-            --resource-group $(resourceGroup) \
+          az deployment sub what-if \
+            --location $(location) \
             --template-file main.bicep \
-            --parameters factoryName=$(factoryName)
+            --parameters resourceGroupName=$(resourceGroupName) factoryName=$(factoryName) location=$(location)
       displayName: 'Bicep What-If Analysis'
 
 - stage: DeployADF
@@ -47,7 +48,7 @@ stages:
               inlineScript: |
                 echo "Deploying Azure Data Factory..."
                 az deployment group create \
-                  --resource-group $(resourceGroup) \
-                  --template-file main.bicep \
-                  --parameters factoryName=$(factoryName)
+                 --location $(location) \
+                 --template-file main.bicep \
+                 --parameters resourceGroupName=$(resourceGroupName) factoryName=$(factoryName) location=$(location)
             displayName: 'Deploy ADF using Bicep'
