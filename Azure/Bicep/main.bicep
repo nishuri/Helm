@@ -16,22 +16,19 @@ param location string
 ])
 param identityType string = 'SystemAssigned'
 
-// Create the Resource Group in the subscription.
+// Create the Resource Group
 resource rg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: resourceGroupName
   location: location
 }
 
-// Deploy the Data Factory resource into the newly created resource group.
-resource dataFactory 'Microsoft.DataFactory/factories@2018-06-01' = {
-  name: factoryName
+// Deploy Data Factory into the Resource Group via a module
+module dataFactoryModule 'datafactory.bicep' = {
+  name: 'deployDataFactory'
   scope: rg
-  location: location
-  identity: {
-    type: identityType
-  }
-  properties: {
-    globalParameters: {}
+  params: {
+    factoryName: factoryName
+    location: location
+    identityType: identityType
   }
 }
-
