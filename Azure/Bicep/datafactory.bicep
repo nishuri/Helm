@@ -17,6 +17,7 @@ resource dataFactory 'Microsoft.DataFactory/factories@2018-06-01' = {
   identity: {
     type: identityType
   }
+  tags: tags
   properties: {
     globalParameters: {}
   }
