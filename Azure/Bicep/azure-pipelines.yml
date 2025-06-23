@@ -1,0 +1,53 @@
+trigger:
+- main
+
+variables:
+  resourceGroup: 'your-existing-rg-name'
+  factoryName: 'myADFFactory'                       
+
+stages:
+- stage: ValidateBicep
+  displayName: 'Validate ADF Deployment with What-If'
+  jobs:
+  - job: WhatIf
+    displayName: 'Run What-If Analysis'
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - task: AzureCLI@2
+      inputs:
+        azureSubscription: 'YourAzureServiceConnection'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          echo "Running What-If Deployment for Bicep..."
+          az deployment group what-if \
+            --resource-group $(resourceGroup) \
+            --template-file main.bicep \
+            --parameters factoryName=$(factoryName)
+      displayName: 'Bicep What-If Analysis'
+
+- stage: DeployADF
+  displayName: 'Deploy ADF After Approval'
+  dependsOn: ValidateBicep
+  condition: succeeded()
+  jobs:
+  - deployment: DeployADF
+    displayName: 'Execute Deployment to Resource Group'
+    environment: 'Production'   # we need to Set up this environment in DevOps UI
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: AzureCLI@2
+            inputs:
+              azureSubscription: 'YourAzureServiceConnection'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                echo "Deploying Azure Data Factory..."
+                az deployment group create \
+                  --resource-group $(resourceGroup) \
+                  --template-file main.bicep \
+                  --parameters factoryName=$(factoryName)
+            displayName: 'Deploy ADF using Bicep'
