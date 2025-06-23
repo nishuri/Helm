@@ -2,7 +2,7 @@ trigger:
 - main
 
 variables:
-  resourceGroup: 'your-existing-rg-name'
+  resourceGroupName: 'your-existing-rg-name'
   factoryName: 'myADFFactory'
   location: 'eastus'    
 
