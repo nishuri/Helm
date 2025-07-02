@@ -1,0 +1,88 @@
+parameters:
+  - name: selectedRepo
+    type: string
+    default: ''
+    values:
+      - ''
+      - MI-Genesis/GenHexFluidCore
+      - MI-Genesis/GenHexFluidReactHooks
+      - MI-Genesis/GenHexSDCReactDebugger
+      - MI-Genesis/NexusDeveloperPortal
+      - MI-Genesis/NexusDriveWebApp
+      - MI-Genesis/NexusDrive
+      - MI-Genesis/NexusCLIDrive
+      - MI-Genesis/NexusSolutionsWorkflow
+      - MI-Genesis/NexusSolnLayoutOptimization
+      - MI-Genesis/GenHexStaticDocumentation
+      - MI-Genesis/NexusDesigner
+      - MI-Genesis/Nexus3DWhiteboardReactApp
+      - MI-Genesis/GenHexVisualization
+      - MI-Genesis/Portal
+      - MI-Genesis/NexusLandingPage
+      - MI-Genesis/NexusCoreCreditService
+      - MI-Genesis/NexusCoreFileGatewaySdk
+      - MI-Genesis/HullLicensingWebService-Nexus
+      - MI-Genesis/HullLicensingWebService-Samples
+      - MI-Genesis/ProductionSoftware
+      - MI-Genesis/PSWebUI
+
+schedules:
+  - cron: '0 3 * * 3'
+    displayName: 'Weekly on Wednesday at 3 AM UTC'
+    branches:
+      include:
+        - main
+    always: true
+
+trigger: none
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+  - task: npmAuthenticate@0
+    displayName: 'Authenticate with Azure Artifacts'
+    inputs:
+      workingFile: .npmrc
+
+  - script: |
+      echo "//pkgs.dev.azure.com/hexagonmi/MI-Genesis/_packaging/NexusPlatform/npm/registry/:_authToken=$(TOKEN)" > .npmrc
+      echo "@nexusplatform:registry=https://pkgs.dev.azure.com/hexagonmi/MI-Genesis/_packaging/NexusPlatform/npm/registry/" >> .npmrc
+      echo "always-auth=true" >> .npmrc
+    displayName: "Set up .npmrc for Renovate"
+    env:
+      TOKEN: $(System.AccessToken)
+
+  - bash: |
+      corepack enable
+      corepack prepare pnpm@9.15.9 --activate
+    displayName: 'Enable pnpm for Renovate'
+
+  - bash: |
+      git config --global user.email "bot@renovateapp.com"
+      git config --global user.name "Renovate Bot"
+      echo "Current branch: $BUILD_BRANCHNAME"
+
+      if [ "$BUILD_BRANCHNAME" != "main" ]; then
+        echo "Branch is not main. Running Renovate in dry-run mode."
+        DRY_RUN="--dry-run"
+      else
+        echo "Branch is main. Running Renovate in full mode (will create PRs)."
+        DRY_RUN=""
+      fi
+
+      if [ -z "$SELECTED_REPO" ]; then
+        echo "running Renovate for ALL repositories."
+        npx --userconfig .npmrc renovate $DRY_RUN
+      else
+        echo "Running Renovate for repository: $SELECTED_REPO"
+        npx --userconfig .npmrc renovate $DRY_RUN --repo="$SELECTED_REPO"
+      fi
+    displayName: 'Run Renovate'
+    env:
+      LOG_LEVEL: DEBUG
+      RENOVATE_PLATFORM: azure
+      RENOVATE_TOKEN: $(RENOVATE_TOKEN)
+      TOKEN: $(System.AccessToken)
+      SELECTED_REPO: ${{ parameters.selectedRepo }}
+      BUILD_BRANCHNAME: $(Build.SourceBranchName)
