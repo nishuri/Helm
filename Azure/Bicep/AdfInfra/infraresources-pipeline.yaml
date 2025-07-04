@@ -3,7 +3,7 @@ trigger: none
 
 stages:
   - stage: ValidateADFResourcesBicepDev
-    displayName: 'Validate ADF resources Deployment Dev'
+    displayName: 'Validate ADF Resources Deployment Dev'
     variables:
       - group: s148-vyed-dev
     jobs:
@@ -19,46 +19,50 @@ stages:
               scriptType: bash
               scriptLocation: inlineScript
               inlineScript: |
-                echo "Running What-If Deployment for Bicep..."
+                echo "Running What-If Deployment for ADF Resources..."
                 az deployment group what-if \
                   --resource-group $(devDataFactoryRGName) \
                   --location $(location) \
                   --template-file infrabicep/main.bicep \
-                  --parameters resourceGroupName=$(devDataFactoryRGName) factoryName=$(devDataFactoryName) location=$(location) storageAccountName=$(storageAccountName) containerName=$(containerName)
+                  --parameters resourceGroupName=$(devDataFactoryRGName) \
+                               factoryName=$(devDataFactoryName) \
+                               location=$(location) \
+                               storageAccountName=$(storageAccountName) \
+                               containerName=$(containerName)
 
   - stage: DeployADFResourcesDev
-  displayName: 'Deploy ADF Resources Dev'
-  dependsOn: ValidateADFResourcesBicepDev
-  condition: succeeded()
-  environment: 'deploys148adf'
-  variables:
-    - group: s148-vyed-dev
-  jobs:
-    - deployment: DeployADFResources
-      displayName: 'Execute ADF Resources Deployment to Dev'
-      environment: 'deploys148adf'
-      strategy:
-        runOnce:
-          deploy:
-            steps:
-              - checkout: self
-              - task: AzureCLI@2
-                displayName: 'Deploy ADF Resources using Bicep'
-                inputs:
-                  azureSubscription: 's148d.azdo-deployment-dfe-gov'
-                  scriptType: bash
-                  scriptLocation: inlineScript
-                  inlineScript: |
-                    echo "Deploying ADF Resources..."
-                    az deployment group create \
-                      --resource-group $(devDataFactoryRGName) \
-                      --location $(location) \
-                      --template-file adfresources/main.bicep \
-                      --parameters resourceGroupName=$(devDataFactoryRGName) \
-                                   factoryName=$(devDataFactoryName) \
-                                   location=$(location) \
-                                   storageAccountName=$(storageAccountName) \
-                                   containerName=$(containerName)
+    displayName: 'Deploy ADF Resources Dev'
+    dependsOn: ValidateADFResourcesBicepDev
+    condition: succeeded()
+    environment: 'deploys148adf'
+    variables:
+      - group: s148-vyed-dev
+    jobs:
+      - deployment: DeployADFResources
+        displayName: 'Execute ADF Resources Deployment to Dev'
+        environment: 'deploys148adf'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                - task: AzureCLI@2
+                  displayName: 'Deploy ADF Resources using Bicep'
+                  inputs:
+                    azureSubscription: 's148d.azdo-deployment-dfe-gov'
+                    scriptType: bash
+                    scriptLocation: inlineScript
+                    inlineScript: |
+                      echo "Deploying ADF Resources..."
+                      az deployment group create \
+                        --resource-group $(devDataFactoryRGName) \
+                        --location $(location) \
+                        --template-file adfresources/main.bicep \
+                        --parameters resourceGroupName=$(devDataFactoryRGName) \
+                                     factoryName=$(devDataFactoryName) \
+                                     location=$(location) \
+                                     storageAccountName=$(storageAccountName) \
+                                     containerName=$(containerName)
 
                 
 
