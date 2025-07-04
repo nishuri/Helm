@@ -22,11 +22,8 @@ stages:
                 echo "Running What-If Deployment for ADF Resources..."
                 az deployment group what-if \
                   --resource-group $(devDataFactoryRGName) \
-                  --location $(location) \
-                  --template-file infrabicep/main.bicep \
-                  --parameters resourceGroupName=$(devDataFactoryRGName) \
-                               factoryName=$(devDataFactoryName) \
-                               location=$(location) \
+                  --template-file adfresources/main.bicep \
+                  --parameters factoryName=$(devDataFactoryName) \
                                storageAccountName=$(storageAccountName) \
                                containerName=$(containerName)
 
@@ -34,7 +31,6 @@ stages:
     displayName: 'Deploy ADF Resources Dev'
     dependsOn: ValidateADFResourcesBicepDev
     condition: succeeded()
-    environment: 'deploys148adf'
     variables:
       - group: s148-vyed-dev
     jobs:
@@ -46,6 +42,24 @@ stages:
             deploy:
               steps:
                 - checkout: self
+
+                - script: |
+                    echo "Removing existing Azure CLI..."
+                    sudo apt-get remove -y azure-cli
+
+                    echo "Adding Microsoft package repo..."
+                    curl -sL https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+                    AZ_REPO=$(lsb_release -cs)
+                    echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" | sudo tee /etc/apt/sources.list.d/azure-cli.list
+
+                    echo "Installing Azure CLI 2.71.0..."
+                    sudo apt-get update
+                    sudo apt-get install -y azure-cli=2.71.0-1~${AZ_REPO}
+
+                    echo "Azure CLI version after downgrade:"
+                    az --version
+                  displayName: 'Downgrade Azure CLI to 2.71.0'
+
                 - task: AzureCLI@2
                   displayName: 'Deploy ADF Resources using Bicep'
                   inputs:
@@ -56,216 +70,7 @@ stages:
                       echo "Deploying ADF Resources..."
                       az deployment group create \
                         --resource-group $(devDataFactoryRGName) \
-                        --location $(location) \
                         --template-file adfresources/main.bicep \
-                        --parameters resourceGroupName=$(devDataFactoryRGName) \
-                                     factoryName=$(devDataFactoryName) \
-                                     location=$(location) \
+                        --parameters factoryName=$(devDataFactoryName) \
                                      storageAccountName=$(storageAccountName) \
                                      containerName=$(containerName)
-
-                
-
-  # - stage: ValidateADFbicepTest
-  #   displayName: 'Validate ADF Deployment Test'
-  #   variables:
-  #     - group: s148-vyed-test
-  #   jobs:
-  #     - job: WhatIf_Test
-  #       displayName: 'Run What-If Analysis'
-  #       pool:
-  #         vmImage: 'ubuntu-latest'
-  #       steps:
-  #         - task: AzureCLI@2
-  #           displayName: 'Bicep What-If Analysis'
-  #           inputs:
-  #             azureSubscription: '$(subscriptionName)'
-  #             scriptType: bash
-  #             scriptLocation: inlineScript
-  #             inlineScript: |
-  #               echo "Running What-If Deployment for Bicep..."
-  #               az deployment sub what-if \
-  #                 --location $(location) \
-  #                 --template-file adfbicep/main.bicep \
-  #                 --parameters resourceGroupName=$(resourceGroupName) factoryName=$(factoryName) location=$(location) tags='$(tags)'
-
-  # - stage: DeployADFTest
-  #   displayName: 'Deploy ADF Test'
-  #   dependsOn: ValidateADFbicepTest
-  #   condition: succeeded()
-  #   variables:
-  #     - group: s148-vyed-test
-  #   jobs:
-  #     - deployment: DeployADF
-  #       displayName: 'Execute Deployment to Test'
-  #       environment: 'deploys148adf'
-  #       strategy:
-  #         runOnce:
-  #           deploy:
-  #             steps:
-  #               - checkout: self
-  #               - task: AzureCLI@2
-  #                 displayName: 'Deploy ADF using Bicep'
-  #                 inputs:
-  #                   azureSubscription: '$(subscriptionName)'
-  #                   scriptType: bash
-  #                   scriptLocation: inlineScript
-  #                   inlineScript: |
-  #                     echo "Deploying Azure Data Factory..."
-  #                     az deployment sub create \
-  #                       --location $(location) \
-  #                       --template-file adfbicep/main.bicep \
-  #                       --parameters resourceGroupName=$(resourceGroupName) factoryName=$(factoryName) location=$(location) tags='$(tags)'
-
-  # - stage: ValidateADFbicepUAT
-  #   displayName: 'Validate ADF Deployment UAT'
-  #   variables:
-  #     - group: s148-vyed-uat
-  #   jobs:
-  #     - job: WhatIf_UAT
-  #       displayName: 'Run What-If Analysis'
-  #       pool:
-  #         vmImage: 'ubuntu-latest'
-  #       steps:
-  #         - task: AzureCLI@2
-  #           displayName: 'Bicep What-If Analysis'
-  #           inputs:
-  #             azureSubscription: '$(subscriptionName)'
-  #             scriptType: bash
-  #             scriptLocation: inlineScript
-  #             inlineScript: |
-  #               echo "Running What-If Deployment for Bicep..."
-  #               az deployment sub what-if \
-  #                 --location $(location) \
-  #                 --template-file adfbicep/main.bicep \
-  #                 --parameters resourceGroupName=$(resourceGroupName) factoryName=$(factoryName) location=$(location) tags='$(tags)'
-
-  # - stage: DeployADFUAT
-  #   displayName: 'Deploy ADF UAT'
-  #   dependsOn: ValidateADFbicepUAT
-  #   condition: succeeded()
-  #   variables:
-  #     - group: s148-vyed-uat
-  #   jobs:
-  #     - deployment: DeployADF
-  #       displayName: 'Execute Deployment to UAT'
-  #       environment: 'deploys148adf'
-  #       strategy:
-  #         runOnce:
-  #           deploy:
-  #             steps:
-  #               - checkout: self
-  #               - task: AzureCLI@2
-  #                 displayName: 'Deploy ADF using Bicep'
-  #                 inputs:
-  #                   azureSubscription: '$(subscriptionName)'
-  #                   scriptType: bash
-  #                   scriptLocation: inlineScript
-  #                   inlineScript: |
-  #                     echo "Deploying Azure Data Factory..."
-  #                     az deployment sub create \
-  #                       --location $(location) \
-  #                       --template-file adfbicep/main.bicep \
-  #                       --parameters resourceGroupName=$(resourceGroupName) factoryName=$(factoryName) location=$(location) tags='$(tags)'
-
-  # - stage: ValidateADFbicepPreprod
-  #   displayName: 'Validate ADF Deployment Preprod'
-  #   variables:
-  #     - group: s148-vyed-pre-prod
-  #   jobs:
-  #     - job: WhatIf_Preprod
-  #       displayName: 'Run What-If Analysis'
-  #       pool:
-  #         vmImage: 'ubuntu-latest'
-  #       steps:
-  #         - task: AzureCLI@2
-  #           displayName: 'Bicep What-If Analysis'
-  #           inputs:
-  #             azureSubscription: '$(subscriptionName)'
-  #             scriptType: bash
-  #             scriptLocation: inlineScript
-  #             inlineScript: |
-  #               echo "Running What-If Deployment for Bicep..."
-  #               az deployment sub what-if \
-  #                 --location $(location) \
-  #                 --template-file adfbicep/main.bicep \
-  #                 --parameters resourceGroupName=$(resourceGroupName) factoryName=$(factoryName) location=$(location) tags='$(tags)'
-
-  # - stage: DeployADFPreprod
-  #   displayName: 'Deploy ADF Preprod'
-  #   dependsOn: ValidateADFbicepPreprod
-  #   condition: succeeded()
-  #   variables:
-  #     - group: s148-vyed-pre-prod
-  #   jobs:
-  #     - deployment: DeployADF
-  #       displayName: 'Execute Deployment to Preprod'
-  #       environment: 'deploys148adf'
-  #       strategy:
-  #         runOnce:
-  #           deploy:
-  #             steps:
-  #               - checkout: self
-  #               - task: AzureCLI@2
-  #                 displayName: 'Deploy ADF using Bicep'
-  #                 inputs:
-  #                   azureSubscription: '$(subscriptionName)'
-  #                   scriptType: bash
-  #                   scriptLocation: inlineScript
-  #                   inlineScript: |
-  #                     echo "Deploying Azure Data Factory..."
-  #                     az deployment sub create \
-  #                       --location $(location) \
-  #                       --template-file adfbicep/main.bicep \
-  #                       --parameters resourceGroupName=$(resourceGroupName) factoryName=$(factoryName) location=$(location) tags='$(tags)'
-
-  # - stage: ValidateADFbicepProd
-  #   displayName: 'Validate ADF Deployment Prod'
-  #   variables:
-  #     - group: s148-vyed-prod
-  #   jobs:
-  #     - job: WhatIf_Prod
-  #       displayName: 'Run What-If Analysis'
-  #       pool:
-  #         vmImage: 'ubuntu-latest'
-  #       steps:
-  #         - task: AzureCLI@2
-  #           displayName: 'Bicep What-If Analysis'
-  #           inputs:
-  #             azureSubscription: '$(subscriptionName)'
-  #             scriptType: bash
-  #             scriptLocation: inlineScript
-  #             inlineScript: |
-  #               echo "Running What-If Deployment for Bicep..."
-  #               az deployment sub what-if \
-  #                 --location $(location) \
-  #                 --template-file adfbicep/main.bicep \
-  #                 --parameters resourceGroupName=$(resourceGroupName) factoryName=$(factoryName) location=$(location) tags='$(tags)'
-
-  # - stage: DeployADFProd
-  #   displayName: 'Deploy ADF Prod'
-  #   dependsOn: ValidateADFbicepProd
-  #   condition: succeeded()
-  #   variables:
-  #     - group: s148-vyed-prod
-  #   jobs:
-  #     - deployment: DeployADF
-  #       displayName: 'Execute Deployment to Prod'
-  #       environment: 'deploys148adf'
-  #       strategy:
-  #         runOnce:
-  #           deploy:
-  #             steps:
-  #               - checkout: self
-  #               - task: AzureCLI@2
-  #                 displayName: 'Deploy ADF using Bicep'
-  #                 inputs:
-  #                   azureSubscription: '$(subscriptionName)'
-  #                   scriptType: bash
-  #                   scriptLocation: inlineScript
-  #                   inlineScript: |
-  #                     echo "Deploying Azure Data Factory..."
-  #                     az deployment sub create \
-  #                       --location $(location) \
-  #                       --template-file adfbicep/main.bicep \
-  #                       --parameters resourceGroupName=$(resourceGroupName) factoryName=$(factoryName) location=$(location) tags='$(tags)'
