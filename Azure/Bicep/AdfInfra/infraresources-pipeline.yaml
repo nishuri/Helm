@@ -26,31 +26,40 @@ stages:
                   --template-file infrabicep/main.bicep \
                   --parameters resourceGroupName=$(devDataFactoryRGName) factoryName=$(devDataFactoryName) location=$(location) storageAccountName=$(storageAccountName) containerName=$(containerName)
 
-  - stage: DeployADFDEVInfra
-    displayName: 'Deploy ADF Dev Infra'
-    dependsOn:ValidateADFResourcesBicepDev
-    condition: succeeded()
-    environment: 'deploys148adf'
-    variables:
-      - group: s148-vyed-dev
-    jobs:
-    - job: DeployJob
-      displayName: 'Execute Infra Deployment to Dev'
-      steps:
-        - checkout: self
-        - task: AzureCLI@2
-          displayName: 'Deploy ADF Infra using Bicep'
-          inputs:
-            azureSubscription: 's148d.azdo-deployment-dfe-gov'
-            scriptType: bash
-            scriptLocation: inlineScript
-            inlineScript: |
-              echo "Deploying Azure Data Factory..."
-              az deployment group create \
-                  --resource-group $(devDataFactoryRGName) \
-                  --location $(location) \
-                  --template-file infrabicep/main.bicep \
-                  --parameters resourceGroupName=$(devDataFactoryRGName) factoryName=$(devDataFactoryName) location=$(location) storageAccountName=$(storageAccountName) containerName=$(containerName)
+  - stage: DeployADFResourcesDev
+  displayName: 'Deploy ADF Resources Dev'
+  dependsOn: ValidateADFResourcesBicepDev
+  condition: succeeded()
+  environment: 'deploys148adf'
+  variables:
+    - group: s148-vyed-dev
+  jobs:
+    - deployment: DeployADFResources
+      displayName: 'Execute ADF Resources Deployment to Dev'
+      environment: 'deploys148adf'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - checkout: self
+              - task: AzureCLI@2
+                displayName: 'Deploy ADF Resources using Bicep'
+                inputs:
+                  azureSubscription: 's148d.azdo-deployment-dfe-gov'
+                  scriptType: bash
+                  scriptLocation: inlineScript
+                  inlineScript: |
+                    echo "Deploying ADF Resources..."
+                    az deployment group create \
+                      --resource-group $(devDataFactoryRGName) \
+                      --location $(location) \
+                      --template-file adfresources/main.bicep \
+                      --parameters resourceGroupName=$(devDataFactoryRGName) \
+                                   factoryName=$(devDataFactoryName) \
+                                   location=$(location) \
+                                   storageAccountName=$(storageAccountName) \
+                                   containerName=$(containerName)
+
                 
 
   # - stage: ValidateADFbicepTest
