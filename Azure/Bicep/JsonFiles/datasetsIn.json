@@ -1,0 +1,27 @@
+{
+  "name": "TestDatasetIn",
+  "type": "Microsoft.DataFactory/factories/datasets",
+  "properties": {
+    "linkedServiceName": {
+      "referenceName": "TestStorageLinkedService",
+      "type": "LinkedServiceReference"
+    },
+    "parameters": {
+      "containerName": {
+        "type": "String"
+      }
+    },
+    "type": "Binary",
+    "typeProperties": {
+      "location": {
+        "type": "AzureBlobStorageLocation",
+        "container": {
+          "value": "@dataset().containerName",
+          "type": "Expression"
+        },
+        "folderPath": "input",
+        "fileName": "emp.txt"
+      }
+    }
+  }
+}
