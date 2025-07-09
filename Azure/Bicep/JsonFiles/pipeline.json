@@ -1,52 +1,48 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-  "contentVersion": "1.0.0.0",
-  "parameters": {
-    "factoryName": {
-      "type": "string"
-    }
-  },
-  "resources": [
-    {
-      "type": "Microsoft.DataFactory/factories/pipelines",
-      "apiVersion": "2018-06-01",
-      "name": "[concat(parameters('factoryName'), '/TestCopyPipeline')]",
-      "properties": {
-        "activities": [
+  "name": "TestCopyPipeline",
+  "type": "Microsoft.DataFactory/factories/pipelines",
+  "properties": {
+    "description": "Simple binary copy pipeline",
+    "activities": [
+      {
+        "name": "DataCopyActivity",
+        "type": "Copy",
+        "typeProperties": {
+          "source": {
+            "type": "BinarySource",
+            "storeSettings": {
+              "type": "AzureBlobStorageReadSettings",
+              "recursive": true
+            }
+          },
+          "sink": {
+            "type": "BinarySink",
+            "storeSettings": {
+              "type": "AzureBlobStorageWriteSettings"
+            }
+          },
+          "enableStaging": false
+        },
+        "inputs": [
           {
-            "name": "DataCopyActivity",
-            "type": "Copy",
-            "typeProperties": {
-              "source": {
-                "type": "BinarySource",
-                "storeSettings": {
-                  "type": "AzureBlobStorageReadSettings",
-                  "recursive": true
-                }
-              },
-              "sink": {
-                "type": "BinarySink",
-                "storeSettings": {
-                  "type": "AzureBlobStorageWriteSettings"
-                }
-              },
-              "enableStaging": false
-            },
-            "inputs": [
-              {
-                "referenceName": "TestDatasetIn",
-                "type": "DatasetReference"
-              }
-            ],
-            "outputs": [
-              {
-                "referenceName": "TestDatasetOut",
-                "type": "DatasetReference"
-              }
-            ]
+            "referenceName": "TestDatasetIn",
+            "type": "DatasetReference",
+            "parameters": {
+              "container": "input"
+            }
+          }
+        ],
+        "outputs": [
+          {
+            "referenceName": "TestDatasetOut",
+            "type": "DatasetReference",
+            "parameters": {
+              "container": "output"
+            }
           }
         ]
       }
-    }
-  ]
+    ],
+    "annotations": []
+  }
 }
