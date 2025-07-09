@@ -1,25 +1,22 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-  "contentVersion": "1.0.0.0",
-  "parameters": {
-    "factoryName": {
-      "type": "string"
+  "name": "TestStorageLinkedService",
+  "type": "Microsoft.DataFactory/factories/linkedservices",
+  "properties": {
+    "parameters": {
+      "storageAccountName": { 
+		"type": "String" 
+		},
+      "accountKey": { 
+		"type": "SecureString" 
+		}
     },
-    "storageAccountName": {
-      "type": "string"
-    }
-  },
-  "resources": [
-    {
-      "type": "Microsoft.DataFactory/factories/linkedservices",
-      "apiVersion": "2018-06-01",
-      "name": "[concat(parameters('factoryName'), '/TestStorageLinkedService')]",
-      "properties": {
-        "type": "AzureBlobStorage",
-        "typeProperties": {
-          "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('storageAccountName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2021-09-01').keys[0].value)]"
-        }
+    "annotations": [],
+    "type": "AzureBlobStorage",
+    "typeProperties": {
+      "connectionString": {
+        "type": "Expression",
+        "value": "DefaultEndpointsProtocol=https;AccountName=@linkedService().storageAccountName;AccountKey=@linkedService().accountKey"
       }
     }
-  ]
+  }
 }
