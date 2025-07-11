@@ -2,20 +2,12 @@
   "name": "TestStorageLinkedService",
   "type": "Microsoft.DataFactory/factories/linkedservices",
   "properties": {
-    "parameters": {
-      "storageAccountName": { 
-		"type": "String" 
-		},
-      "accountKey": { 
-		"type": "SecureString" 
-		}
-    },
     "annotations": [],
     "type": "AzureBlobStorage",
     "typeProperties": {
       "connectionString": {
         "type": "Expression",
-        "value": "DefaultEndpointsProtocol=https;AccountName=@linkedService().storageAccountName;AccountKey=@linkedService().accountKey"
+        "value": "$(accountKey)"
       }
     }
   }
