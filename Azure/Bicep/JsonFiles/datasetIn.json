@@ -6,17 +6,12 @@
       "referenceName": "TestStorageLinkedService",
       "type": "LinkedServiceReference"
     },
-    "parameters": {
-      "containerName": {
-        "type": "String"
-      }
-    },
     "type": "Binary",
     "typeProperties": {
       "location": {
         "type": "AzureBlobStorageLocation",
         "container": {
-          "value": "@dataset().containerName",
+          "value": "$(containerName)",
           "type": "Expression"
         },
         "folderPath": "input",
