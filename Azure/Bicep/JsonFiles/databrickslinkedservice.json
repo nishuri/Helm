@@ -1,0 +1,18 @@
+{
+  "name": "ls_$(workspaceSuffix)",
+  "type": "Microsoft.DataFactory/factories/linkedservices",
+  "properties": {
+    "annotations": [],
+    "type": "AzureDatabricks",
+    "typeProperties": {
+      "domain": "$(databricksDomain)",
+      "authentication": "MSI",
+      "workspaceResourceId": "$(workspaceResourceId)",
+      "existingClusterId": "$(databricksClusterId)"
+    },
+    "connectVia": {
+      "referenceName": "$(integrationRuntime)",
+      "type": "IntegrationRuntimeReference"
+    }
+  }
+}
