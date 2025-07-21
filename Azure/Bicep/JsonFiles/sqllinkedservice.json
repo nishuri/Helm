@@ -1,0 +1,22 @@
+{
+  "name": "ls_$(sqlDbSuffix)",
+  "type": "Microsoft.DataFactory/factories/linkedservices",
+  "properties": {
+    "annotations": [],
+    "type": "AzureSqlDatabase",
+    "typeProperties": {
+      "server": "$(sqlServerName)",
+      "database": "$(sqlDatabaseName)",
+      "encrypt": "mandatory",
+      "trustServerCertificate": true,
+      "authenticationType": "SystemAssignedManagedIdentity",
+      "alwaysEncryptedSettings": {
+        "alwaysEncryptedAkvAuthType": "ManagedIdentity"
+      }
+    },
+    "connectVia": {
+      "referenceName": "$(integrationRuntime)",
+      "type": "IntegrationRuntimeReference"
+    }
+  }
+}
