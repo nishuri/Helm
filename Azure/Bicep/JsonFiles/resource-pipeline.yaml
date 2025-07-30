@@ -1,0 +1,149 @@
+trigger: none
+#appendCommitMessageToRunName: false
+
+stages:
+  - stage: DeployResourcestoDev
+    displayName: 'Deploy ADF Resources Deployment Dev'
+    variables:
+    - template: ../parameters/dev/parameters.yml
+    - group: s148-vyed-dev
+    jobs:
+      - job: DeployingtoDev
+        displayName: 'Deploying Resources to Dev'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - checkout: self
+
+          - task: replacetokens@6
+            displayName: 'Replace tokens using azpipelines pattern'
+            inputs:
+              sources: 's148-adf-resources/**/*.json'
+              tokenPattern: 'azpipelines'
+
+          - task: deploy-adf-json@2
+            displayName: 'Deploy ADF Resources'
+            inputs:
+              azureSubscription: 's148d.azdo-deployment-dfe-gov'
+              ResourceGroupName: $(devDataFactoryRGName)
+              DatafactoryName: $(devDataFactoryName)
+              ServicePath: 's148-adf-resources/linkedservices'
+              #DatasetPath: '../datasets'
+              #PipelinePath: '../pipelines'
+
+  - stage: DeployResourcestoTest
+    displayName: 'Deploy ADF Resources Deployment Test'
+    variables:
+    - template: ../parameters/test/parameters.yml
+    - group: s148-vyed-test
+    jobs:
+      - job: DeployingtoTest
+        displayName: 'Deploying Resources to Test'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - checkout: self
+
+          - task: replacetokens@6
+            displayName: 'Replace tokens using azpipelines pattern'
+            inputs:
+              sources: 's148-adf-resources/**/*.json'
+              tokenPattern: 'azpipelines'
+
+          - task: deploy-adf-json@2
+            displayName: 'Deploy ADF Resources'
+            inputs:
+              azureSubscription: 's148t.azdo-deployment-dfe-gov'
+              ResourceGroupName: $(testDataFactoryRGName)
+              DatafactoryName: $(testDataFactoryName)
+              ServicePath: 's148-adf-resources/linkedservices'
+              #DatasetPath: '../datasets'
+              #PipelinePath: '../pipelines'
+
+  - stage: DeployResourcestoUAT
+    displayName: 'Deploy ADF Resources Deployment UAT'
+    variables:
+    - template: ../parameters/uat/parameters.yml
+    - group: s148-vyed-uat
+    jobs:
+      - job: DeployingtoUAT
+        displayName: 'Deploying Resources to UAT'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - checkout: self
+
+          - task: replacetokens@6
+            displayName: 'Replace tokens using azpipelines pattern'
+            inputs:
+              sources: 's148-adf-resources/**/*.json'
+              tokenPattern: 'azpipelines'
+
+          - task: deploy-adf-json@2
+            displayName: 'Deploy ADF Resources'
+            inputs:
+              azureSubscription: 's148t.azdo-deployment-dfe-gov'
+              ResourceGroupName: $(uatDataFactoryRGName)
+              DatafactoryName: $(uatDataFactoryName)
+              ServicePath: 's148-adf-resources/linkedservices'
+              #DatasetPath: '../datasets'
+              #PipelinePath: '../pipelines'
+
+
+  - stage: DeployResourcestopreprod
+    displayName: 'Deploy ADF Resources Deployment Preprod'
+    variables:
+    - template: ../parameters/preprod/parameters.yml
+    - group: s148-vyed-pre-prod
+    jobs:
+      - job: DeployingtoPreProd
+        displayName: 'Deploying Resources to Preprod'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - checkout: self
+
+          - task: replacetokens@6
+            displayName: 'Replace tokens using azpipelines pattern'
+            inputs:
+              sources: 's148-adf-resources/**/*.json'
+              tokenPattern: 'azpipelines'
+
+          - task: deploy-adf-json@2
+            displayName: 'Deploy ADF Resources'
+            inputs:
+              azureSubscription: 's148p.azdo-deployment-dfe-gov'
+              ResourceGroupName: $(preprodDataFactoryRGName)
+              DatafactoryName: $(preprodDataFactoryName)
+              ServicePath: 's148-adf-resources/linkedservices'
+              #DatasetPath: '../datasets'
+              #PipelinePath: '../pipelines'
+
+  - stage: DeployResourcestoprod
+    displayName: 'Deploy ADF Resources Deployment prod'
+    variables:
+    - template: ../parameters/prod/parameters.yml
+    - group: s148-vyed-prod
+    jobs:
+      - job: DeployingtoProd
+        displayName: 'Deploying Resources to prod'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - checkout: self
+
+          - task: replacetokens@6
+            displayName: 'Replace tokens using azpipelines pattern'
+            inputs:
+              sources: 's148-adf-resources/**/*.json'
+              tokenPattern: 'azpipelines'
+
+          - task: deploy-adf-json@2
+            displayName: 'Deploy ADF Resources'
+            inputs:
+              azureSubscription: 's148p.azdo-deployment-dfe-gov'
+              ResourceGroupName: $(prodDataFactoryRGName)
+              DatafactoryName: $(prodDataFactoryName)
+              ServicePath: 's148-adf-resources/linkedservices'
+              #DatasetPath: '../datasets'
+              #PipelinePath: '../pipelines'
