@@ -1,0 +1,38 @@
+# templates/adf-deploy-template.yml
+parameters:
+  - name: environment
+    type: string
+  - name: jobName
+    type: string
+  - name: azureSubscription
+    type: string
+  - name: resourceGroupName
+    type: string
+  - name: dataFactoryName
+    type: string
+  - name: adfServicePath
+    type: string
+
+jobs:
+  - job: ${{ parameters.jobName }}
+    displayName: 'Deploying Resources to ${{ parameters.environment }}'
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+      - checkout: self
+
+      - task: replacetokens@6
+        displayName: 'Replace tokens using azpipelines pattern'
+        inputs:
+          sources: 's148-adf-resources/**/*.json'
+          tokenPattern: 'azpipelines'
+
+      - task: deploy-adf-json@2
+        displayName: 'Deploy ADF Resources'
+        inputs:
+          azureSubscription: '${{ parameters.azureSubscription }}'
+          ResourceGroupName: ${{ parameters.resourceGroupName }}
+          DatafactoryName: ${{ parameters.dataFactoryName }}
+          ServicePath: ${{ parameters.adfServicePath }}
+          #DatasetPath: '../datasets'
+          #PipelinePath: '../pipelines'
