@@ -1,0 +1,78 @@
+trigger: none
+#appendCommitMessageToRunName: false
+
+stages:
+  - stage: DeployResourcestoDev
+    displayName: 'Deploy ADF Resources Deployment Dev'
+    variables:
+      - template: ../parameters/dev/parameters.yml
+      - group: s148-vyed-dev
+    jobs:
+      - template: templates/adf-deploy-template.yml
+        parameters:
+          environment: 'Dev'
+          jobName: 'DeployingtoDev'
+          azureSubscription: 's148d.azdo-deployment-dfe-gov'
+          resourceGroupName: $(devDataFactoryRGName)
+          dataFactoryName: $(devDataFactoryName)
+          adfServicePath: $(adfservicepath)
+
+  - stage: DeployResourcestoTest
+    displayName: 'Deploy ADF Resources Deployment Test'
+    variables:
+      - template: ../parameters/test/parameters.yml
+      - group: s148-vyed-test
+    jobs:
+      - template: templates/adf-deploy-template.yml
+        parameters:
+          environment: 'Test'
+          jobName: 'DeployingtoTest'
+          azureSubscription: 's148t.azdo-deployment-dfe-gov'
+          resourceGroupName: $(testDataFactoryRGName)
+          dataFactoryName: $(testDataFactoryName)
+          adfServicePath: $(adfservicepath)
+
+  - stage: DeployResourcestoUAT
+    displayName: 'Deploy ADF Resources Deployment UAT'
+    variables:
+      - template: ../parameters/uat/parameters.yml
+      - group: s148-vyed-uat
+    jobs:
+      - template: templates/adf-deploy-template.yml
+        parameters:
+          environment: 'UAT'
+          jobName: 'DeployingtoUAT'
+          azureSubscription: 's148t.azdo-deployment-dfe-gov'
+          resourceGroupName: $(uatDataFactoryRGName)
+          dataFactoryName: $(uatDataFactoryName)
+          adfServicePath: $(adfservicepath)
+
+  - stage: DeployResourcestopreprod
+    displayName: 'Deploy ADF Resources Deployment Preprod'
+    variables:
+      - template: ../parameters/preprod/parameters.yml
+      - group: s148-vyed-pre-prod
+    jobs:
+      - template: templates/adf-deploy-template.yml
+        parameters:
+          environment: 'Preprod'
+          jobName: 'DeployingtoPreProd'
+          azureSubscription: 's148p.azdo-deployment-dfe-gov'
+          resourceGroupName: $(preprodDataFactoryRGName)
+          dataFactoryName: $(preprodDataFactoryName)
+          adfServicePath: $(adfservicepath)
+
+  # - stage: DeployResourcestoprod
+  #   displayName: 'Deploy ADF Resources Deployment prod'
+  #   variables:
+  #     - template: ../parameters/prod/parameters.yml
+  #     - group: s148-vyed-prod
+  #   jobs:
+  #     - template: templates/adf-deploy-template.yml
+  #       parameters:
+  #         environment: 'prod'
+  #         jobName: 'DeployingtoProd'
+  #         azureSubscription: 's148p.azdo-deployment-dfe-gov'
+  #         resourceGroupName: $(prodDataFactoryRGName)
+  #         dataFactoryName: $(prodDataFactoryName)
+  #         adfServicePath: $(adfservicepath)
