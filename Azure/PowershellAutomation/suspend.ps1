@@ -1,7 +1,13 @@
-# Set the properties for the Azure Analysis Services instance
-$subscriptionId = '89bc3160-da6b-4145-b11d-e364986037a3'
-$resourceGroupName = 's148d01-aas-anm'
-$serverName = 's148d01aasanm01'
+param(
+    [Parameter(Mandatory = $true)]
+    [string]$subscriptionId,
+
+    [Parameter(Mandatory = $true)]
+    [string]$resourceGroupName,
+
+    [Parameter(Mandatory = $true)]
+    [string]$serverName
+)
 
 # Write an information log with the current time.
 Write-Host "Running Powershell code to Suspend Azure Analysis Service $serverName"
