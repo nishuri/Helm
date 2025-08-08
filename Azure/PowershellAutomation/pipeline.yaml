@@ -1,5 +1,15 @@
 trigger: none
-appendCommitMessageToRunName: false 
+appendCommitMessageToRunName: false
+
+parameters:
+  - name: stageSelector
+    displayName: 'Enter the stage to suspend  Analsys'
+    type: string
+    default: 'DEV_TEST'
+    values:
+      - DEV_TEST
+      - DEV
+      - TEST
 
 schedules:
   - cron: "15 18 * * Mon-Fri"
@@ -34,6 +44,7 @@ stages:
 
 - stage: dev
   displayName: 'Suspend Analsys service Dev Environment'
+  condition: or(eq('${{ parameters.environment }}', 'DEV'), eq('${{ parameters.environment }}', 'DEV_TEST'))
   jobs:
   - job: Dev_Analysis_Service
     steps:
@@ -48,8 +59,7 @@ stages:
 
 - stage: test
   displayName: 'Suspend Analsys service Test Environment'
-  dependsOn: dev
-  condition: succeeded()
+  condition: or(eq('${{ parameters.environment }}', 'TEST'), eq('${{ parameters.environment }}', 'DEV_TEST'))
   jobs:
   - job: Test_Analysis_Service
     steps:
@@ -64,8 +74,7 @@ stages:
 
 - stage: Uat
   displayName: 'Suspend Analsys service Uat Environment'
-  dependsOn: dev
-  condition: succeeded()
+  condition: or(eq('${{ parameters.environment }}', 'TEST'), eq('${{ parameters.environment }}', 'DEV_TEST'))
   jobs:
   - job: uat_Analysis_Service
     steps:
