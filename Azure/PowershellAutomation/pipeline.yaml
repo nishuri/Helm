@@ -1,1 +1,80 @@
+trigger: none
+appendCommitMessageToRunName: false 
+
+schedules:
+  - cron: "15 18 * * Mon-Fri"
+    displayName: "Stop Analsys service at 6:15 PM (Mon-Fri)"
+    branches:
+      include:
+        - main
+    always: true
+
+
+stages:
+- stage: Set_Description
+  jobs:
+  - job: Set_Description_Job
+    steps:
+    - task: PowerShell@2
+      displayName: 'Set Dynamic Description'
+      inputs:
+        targetType: 'inline'
+        script: |
+          $currentHour = (Get-Date).Hour
+          $description = ""
+
+          if ($currentHour -eq 18) {
+            $description = "Stopping azure Analsys service- $(Get-Date -Format 'yyyy-MM-dd_HH-mm-ss')"
+          } else {
+            $description = "Suspend Azure Analsys service- $(Get-Date -Format 'yyyy-MM-dd_HH-mm-ss')"
+          }
+          Write-Output "##vso[build.updatebuildnumber]$description"
+
+
+
+- stage: dev
+  displayName: 'Suspend Analsys service Dev Environment'
+  jobs:
+  - job: Dev_Analysis_Service
+    steps:
+    - task: AzureCLI@2
+      displayName: 'Powershell task'
+      inputs:
+        azureSubscription: 's148d.azdo-deployment-dfe-gov'
+        scriptType: 'pscore'
+        scriptLocation: 'scriptPath'
+        ScriptPath: $(Build.SourcesDirectory)/scripts/s148VYEDSuspendAnalsys.ps1
+        arguments: '-subscriptionId "89bc3160-da6b-4145-b11d-e364986037a3" -resourceGroupName "s148d01-aas-anm" -serverName "s148d01aasanm01"'
+
+- stage: test
+  displayName: 'Suspend Analsys service Test Environment'
+  dependsOn: dev
+  condition: succeeded()
+  jobs:
+  - job: Test_Analysis_Service
+    steps:
+    - task: AzureCLI@2
+      displayName: 'Powershell task'
+      inputs:
+        azureSubscription: 's148t.azdo-deployment-dfe-gov'
+        scriptType: 'pscore'
+        scriptLocation: 'scriptPath'
+        ScriptPath: $(Build.SourcesDirectory)/scripts/s148VYEDSuspendAnalsys.ps1
+        arguments: '-subscriptionId "89bc3160-da6b-4145-b11d-e364986037a3" -resourceGroupName "s148d01-aas-anm" -serverName "s148d01aasanm01"'
+
+- stage: Uat
+  displayName: 'Suspend Analsys service Uat Environment'
+  dependsOn: dev
+  condition: succeeded()
+  jobs:
+  - job: uat_Analysis_Service
+    steps:
+    - task: AzureCLI@2
+      displayName: 'Powershell task'
+      inputs:
+        azureSubscription: 's148t.azdo-deployment-dfe-gov'
+        scriptType: 'pscore'
+        scriptLocation: 'scriptPath'
+        ScriptPath: $(Build.SourcesDirectory)/scripts/s148VYEDSuspendAnalsys.ps1
+        arguments: '-subscriptionId "89bc3160-da6b-4145-b11d-e364986037a3" -resourceGroupName "s148d01-aas-anm" -serverName "s148d01aasanm01"'
 
