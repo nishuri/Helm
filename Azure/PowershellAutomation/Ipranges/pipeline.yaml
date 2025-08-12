@@ -1,0 +1,92 @@
+trigger: none
+appendCommitMessageToRunName: false
+
+parameters:
+  - name: SelectEnvironment
+    displayName: 'Enter the stage to run IP Analsys'
+    type: string
+    default: 'DEV_TEST_PROD'
+    values:
+      - DEV_TEST_PROD
+      - DEV
+      - TEST
+      - PROD
+
+schedules:
+  - cron: "15 18 * * Mon-Fri"
+    displayName: "Run IP Analsys service at 6:15 PM (Mon-Fri)"
+    branches:
+      include:
+        - main
+    always: true
+
+
+stages:
+- stage: Set_Description
+  jobs:
+  - job: Set_Description_Job
+    steps:
+    - task: PowerShell@2
+      displayName: 'Set Dynamic Description'
+      inputs:
+        targetType: 'inline'
+        script: |
+          $currentHour = (Get-Date).Hour
+          $description = ""
+
+          if ($currentHour -eq 18) {
+            $description = "Updating storage account IP Ranges- $(Get-Date -Format 'yyyy-MM-dd_HH-mm-ss')"
+          } else {
+            $description = "Adding storage account IP Ranges- $(Get-Date -Format 'yyyy-MM-dd_HH-mm-ss')"
+          }
+          Write-Output "##vso[build.updatebuildnumber]$description"
+
+
+
+- stage: dev
+  displayName: 'Updating storage account IP Ranges in Dev Environment'
+  condition: or(eq('${{ parameters.SelectEnvironment }}', 'DEV'), eq('${{ parameters.SelectEnvironment }}', 'DEV_TEST_PROD'))
+  jobs:
+  - job: Dev_stgacnt_ip_update
+    steps:
+    - task: AzurePowerShell@5
+      displayName: 'Powershell task'
+      inputs:
+        azureSubscription: s148d.azdo-deployment-dfe-gov
+        ScriptType: filepath
+        scriptPath: $(Build.SourcesDirectory)/scripts/s148VYEDStgAccntIPRanges.ps1
+        scriptArguments: -storageAccountName "s148d01storageaasanmbk" -resourceGroupName "s148d01-aas-anm" -name "AzureCloud.westeurope"
+        azurePowerShellVersion: LatestVersion
+        pwsh: true
+
+- stage: test
+  displayName: 'Updating storage account IP Ranges in Test Environment'
+  condition: or(eq('${{ parameters.SelectEnvironment }}', 'TEST'), eq('${{ parameters.SelectEnvironment }}', 'DEV_TEST'))
+  jobs:
+  - job: Test_stgacnt_ip_update
+    steps:
+    - task: AzurePowerShell@5
+      displayName: 'Powershell task'
+      inputs:
+        azureSubscription: s148t.azdo-deployment-dfe-gov
+        ScriptType: filepath
+        scriptPath: $(Build.SourcesDirectory)/scripts/s148VYEDStgAccntIPRanges.ps1
+        scriptArguments: -storageAccountName "s148d01storageaasanmbk" -resourceGroupName "s148t01-aas-anm" -name "AzureCloud.westeurope"
+        azurePowerShellVersion: LatestVersion
+        pwsh: true
+
+- stage: prod
+  displayName: 'Updating storage account IP Ranges in prod Environment'
+  condition: or(eq('${{ parameters.SelectEnvironment }}', 'TEST'), eq('${{ parameters.SelectEnvironment }}', 'DEV_TEST'))
+  jobs:
+  - job: Prod_stgacnt_ip_update
+    steps:
+    - task: AzurePowerShell@5
+      displayName: 'Powershell task'
+      inputs:
+        azureSubscription: s148p.azdo-deployment-dfe-gov
+        ScriptType: filepath
+        scriptPath: $(Build.SourcesDirectory)/scripts/s148VYEDStgAccntIPRanges.ps1
+        scriptArguments: -storageAccountName "s148d01storageaasanmbk" -resourceGroupName "s148p01-aas-anm" -name "AzureCloud.westeurope"
+        azurePowerShellVersion: LatestVersion
+        pwsh: true
