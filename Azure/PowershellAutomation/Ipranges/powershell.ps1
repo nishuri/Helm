@@ -13,6 +13,8 @@ param(
 Write-Host "Getting PowerShell Module"
 Import-Module Az.Storage
 
+$ErrorActionPreference = "Stop"
+
 $response = Invoke-WebRequest "https://www.microsoft.com/en-us/download/details.aspx?id=56519"
 $fileStartIndex = $response.Content.IndexOf("ServiceTags_Public_")
 $fileEndIndex = $response.Content.IndexOf(".json", $fileStartIndex)
@@ -45,20 +47,18 @@ foreach ($ip in $filteredAddresses) {
     } else {
         $modifiedIp = $ip
     }
-    $ipRange = @{
-        IPAddressOrRange = $modifiedIp
-        Action = "allow"
-    }
+    $ipRange = New-AzStorageAccountNetworkRule -IPAddressOrRange $modifiedIp -Action Allow
     $ipRanges += $ipRange
 }
 
 Write-Host "Updating storage account $storageAccountName netowrking"
 
 try {
-    Add-AzStorageAccountNetworkRule -ResourceGroupName $resourceGroupName -Name $storageAccountName -IPRule $ipRanges
+    Add-AzStorageAccountNetworkRule -ResourceGroupName $resourceGroupName -Name $storageAccountName -IPRule $ipRanges -ErrorAction Stop
+    Write-Host "IP rules added successfully to storage account $storageAccountName"
     } 
     catch {
         Write-Host "Error adding IP rules - $_"
+        throw
           }
 
-Write-Host "IP rules added successfully to storage account $storageAccountName"
