@@ -1,0 +1,78 @@
+trigger: none
+appendCommitMessageToRunName: false
+
+parameters:
+  - name: SelectEnvironment
+    displayName: 'Enter the stage to Resume  Analsys'
+    type: string
+    default: 'TEST'
+    values:
+      - DEV_TEST
+      - DEV
+      - TEST
+
+schedules:
+  - cron: "0 7 * * Mon-Fri"
+    displayName: "Stop Analsys service at 6:15 PM (Mon-Fri)"
+    branches:
+      include:
+        - main
+    always: true
+
+
+stages:
+- stage: Set_Description
+  jobs:
+  - job: Set_Description_Job
+    steps:
+    - task: PowerShell@2
+      displayName: 'Set Dynamic Description'
+      inputs:
+        targetType: 'inline'
+        script: |
+          $currentHour = (Get-Date).Hour
+          $description = ""
+          $env = "${{ parameters.SelectEnvironment }}"
+
+          if ($currentHour -eq 18) {
+            $description = "Resume Azure Analysis Services Server in Environiment $env- $(Get-Date -Format 'yyyy-MM-dd_HH-mm-ss')"
+          } else {
+            $description = "Manual- Resume Azure Analysis Services Server in Environiment $env- $(Get-Date -Format 'yyyy-MM-dd_HH-mm-ss')"
+          }
+          Write-Output "##vso[build.updatebuildnumber]$description"
+
+
+
+- stage: dev
+  displayName: 'Resume Analsys service Dev Environment'
+  condition: or(eq('${{ parameters.SelectEnvironment }}', 'DEV'), eq('${{ parameters.SelectEnvironment }}', 'DEV_TEST'))
+  dependsOn: Set_Description 
+  jobs:
+  - job: Dev_Analysis_Service
+    steps:
+    - task: AzurePowerShell@5
+      displayName: 'Powershell task'
+      inputs:
+        azureSubscription: 's148d.azdo-deployment-dfe-gov'
+        scriptType: filePath
+        ScriptPath: $(Build.SourcesDirectory)/s148-aas-resume/scripts/s148VYEDResumeAnalsys.ps1
+        scriptArguments: -resourceGroupName "s148d01-aas-anm" -serverName "s148d01aasanm01"
+        azurePowerShellVersion: LatestVersion
+        pwsh: true
+
+- stage: test
+  displayName: 'Resume Analsys service Test Environment'
+  condition: or(eq('${{ parameters.SelectEnvironment }}', 'TEST'), eq('${{ parameters.SelectEnvironment }}', 'DEV_TEST'))
+  dependsOn: Set_Description 
+  jobs:
+  - job: Test_Analysis_Service
+    steps:
+    - task: AzurePowerShell@5
+      displayName: 'Powershell task'
+      inputs:
+        azureSubscription: 's148t.azdo-deployment-dfe-gov'
+        scriptType: filePath
+        ScriptPath: $(Build.SourcesDirectory)/s148-aas-resume/scripts/s148VYEDResumeAnalsys.ps1
+        scriptArguments: -resourceGroupName "s148t01-aas-anm" -serverName "s148t01aasanm01"
+        azurePowerShellVersion: LatestVersion
+        pwsh: true
