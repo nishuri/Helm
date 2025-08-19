@@ -13,11 +13,11 @@ Import-Module Az.AnalysisServices
 
 
 #Getting Currnt State
-$server=Get-AzAnalysisServicesServer -ResourceGroupName $resourceGroupName -Name $serverName -ErrorAction SilentlyContinue -ErrorVariable error
+$server=Get-AzAnalysisServicesServer -ResourceGroupName $resourceGroupName -Name $serverName -ErrorAction SilentlyContinue -ErrorVariable err
 
-if ($error)
+if ($err)
 {
-    Write-Host "Powershell command failed to GET the status of Azure Analysis Service server $server. Error $error"
+    Write-Host "Powershell command failed to GET the status of Azure Analysis Service server $server. Error $err"
 }
 else
 {
@@ -30,18 +30,18 @@ else
     }
     else
     {
-        $resumeOut=Resume-AzAnalysisServicesServer -ResourceGroupName $resourceGroupName -Name $serverName -ErrorAction SilentlyContinue -ErrorVariable error
+        $resumeOut=Resume-AzAnalysisServicesServer -ResourceGroupName $resourceGroupName -Name $serverName -ErrorAction SilentlyContinue -ErrorVariable err
 
-        if ($error)
+        if ($err)
         {
-            Write-Host "Powershell command failed to resume Azure Analysis Service server $serverName. Error is $error"
+            Write-Host "Powershell command failed to resume Azure Analysis Service server $serverName. Error is $err"
         }
         else
         {
-            $newState=Get-AzAnalysisServicesServer -ResourceGroupName $resourceGroupName -Name $serverName -ErrorAction SilentlyContinue -ErrorVariable error
-            if ($error)
+            $newState=Get-AzAnalysisServicesServer -ResourceGroupName $resourceGroupName -Name $serverName -ErrorAction SilentlyContinue -ErrorVariable err
+            if ($err)
             {
-                Write-Host "Powershell command failed to GET the status of Azure Analysis Service server $serverName. Error : $error"
+                Write-Host "Powershell command failed to GET the status of Azure Analysis Service server $serverName. Error : $err"
             }
             else
             {
