@@ -65,8 +65,12 @@ if ($remaining -le 0) {
     return
 }
 
+$newIps = $ipRanges | Where-Object { $currentRules -notcontains $_ }
+
+Write-Host "New IPs to add: $($newIps.Count)"
+
 # Add only up to available capacity
-$toAdd = $ipRanges | Select-Object -First $remaining
+$toAdd = $newIps | Select-Object -First $remaining
 
 foreach ($range in $toAdd) {
     try {
