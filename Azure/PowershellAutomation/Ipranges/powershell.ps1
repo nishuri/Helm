@@ -6,12 +6,12 @@ param(
     [string]$resourceGroupName,
 
     [Parameter(Mandatory = $true)]
-    [string]$name
+    [string]$regionName
 )
 
-# Importing Analysis Service Modules
+
 Write-Host "Getting PowerShell Module"
-Import-Module Az.Storage
+Import-Module Az.Storage -ErrorAction Stop
 
 $ErrorActionPreference = "Stop"
 
@@ -26,7 +26,7 @@ $addresses = @()
 $filteredAddresses = @()
 
 foreach ($item in $data.values) {
-    if ($item.name -eq $name) {
+    if ($item.name -eq $regionName) {
         foreach ($ip in $item.properties.addressPrefixes) {
             $addresses += $ip
             }
@@ -47,18 +47,39 @@ foreach ($ip in $filteredAddresses) {
     } else {
         $modifiedIp = $ip
     }
-    $ipRange = New-AzStorageAccountNetworkRule -IPAddressOrRange $modifiedIp -Action Allow
-    $ipRanges += $ipRange
+    $ipRanges += $modifiedIp
 }
 
 Write-Host "Updating storage account $storageAccountName netowrking"
 
-try {
-    Add-AzStorageAccountNetworkRule -ResourceGroupName $resourceGroupName -Name $storageAccountName -IPRule $ipRanges -ErrorAction Stop
-    Write-Host "IP rules added successfully to storage account $storageAccountName"
+$storageAccount = Get-AzStorageAccount -ResourceGroupName $resourceGroupName -Name $storageAccountName
+$currentRules = $storageAccount.NetworkRuleSet.IpRules
+$currentCount = $currentRules.Count
+$maxLimit = 400
+$remaining = $maxLimit - $currentCount
+
+Write-Host "Storage account already has $currentCount rules. Remaining capacity: $remaining"
+
+if ($remaining -le 0) {
+    Write-Host "No capacity left to add IP rules. Skipping..."
+    return
+}
+
+# Add only up to available capacity
+$toAdd = $ipRanges | Select-Object -First $remaining
+
+foreach ($range in $toAdd) {
+    try {
+        Add-AzStorageAccountNetworkRule -ResourceGroupName $resourceGroupName -Name $storageAccountName -IPAddressOrRange $range -ErrorAction Stop
+        Write-Host "Added $range successfully"
     } 
     catch {
-        Write-Host "Error adding IP rules - $_"
-        throw
-          }
+        Write-Host "Error adding $range - $_"
+    }
+}
 
+# Report skipped IPs if any
+if ($ipRanges.Count -gt $remaining) {
+    $skipped = $ipRanges.Count - $remaining
+    Write-Host "Skipped $skipped IP(s) because the storage account reached the 400 rule limit."
+}
