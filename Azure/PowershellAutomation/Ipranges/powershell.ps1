@@ -69,7 +69,7 @@ if ($remaining -le 0) {
 
 $newIps = $ipRanges | Where-Object { $currentRuleIps -notcontains $_ }
 
-Write-Host "New IPs to add: $($newIps.Count)"
+$beforeIps = (Get-AzStorageAccount -ResourceGroupName $resourceGroupName -Name $storageAccountName).NetworkRuleSet.IpRules | ForEach-Object { $_.IPAddressOrRange }
 
 # Add only up to available capacity
 $toAdd = $newIps | Select-Object -First $remaining
@@ -77,12 +77,19 @@ $toAdd = $newIps | Select-Object -First $remaining
 foreach ($range in $toAdd) {
     try {
         Add-AzStorageAccountNetworkRule -ResourceGroupName $resourceGroupName -Name $storageAccountName -IPAddressOrRange $range -ErrorAction Stop | Out-Null
-        Write-Host "Added $range successfully"
     } 
     catch {
         Write-Host "Error adding $range - $_"
     }
 }
+
+# Get updated IPs
+$afterIps = (Get-AzStorageAccount -ResourceGroupName $resourceGroupName -Name $storageAccountName).NetworkRuleSet.IpRules | ForEach-Object { $_.IPAddressOrRange }
+
+# Find the difference
+$actuallyAdded = $afterIps | Where-Object { $beforeIps -notcontains $_ }
+
+Write-Host "Newly added IPs: $($actuallyAdded -join ', ')"
 
 # Report skipped IPs if any
 if ($ipRanges.Count -gt $remaining) {
