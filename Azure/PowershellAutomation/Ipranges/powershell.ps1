@@ -54,7 +54,9 @@ Write-Host "Updating storage account $storageAccountName netowrking"
 
 $storageAccount = Get-AzStorageAccount -ResourceGroupName $resourceGroupName -Name $storageAccountName
 $currentRules = $storageAccount.NetworkRuleSet.IpRules
-$currentCount = $currentRules.Count
+$currentRuleIps = $currentRules | ForEach-Object { $_.IPAddressOrRange }
+
+$currentCount = $currentRuleIps.Count
 $maxLimit = 400
 $remaining = $maxLimit - $currentCount
 
@@ -65,7 +67,7 @@ if ($remaining -le 0) {
     return
 }
 
-$newIps = $ipRanges | Where-Object { $currentRules -notcontains $_ }
+$newIps = $ipRanges | Where-Object { $currentRuleIps -notcontains $_ }
 
 Write-Host "New IPs to add: $($newIps.Count)"
 
@@ -74,7 +76,7 @@ $toAdd = $newIps | Select-Object -First $remaining
 
 foreach ($range in $toAdd) {
     try {
-        Add-AzStorageAccountNetworkRule -ResourceGroupName $resourceGroupName -Name $storageAccountName -IPAddressOrRange $range -ErrorAction Stop
+        Add-AzStorageAccountNetworkRule -ResourceGroupName $resourceGroupName -Name $storageAccountName -IPAddressOrRange $range -ErrorAction Stop | Out-Null
         Write-Host "Added $range successfully"
     } 
     catch {
