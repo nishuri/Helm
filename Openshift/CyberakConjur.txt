@@ -1,0 +1,264 @@
+# CyberArk Conjur on OpenShift — Step-by-step Deployment Guide
+
+> **Purpose:** Install and configure CyberArk Conjur (Open Source or Enterprise follower) on Red Hat OpenShift / Kubernetes so applications can securely fetch secrets.
+
+---
+
+## Table of contents
+
+1. Overview and architecture
+2. Prerequisites
+3. High-level installation options
+4. Detailed step-by-step (Helm / Conjur OSS on OpenShift)
+5. Conjur Follower / Enterprise follower notes
+6. Deploying the Secrets Provider (init container) for apps
+7. Example: Bootstrap, policy, and app retrieval flow
+8. Security and hardening checklist
+9. Troubleshooting
+10. Cleanup
+11. Appendix: sample manifests and values
+
+---
+
+## 1. Overview and architecture
+
+Conjur is a secrets-management service that stores and serves application secrets with strong authentication and audit.
+
+Typical architecture on OpenShift (small):
+
+* Conjur API (master/leader) running either outside the cluster or inside as a Helm-deployed pod
+* PostgreSQL backing store (managed by chart or external RDS/Postgres)
+* Conjur Followers (optional / recommended for production) running in-cluster to accelerate and secure pod access
+* Conjur Secrets Provider for Kubernetes / OpenShift (runs as an init container) to bring secrets into application pods
+
+Flow: Application pod -> (init container / sidecar) authenticates to Conjur Follower -> fetches secrets -> injects into pod environment/secret.
+
+## 2. Prerequisites
+
+* OpenShift cluster (tested on OCP 4.x, ensure you have cluster-admin or appropriate privileges)
+* `kubectl` and `oc` CLIs configured and logged in
+* `helm` v3+ installed locally
+* Persistent storage class available for Postgres PVCs
+* DNS / routing for Conjur service (Route or Ingress)
+* Images accessible (if cluster restricts external images, push to a registry accessible by OpenShift)
+* For production: TLS certificates (or plan to use OpenShift Routes with TLS)
+
+Secrets and sensitive values you will create (store in a secure place):
+
+* Conjur data encryption key (DATA_KEY)
+* Admin API key / bootstrap credentials
+
+## 3. High-level installation options
+
+1. **Conjur OSS (Helm chart)** — Good for PoC and many production use-cases. Uses `cyberark/conjur-oss` Helm chart.
+2. **Conjur Enterprise (DAP) with followers** — Use `kubernetes-conjur-deploy` scripts or follower operator; recommended for enterprise-grade HA and managed leader outside cluster.
+3. **Appliance-based follower** — Useful when Conjur leader is external (on-premises) and you deploy followers in OpenShift.
+
+This guide focuses on the Conjur OSS Helm chart for OpenShift and then shows how to wire an application with the Secrets Provider.
+
+## 4. Detailed step-by-step (Helm / Conjur OSS on OpenShift)
+
+> The steps below are written for OpenShift but are applicable to Kubernetes with small adjustments.
+
+### 4.1. Prepare environment
+
+```bash
+oc project my-conjur || oc new-project my-conjur
+oc adm policy add-scc-to-user anyuid -z default -n my-conjur  # only if needed for images that require non-root
+```
+
+> Note: Use restrictive SCCs in production. Avoid `anyuid` if images support non-root.
+
+### 4.2. Add CyberArk Helm repo and inspect chart
+
+```bash
+helm repo add cyberark https://cyberark.github.io/helm-charts
+helm repo update
+helm search repo cyberark/conjur-oss --versions
+```
+
+### 4.3. Generate DATA_KEY (used for encrypting DB contents)
+
+If you have `docker` access or `conjur` image locally:
+
+```bash
+# example using the published image
+DATA_KEY=$(docker run --rm cyberark/conjur data-key generate)
+# base64 encode if the chart expects it; check chart README
+```
+
+Save the `DATA_KEY` securely.
+
+### 4.4. Prepare a `values.yaml` for OpenShift
+
+Create `conjur-values.yaml` with important settings (example minimal):
+
+```yaml
+openshift:
+  enabled: true
+  # if using custom service account, routes, imagePullSecrets, etc.
+postgres:
+  persistence:
+    enabled: true
+    size: 10Gi
+conjur:
+  dataKey: "<YOUR_DATA_KEY>"
+  service:
+    type: ClusterIP
+  nginx:
+    route:
+      enabled: true
+      host: conjur.example.com
+```
+
+Adjust image names if your OpenShift environment requires UBI-based images or pulling from an internal registry.
+
+### 4.5. Install chart
+
+```bash
+helm install conjur-oss cyberark/conjur-oss -n my-conjur -f conjur-values.yaml
+# or use chart tarball for specific version
+# helm install conjur-oss ./conjur-oss-<version>.tgz -n my-conjur -f conjur-values.yaml
+```
+
+Monitor pods:
+
+```bash
+oc get pods -n my-conjur -w
+oc logs -n my-conjur deploy/conjur-oss
+```
+
+### 4.6. Post-install: bootstrap and admin token
+
+After Conjur API is up you will need to bootstrap and create admin API keys or host identities. The chart may output a `seed` or `init` secret.
+
+Common actions:
+
+* Retrieve the data-key or admin credentials from the Helm release secrets
+* Create Conjur policies to define hosts and variables
+
+Example to call Conjur API (internal curl example):
+
+```bash
+# Example, adapt host, route, TLS settings
+CONJUR_APPLIANCE_URL="https://conjur.example.com"
+# create a policy by posting policy file
+curl -k -H "Content-Type: application/yaml" --data-binary @policy.yml \
+  $CONJUR_APPLIANCE_URL/host_factory/<account>/hosts
+```
+
+## 5. Conjur Follower / Enterprise follower notes
+
+* For production, deploy Conjur Followers in the cluster and run the Conjur Leader (Master) separately (or use DAP).
+* Followers authenticate local pods and proxy requests to leader for writes as needed.
+* You may use `kubernetes-conjur-deploy` scripts (CyberArk repo) or the Conjur Follower operator for OpenShift.
+
+## 6. Deploying the Secrets Provider (init container) for apps
+
+CyberArk provides a Secrets Provider for Kubernetes / OpenShift which runs as an init container and injects secrets into a Kubernetes Secret or environment variables.
+
+High-level steps:
+
+1. Install Secrets Provider (Helm chart or YAML) into your cluster.
+2. Configure RBAC and service account for pods to use the `authenticator` (e.g., `k8s` authenticator) and map pod identities to Conjur host IDs.
+3. Annotate your application `Pod` or `Deployment` to run the init container and specify which Conjur variables to fetch.
+
+Example Pod annotation pattern (conceptual):
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sample-app
+spec:
+  template:
+    metadata:
+      annotations:
+        conjur.org/authenticator: "authn-k8s/my-authenticator"
+        conjur.org/secret/VAR_DB_PASSWORD: "/myapp/db/password"
+    spec:
+      serviceAccountName: app-sa
+      containers:
+      - name: app
+        image: my-app:latest
+      initContainers:
+      - name: conjur-secrets-init
+        image: cyberark/conjur-k8s-sidecar-<version>
+        # the Secrets Provider may be installed as an init container via the chart and injected automatically
+```
+
+Refer to the Secrets Provider docs for exact annotations and filenames in `values.yaml`.
+
+## 7. Example: Bootstrap, policy, and app retrieval flow
+
+1. Create a Conjur policy file (`app-policy.yml`) that declares `hosts` and `secrets` (variables) and grants `host` access to read secrets.
+2. Load the policy to Conjur using the Conjur CLI or API.
+3. Create a Host factory token or use OpenShift service account JWT to let a pod bootstrap as a Conjur host.
+4. Deploy application with annotations so the Secrets Provider authenticates and fetches secrets on pod start.
+5. Verify pod logs and `kubectl` secrets to confirm the secret is present.
+
+## 8. Security and hardening checklist
+
+* Use TLS for Conjur API and Follower communication.
+* Use Pod Security Policies / SCC appropriately; prefer non-root images.
+* Limit RBAC permissions; create minimal service accounts for apps.
+* Rotate `DATA_KEY` and admin keys per policy.
+* Use Conjur Audit features and integrate logs with your SIEM.
+* Ensure Postgres backups and encryption at rest for PVs.
+
+## 9. Troubleshooting
+
+* **Pod stuck CrashLoopBackOff**: check logs of Conjur container and init container. Verify service account and authenticator configuration.
+* **Secret not injected**: check Secrets Provider logs, ensure annotations are correct, confirm host identity was provisioned and allowed by policy.
+* **Helm install fails**: examine chart values for `openshift.enabled: true`, imagePullSecrets, PVC classes, and ensure `DATA_KEY` format is correct.
+
+## 10. Cleanup
+
+To remove Conjur OSS installed via Helm:
+
+```bash
+helm uninstall conjur-oss -n my-conjur
+oc delete namespace my-conjur
+# delete persistent volumes and any external secrets
+```
+
+## 11. Appendix: sample policy and values (short)
+
+### Sample Conjur policy (app-policy.yml)
+
+```yaml
+- !policy
+  id: myapp
+  body:
+  - !variable db/password
+  - !grant
+    role: !host myapp-host
+    privileges: [ read ]
+```
+
+### Minimal `conjur-values.yaml` example
+
+```yaml
+openshift:
+  enabled: true
+postgres:
+  persistence:
+    enabled: true
+conjur:
+  dataKey: "REPLACE_WITH_DATAKEY"
+  nginx:
+    route:
+      enabled: true
+      host: conjur.example.com
+```
+
+---
+
+### Notes
+
+* This guide is written to be actionable for a PoC; before production rollout validate HA, backups, certificate management, and enterprise requirements.
+* For enterprise DAP/Conjur followers see CyberArk official instructions for follower setup and best practices.
+
+---
+
+*End of guide.*
