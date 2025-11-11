@@ -1,0 +1,56 @@
+trigger:
+- none
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  devRGName: 's148t01-vyed'
+  sourceDirectory: 'Infra'
+  templateFile: 'main.bicep'
+
+stages:
+- stage: WhatIf
+  displayName: 'Preview'
+  jobs:
+   - job: 
+     displayName: 'What-If'
+     steps:
+     - task: AzureCLI@2
+       inputs:
+         azureSubscription: 's148t.azdo-deployment-dfe-gov'
+         scriptType: 'bash'
+         scriptLocation: 'inlineScript'
+         inlineScript: |
+           az deployment group what-if --resource-group $(devRGName) \
+                  --template-file $(sourceDirectory)/$(templateFile)
+                
+- stage: Dev
+  displayName: 'Deploy Dev'
+  dependsOn: WhatIf
+  jobs:
+  - job: waitForValidation
+    displayName: Wait for external validation
+    pool: server
+    timeoutInMinutes: 4320
+    steps:
+    - task: ManualValidation@0
+      timeoutInMinutes: 1440
+      inputs:
+        notifyUsers: 'nirman.singha@education.gov.uk'
+        instructions: 'Please validate the build configuration and resume'
+  - job: Deploy
+    displayName: 'Deploy Infrastructure'
+    dependsOn: waitForValidation
+    steps:
+      - task: AzureCLI@2 
+        displayName: 'Deploy'
+        inputs:
+          azureSubscription: 's148t.azdo-deployment-dfe-gov'
+          scriptType: 'bash'
+          scriptLocation: 'inlineScript'
+          inlineScript: |
+            az deployment group create \
+                  --name $(Build.BuildNumber) \
+                  --resource-group $(devRGName) \
+                  --template-file $(sourceDirectory)/$(templateFile) \
