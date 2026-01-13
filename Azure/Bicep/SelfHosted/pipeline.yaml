@@ -1,5 +1,8 @@
 trigger: none
 
+variables:
+  devResourceGroupName: s148d01-vyed-dev-rg
+
 stages:
 - stage: WhatIf_Dev
   displayName: 'What-If Analysis (Dev)'
