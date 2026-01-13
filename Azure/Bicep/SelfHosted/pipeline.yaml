@@ -1,0 +1,54 @@
+trigger: none
+
+stages:
+- stage: WhatIf_Dev
+  displayName: 'What-If Analysis (Dev)'
+  variables:
+    - group: s148-vyed-dev
+  jobs:
+    - job: WhatIf
+      displayName: 'Run What-If'
+      pool:
+        vmImage: 'ubuntu-latest'
+      steps:
+        - checkout: self
+
+        - task: AzureCLI@2
+          displayName: 'Bicep What-If Deployment'
+          inputs:
+            azureSubscription: 's148d.azdo-deployment-dfe-gov'
+            scriptType: bash
+            scriptLocation: inlineScript
+            inlineScript: |
+              echo "Running What-If for Dev deployment..."
+
+              az deployment group what-if \
+                --resource-group $(devResourceGroupName) \
+                --template-file main.bicep \
+                --parameters @parameters/dev.parameters.json
+- stage: Deploy_Dev
+  displayName: 'Deploy Resources (Dev)'
+  dependsOn: WhatIf_Dev
+  condition: succeeded()
+  variables:
+    - group: s148-vyed-dev
+  jobs:
+    - job: Deploy
+      displayName: 'Deploy using Bicep'
+      pool:
+        vmImage: 'ubuntu-latest'
+      steps:
+        - checkout: self
+        - task: AzureCLI@2
+          displayName: 'Deploy Bicep to Dev'
+          inputs:
+            azureSubscription: 's148d.azdo-deployment-dfe-gov'
+            scriptType: bash
+            scriptLocation: inlineScript
+            inlineScript: |
+              echo "Deploying resources to Dev..."
+
+              az deployment group create \
+                --resource-group $(devResourceGroupName) \
+                --template-file main.bicep \
+                --parameters @parameters/dev.parameters.json
