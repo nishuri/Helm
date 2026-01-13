@@ -1,5 +1,5 @@
 Module - 1
-Introduction to Azure DevOps
+Introduction to Azure DevOps by manish kumar
 
 This module provides an overview of Azure DevOps, including its core services and how to start with pipelines.
 
