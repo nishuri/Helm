@@ -1,0 +1,45 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "value": "centralindia"
+    },
+    "vmName": {
+      "value": "ado-windows-agent-01"
+    },
+    "vmSize": {
+      "value": "Standard_DS2_v2"
+    },
+    "adminUsername": {
+      "value": "azureadmin"
+    },
+    "adminPassword": {
+      "value": "ReplaceWithStrongPassword!123"
+    },
+    "vnetName": {
+      "value": "s148d01-vyed-vn-01"
+    },
+    "subnetName": {
+      "value": "s148d01-vyed-sn-01"
+    },
+    "rdpAllowedCidr": {
+      "value": "208.127.46.244/32"
+    },
+    "osDiskSku": {
+      "value": "Premium_LRS"
+    },
+    "imagePublisher": {
+      "value": "MicrosoftWindowsServer"
+    },
+    "imageOffer": {
+      "value": "WindowsServer"
+    },
+    "imageSku": {
+      "value": "2022-Datacenter"
+    },
+    "imageVersion": {
+      "value": "latest"
+    }
+  }
+}
