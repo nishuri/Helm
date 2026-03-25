@@ -1,0 +1,36 @@
+1. Recommended architecture for cross-environment connectivity (Customer Power BI <--> AWS SQL Server)
+
+Customer Power BI Service
+       ↓ (Outbound HTTPS 443)
+Power BI Gateway (Hosted on AWS EC2 / Windows)
+       ↓ (Secure VPC Connectivity)
+SQL Server in Private VPC (EC2 Windows)
+       ↓
+Connected Worker Application
+
+Power BI Gateway MUST run on Windows (requirement from Microsoft).So we will need a Windows EC2 inside the CW AWS VPC
+
+2. Secure connectivity approach (VPN, Private Link, IP whitelisting, etc.)
+
+For this setup, IP whitelisting is the quickest and least complex connectivity option.
+
+3. Security group/firewall best practices for this setup
+For the Power BI Gateway server:
+
+Allow incoming connection only from the SQL Server on port 1433.
+Allow outbound HTTPS (port 443) so the gateway can communicate with the Power BI Service.
+Allow outbound connection to the SQL Server on port 1433.
+
+For the SQL Server:
+
+Allow inbound connection only from the Power BI Gateway's private IP address on port 1433.
+
+This will Restrict all inbound traffic as much as possible and only allow what is required for the gateway to reach SQL Server.
+
+4. Whether any existing shared gateway or infra can be leveraged
+
+I am not completely sure about any existing shared Power BI Gateway. However, from an infrastructure perspective, we can leverage the same AWS VPC where the current SQL Server and Connected Worker components are already hosted.
+
+5. Any organizational constraints or alternative recommended architecture
+No major organizational constraints identified. The proposed architecture looks valid and we can proceed with this approach.
+
