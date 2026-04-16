@@ -1,0 +1,12 @@
+Script Changes:-
+
+* Handle both single and multiple secret inputs (pipeline should not fail for single secret).
+* Replace current behaviour: do not auto-disable old secrets 
+* Add option to enable/disable secrets via runtime parameter (UI) to control secret status (enable/disable).
+* Remove hardcoded values → use parameterization + variable groups.
+
+
+Pipeline Changes:_
+
+* Move Key Vault name from hardcoded → variable group.
+* Update pipeline naming/description (Name finalize during call).
