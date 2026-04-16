@@ -1,46 +1,60 @@
 trigger: none
 
 parameters:
-  - name: SecretNames
-    displayName: "Existing Secret Names"
+  - name: Operation
+    displayName: "Operation Type"
+    type: string
+    default: Copy
+    values:
+      - Copy
+      - Enable
+      - Disable
+
+  - name: CurrentSecretNames
+    displayName: "Current Secret Names (for Copy)"
     type: string
     default: ""
 
   - name: NewSecretNames
-    displayName: "New Secret Names"
+    displayName: "New Secret Names (for Copy)"
+    type: string
+    default: ""
+
+  - name: TargetSecretNames
+    displayName: "Secret Names to Enable / Disable"
     type: string
     default: ""
 
 variables:
-   VaultName: 's148d01-kv-vyed-01'
-   
+  - group: s148-vyed-dev
 
 pool:
-  vmImage: "windows-latest"
+  vmImage: windows-latest
 
 steps:
-  - task: AzurePowerShell@5
-    displayName: "Install Az Modules If Missing"
-    inputs:
-      azureSubscription: 's148d.azdo-deployment-dfe-gov'
-      ScriptType: 'InlineScript'
-      Inline: |
-        if (-not (Get-Module -ListAvailable -Name Az.KeyVault)) {
-            Write-Host "Az.KeyVault not found. Installing..." -ForegroundColor Yellow
-            Install-Module -Name Az.KeyVault  -Scope CurrentUser -Force -AllowClobber
-            Install-Module -Name Az.Accounts -Scope CurrentUser -Force -AllowClobber
-        } else {
-            Write-Host "Az modules already available." -ForegroundColor Green
-        }
-      azurePowerShellVersion: 'LatestVersion'
-      pwsh: true
+- task: AzurePowerShell@5
+  displayName: "Install Az Modules If Missing"
+  inputs:
+    azureSubscription: 's148d.azdo-deployment-dfe-gov'
+    ScriptType: InlineScript
+    Inline: |
+      if (-not (Get-Module -ListAvailable -Name Az.KeyVault)) {
+          Write-Host "Az.KeyVault not found. Installing..." -ForegroundColor Yellow
+          Install-Module -Name Az.KeyVault -Scope CurrentUser -Force -AllowClobber
+          Install-Module -Name Az.Accounts -Scope CurrentUser -Force -AllowClobber
+      }
+      else {
+          Write-Host "Az modules already available." -ForegroundColor Green
+      }
+    azurePowerShellVersion: LatestVersion
+    pwsh: true
 
-  - task: AzurePowerShell@5
-    displayName: "Rename Key Vault Secrets (No Versioning)"
-    inputs:
-      azureSubscription: 's148d.azdo-deployment-dfe-gov'
-      ScriptType: 'FilePath'
-      ScriptPath: 'scripts/keyvaultNameChange.ps1'
-      ScriptArguments: '-VaultName "$(VaultName)" -SecretNames "${{ parameters.SecretNames }}" -NewSecretNames "${{ parameters.NewSecretNames }}"'
-      azurePowerShellVersion: 'LatestVersion'
-      pwsh: true
+- task: AzurePowerShell@5
+  displayName: "Key Vault Operations"
+  inputs:
+    azureSubscription: 's148d.azdo-deployment-dfe-gov'
+    ScriptType: FilePath
+    ScriptPath: scripts/keyvaultNameChange.ps1
+    ScriptArguments: '-Operation "${{ parameters.Operation }}" -SourceVaultName "$(SourceVaultName)" -DestinationVaultName "$(DestinationVaultName)" -TargetVaultName "$(TargetVaultName)" -CurrentSecretNames "${{ parameters.CurrentSecretNames }}" -NewSecretNames "${{ parameters.NewSecretNames }}" -TargetSecretNames "${{ parameters.TargetSecretNames }}"'
+    azurePowerShellVersion: LatestVersion
+    pwsh: true
