@@ -1,66 +1,95 @@
-#Source Information
-$sourceVaultName = "EDAV-DEV-KVault-WEU"
-$sourceSubscriptionId = "ESFA-DataSci-Dev"
-$sourceTenantId = "1a92889b-8ea1-4a16-8132-347814051567"
+param(
+    [Parameter(Mandatory = $true)]
+    [ValidateSet("Copy", "Enable", "Disable")]
+    [string] $Operation,
 
-#Authenticate to Source Keyvault
-Connect-AzAccount -Tenant $sourceTenantId -Subscription $sourceSubscriptionId 
+    # Used only for COPY
+    [string] $SourceVaultName,
+    [string] $DestinationVaultName,
+    [string] $CurrentSecretNames,
+    [string] $NewSecretNames,
 
-#GetSecret from Source Keyvault
-$secrets=Get-AzKeyVaultSecret -VaultName $sourceVaultName -Name 'VYED-NotifyVMFI-Key'
+    # Used only for ENABLE / DISABLE
+    [string] $TargetVaultName,
+    [string] $TargetSecretNames
+)
 
-#DestinationInformation
-$destVaultName = "s148d01-kv-dtp-01"
-$destSubscriptionId = "s148-vyed-development"
-$destTenantId = "9c7d9dd3-840c-4b3f-818e-552865082e16"
+Write-Host "======================================"
+Write-Host "Operation Selected: $Operation"
+Write-Host "======================================"
 
-#Authenticate to Destination Keyvault
-Connect-AzAccount -Tenant $destTenantId -Subscription $destSubscriptionId
-
-#Loop and Copy each in Destination
-
-foreach ($secret in $secrets)
-{
-    #set variables
-    $secretName = $secret.Name
-    $secretValue = $secret.SecretValue
-    if ($secret.Expires -ne $null)
-    {
-        $secretExpires = $secret.Expires
-    }
-    if ($secret.ContentType -ne $null)
-    {
-        $contentType=$secret.ContentType
-    }
-
-    #Create Secret in Destination Key Vault
-    
-    if ($secretExpires -ne $null -and $contentType -ne $null)
-    {
-        Set-AzKeyVaultSecret -VaultName $destVaultName -Name $secretName -SecretValue $secretValue -ContentType $contentType -Expires $secretExpires
-    }
-    elseif ($secret.Expires -ne $null)
-    {
-        Set-AzKeyVaultSecret -VaultName $destVaultName -Name $secretName -SecretValue $secretValue -ContentType $contentType
-    }
-    elseif ($secret.ContentType -ne $null)
-    {
-        Set-AzKeyVaultSecret -VaultName $destVaultName -Name $secretName -SecretValue $secretValue -Expires $secretExpires
-    }
-    else
-    {
-        Set-AzKeyVaultSecret -VaultName $destVaultName -Name $secretName -SecretValue $secretValue 
-    }
-
-    #Drop variables
-    $secretName = $null
-    $secretValue = $null
-    $secretExpires = $null
-    $contentType = $null
+# Helper: normalize single/multiple input
+function Normalize-Secrets ($input) {
+    return $input.Split(",") | ForEach-Object { $_.Trim() } | Where-Object { $_ }
 }
 
-#Disconnect Source Tenant
-Disconnect-AzAccount
+# -----------------------------
+# COPY MODE
+# -----------------------------
+if ($Operation -eq "Copy") {
 
-#Disconnect Destination Tenant
-Disconnect-AzAccount
+    if (-not $CurrentSecretNames -or -not $NewSecretNames) {
+        throw "Copy operation requires CurrentSecretNames and NewSecretNames"
+    }
+
+    $OldList = Normalize-Secrets $CurrentSecretNames
+    $NewList = Normalize-Secrets $NewSecretNames
+
+    if ($OldList.Count -ne $NewList.Count) {
+        throw "Old and New secret count mismatch"
+    }
+
+    for ($i = 0; $i -lt $OldList.Count; $i++) {
+
+        $OldName = $OldList[$i]
+        $NewName = $NewList[$i]
+
+        Write-Host "Copying [$OldName] -> [$NewName]"
+
+        $SourceSecret = Get-AzKeyVaultSecret `
+            -VaultName $SourceVaultName `
+            -Name $OldName `
+            -ErrorAction Stop
+
+        $Params = @{
+            VaultName   = $DestinationVaultName
+            Name        = $NewName
+            SecretValue = $SourceSecret.SecretValue
+        }
+
+        if ($SourceSecret.ContentType) { $Params.ContentType = $SourceSecret.ContentType }
+        if ($SourceSecret.Expires)     { $Params.Expires     = $SourceSecret.Expires }
+
+        Set-AzKeyVaultSecret @Params
+
+        Write-Host "Copied successfully"
+    }
+
+    return
+}
+
+# -----------------------------
+# ENABLE / DISABLE MODE
+# -----------------------------
+if ($Operation -in @("Enable", "Disable")) {
+
+    if (-not $TargetSecretNames) {
+        throw "$Operation operation requires TargetSecretNames"
+    }
+
+    $EnabledFlag = ($Operation -eq "Enable")
+
+    $Secrets = Normalize-Secrets $TargetSecretNames
+
+    foreach ($SecretName in $Secrets) {
+
+        Write-Host "$Operation secret [$SecretName] in vault [$TargetVaultName]"
+
+        Update-AzKeyVaultSecret `
+            -VaultName $TargetVaultName `
+            -Name $SecretName `
+            -Enabled $EnabledFlag
+    }
+
+    return
+}
