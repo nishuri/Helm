@@ -1,94 +1,70 @@
 param(
     [Parameter(Mandatory = $true)]
-    [ValidateSet("Copy", "Enable", "Disable")]
+    [ValidateSet("Delete", "Recover")]
     [string] $Operation,
 
-    # Used only for COPY
-    [string] $SourceVaultName,
-    [string] $DestinationVaultName,
-    [string] $CurrentSecretNames,
-    [string] $NewSecretNames,
+    [Parameter(Mandatory = $true)]
+    [string] $VaultName,
 
-    # Used only for ENABLE / DISABLE
-    [string] $TargetVaultName,
-    [string] $TargetSecretNames
+    [Parameter(Mandatory = $true)]
+    [string] $SecretNames
 )
 
 Write-Host "======================================"
-Write-Host "Operation Selected: $Operation"
+Write-Host "Key Vault Secret Decommissioning"
+Write-Host "Operation : $Operation"
+Write-Host "Vault     : $VaultName"
 Write-Host "======================================"
 
-# Helper: normalize single/multiple input
+# -------------------------------------
+# Helper: Normalize single/multiple input
+# -------------------------------------
 function Normalize-Secrets ($input) {
     return $input.Split(",") | ForEach-Object { $_.Trim() } | Where-Object { $_ }
 }
 
-# -----------------------------
-# COPY MODE
-# -----------------------------
-if ($Operation -eq "Copy") {
+$Secrets = Normalize-Secrets $SecretNames
 
-    if (-not $CurrentSecretNames -or -not $NewSecretNames) {
-        throw "Copy operation requires CurrentSecretNames and NewSecretNames"
-    }
+if ($Secrets.Count -eq 0) {
+    throw "No secret names provided."
+}
 
-    $OldList = Normalize-Secrets $CurrentSecretNames
-    $NewList = Normalize-Secrets $NewSecretNames
+# -------------------------------------
+# DELETE MODE (Soft Delete)
+# -------------------------------------
+if ($Operation -eq "Delete") {
 
-    if ($OldList.Count -ne $NewList.Count) {
-        throw "Old and New secret count mismatch"
-    }
+    foreach ($SecretName in $Secrets) {
 
-    for ($i = 0; $i -lt $OldList.Count; $i++) {
+        Write-Host "Deleting secret [$SecretName] from vault [$VaultName]"
 
-        $OldName = $OldList[$i]
-        $NewName = $NewList[$i]
-
-        Write-Host "Copying [$OldName] -> [$NewName]"
-
-        $SourceSecret = Get-AzKeyVaultSecret `
-            -VaultName $SourceVaultName `
-            -Name $OldName `
+        Remove-AzKeyVaultSecret `
+            -VaultName $VaultName `
+            -Name $SecretName `
+            -Force `
             -ErrorAction Stop
 
-        $Params = @{
-            VaultName   = $DestinationVaultName
-            Name        = $NewName
-            SecretValue = $SourceSecret.SecretValue
-        }
-
-        if ($SourceSecret.ContentType) { $Params.ContentType = $SourceSecret.ContentType }
-        if ($SourceSecret.Expires)     { $Params.Expires     = $SourceSecret.Expires }
-
-        Set-AzKeyVaultSecret @Params
-
-        Write-Host "Copied successfully"
+        Write-Host "Secret [$SecretName] soft-deleted successfully"
     }
 
     return
 }
 
-# -----------------------------
-# ENABLE / DISABLE MODE
-# -----------------------------
-if ($Operation -in @("Enable", "Disable")) {
-
-    if (-not $TargetSecretNames) {
-        throw "$Operation operation requires TargetSecretNames"
-    }
-
-    $EnabledFlag = ($Operation -eq "Enable")
-
-    $Secrets = Normalize-Secrets $TargetSecretNames
+# -------------------------------------
+# RECOVER MODE
+# -------------------------------------
+if ($Operation -eq "Recover") {
 
     foreach ($SecretName in $Secrets) {
 
-        Write-Host "$Operation secret [$SecretName] in vault [$TargetVaultName]"
+        Write-Host "Recovering secret [$SecretName] in vault [$VaultName]"
 
-        Update-AzKeyVaultSecret `
-            -VaultName $TargetVaultName `
+        Undo-AzKeyVaultSecretRemoval `
+            -VaultName $VaultName `
             -Name $SecretName `
-            -Enabled $EnabledFlag
+            -ErrorAction Stop
+
+        Write-Host "Secret [$SecretName] recovered successfully"
     }
 
     return
