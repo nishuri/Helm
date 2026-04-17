@@ -1,0 +1,41 @@
+trigger: none
+
+parameters:
+  - name: SecretNames
+    displayName: "Secret Names (comma separated)"
+    type: string
+    default: ""
+
+variables:
+  - group: s148-vyed-dev
+
+pool:
+  vmImage: windows-latest
+
+steps:
+- task: AzurePowerShell@5
+  displayName: "Install Az Modules If Missing"
+  inputs:
+    azureSubscription: 's148d.azdo-deployment-dfe-gov'
+    ScriptType: InlineScript
+    Inline: |
+      if (-not (Get-Module -ListAvailable -Name Az.KeyVault)) {
+          Write-Host "Az.KeyVault not found. Installing..." -ForegroundColor Yellow
+          Install-Module -Name Az.KeyVault -Scope CurrentUser -Force -AllowClobber
+          Install-Module -Name Az.Accounts -Scope CurrentUser -Force -AllowClobber
+      }
+      else {
+          Write-Host "Az modules already available." -ForegroundColor Green
+      }
+    azurePowerShellVersion: LatestVersion
+    pwsh: true
+
+- task: AzurePowerShell@5
+  displayName: "Key Vault Operations"
+  inputs:
+    azureSubscription: 's148d.azdo-deployment-dfe-gov'
+    ScriptType: FilePath
+    ScriptPath: scripts/s148vyed-keyvault-secret-management.ps1
+    ScriptArguments: '-VaultName "$(VaultName)" -SecretNames "${{ parameters.SecretNames }}"'
+    azurePowerShellVersion: LatestVersion
+    pwsh: true
