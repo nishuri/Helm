@@ -15,7 +15,12 @@ Write-Host "======================================"
 # Helper: Normalize single/multiple input
 # -------------------------------------
 function Normalize-Secrets ($input) {
-    return $input.Split(",") | ForEach-Object { $_.Trim() } | Where-Object { $_ }
+    if ($input -is [string]) {
+        return $input.Split(",") | ForEach-Object { $_.Trim() } | Where-Object { $_ }
+    }
+    else {
+        return $input | ForEach-Object { "$_".Trim() } | Where-Object { $_ }
+    }
 }
 
 $Secrets = Normalize-Secrets $SecretNames
