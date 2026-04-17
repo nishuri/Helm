@@ -4,24 +4,13 @@ parameters:
   - name: Operation
     displayName: "Operation Type"
     type: string
-    default: Copy
+    default: Delete
     values:
-      - Copy
-      - Enable
-      - Disable
+      - Delete
+      - Recover
 
-  - name: CurrentSecretNames
-    displayName: "Current Secret Names (for Copy)"
-    type: string
-    default: ""
-
-  - name: NewSecretNames
-    displayName: "New Secret Names (for Copy)"
-    type: string
-    default: ""
-
-  - name: TargetSecretNames
-    displayName: "Secret Names to Enable / Disable"
+  - name: SecretNames
+    displayName: "Secret Names (comma separated)"
     type: string
     default: ""
 
@@ -54,7 +43,7 @@ steps:
   inputs:
     azureSubscription: 's148d.azdo-deployment-dfe-gov'
     ScriptType: FilePath
-    ScriptPath: scripts/keyvaultNameChange.ps1
-    ScriptArguments: '-Operation "${{ parameters.Operation }}" -SourceVaultName "$(SourceVaultName)" -DestinationVaultName "$(DestinationVaultName)" -TargetVaultName "$(TargetVaultName)" -CurrentSecretNames "${{ parameters.CurrentSecretNames }}" -NewSecretNames "${{ parameters.NewSecretNames }}" -TargetSecretNames "${{ parameters.TargetSecretNames }}"'
+    ScriptPath: scripts/s148vyed-keyvault-secret-management.ps1
+    ScriptArguments: '-Operation "${{ parameters.Operation }}" -VaultName "$(VaultName)" -SecretNames "${{ parameters.SecretNames }}"'
     azurePowerShellVersion: LatestVersion
     pwsh: true
