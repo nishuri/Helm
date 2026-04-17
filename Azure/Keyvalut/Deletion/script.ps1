@@ -3,7 +3,7 @@ param(
     [string] $VaultName,
 
     [Parameter(Mandatory = $true)]
-    [string] $SecretNames
+    $SecretNames
 )
 
 Write-Host "======================================"
