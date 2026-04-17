@@ -16,12 +16,19 @@ Write-Host "======================================"
 # -------------------------------------
 function Normalize-Secrets ($input) {
     if ($input -is [string]) {
-        return $input.Split(",") | ForEach-Object { $_.Trim() } | Where-Object { $_ }
+        return $input.Split(",") |
+            ForEach-Object { $_.Trim().Trim('"') } |
+            Where-Object { $_ }
     }
     else {
-        return $input | ForEach-Object { "$_".Trim() } | Where-Object { $_ }
+        return $input |
+            ForEach-Object { "$_".Trim().Trim('"') } |
+            Where-Object { $_ }
     }
 }
+
+
+Write-Host "SecretNames: $SecretNames"
 
 $Secrets = Normalize-Secrets $SecretNames
 
