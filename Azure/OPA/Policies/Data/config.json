@@ -1,0 +1,21 @@
+{
+  "env_priority": {
+    "dev": 1,
+    "test": 2,
+    "uat": 3,
+    "prod": 4
+  },
+
+  "thresholds": {
+    "standard": 20,
+    "normal": 50
+  },
+
+  "weights": {
+    "delete": 40,
+    "replace": 35,
+    "security": 50,
+    "sensitive": 20,
+    "large_change": 15
+  }
+}
