@@ -1,0 +1,4 @@
+.git
+*.md
+bitbucket-pipelines.yml
+Makefile
