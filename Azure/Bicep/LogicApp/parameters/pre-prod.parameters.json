@@ -1,0 +1,38 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "logicAppName": {
+      "value": "la-pp-aas-scheduler"
+    },
+    "SubscriptionId": {
+      "value": "f2d9ceb4-1c46-44c9-911c-a0115d97e252"
+    },
+    "ResourceGroupName": {
+      "value": "rg-t1pp-strategic-modelling"
+    },
+    "ServerName": {
+      "value": "pppbiembedstrategicmodelling01"
+    },
+    "TenantId": {
+      "value": "MICROSOFT-ENTRA-TENANT-ID"
+    },
+    "ClientId": {
+      "value": "OAUTH-SERVICE-PRINCIPAL-CLIENT-ID"
+    },
+    "ClientSecret": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/KEYVAULT-SUBSCRIPTION-ID/resourceGroups/KEYVAULT-RESOURCE-GROUP/providers/Microsoft.KeyVault/vaults/KEYVAULT-NAME"
+        },
+        "secretName": "aas-logicapp-sp-client-secret"
+      }
+    },
+    "workflowState": {
+      "value": "Enabled"
+    },
+    "scaleDownSkuName": {
+      "value": "S1"
+    }
+  }
+}
