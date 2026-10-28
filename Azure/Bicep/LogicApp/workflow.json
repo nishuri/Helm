@@ -1,0 +1,196 @@
+{
+  "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+  "contentVersion": "1.0.0.0",
+  "triggers": {
+    "Recurrence": {
+      "type": "Recurrence",
+      "recurrence": {
+        "frequency": "Day",
+        "interval": 1,
+        "timeZone": "UTC",
+        "schedule": {
+          "hours": [7, 19, 20],
+          "minutes": [0]
+        }
+      },
+      "description": "Runs daily at 07:00, 19:00, and 20:00 UTC. Switch_on_run_hour selects one operation per run."
+    }
+  },
+  "actions": {
+    "Switch_on_run_hour": {
+      "type": "Switch",
+      "expression": "@utcNow('HH')",
+      "cases": {
+        "Resume_07": {
+          "case": "07",
+          "actions": {
+            "Is_weekday_for_resume": {
+              "type": "If",
+              "expression": {
+                "and": [
+                  {
+                    "greaterOrEquals": [
+                      "@dayOfWeek(utcNow())",
+                      1
+                    ]
+                  },
+                  {
+                    "lessOrEquals": [
+                      "@dayOfWeek(utcNow())",
+                      5
+                    ]
+                  }
+                ]
+              },
+              "actions": {
+                "Resume_AAS": {
+                  "type": "Http",
+                  "inputs": {
+                    "uri": "@concat('https://management.azure.com/subscriptions/', parameters('SubscriptionIdParam'), '/resourceGroups/', parameters('ResourceGroupNameParam'), '/providers/Microsoft.AnalysisServices/servers/', parameters('ServerNameParam'), '/resume?api-version=2017-08-01')",
+                    "method": "POST",
+                    "authentication": {
+                      "type": "ActiveDirectoryOAuth",
+                      "authority": "https://login.microsoftonline.com/",
+                      "tenant": "@parameters('TenantIdParam')",
+                      "audience": "https://management.core.windows.net/",
+                      "clientId": "@parameters('ClientIdParam')",
+                      "credentialType": "Secret",
+                      "secret": "@parameters('ClientSecretParam')"
+                    }
+                  },
+                  "runtimeConfiguration": {
+                    "secureData": {
+                      "properties": ["inputs"]
+                    }
+                  },
+                  "runAfter": {},
+                  "description": "Resume Azure Analysis Services (AAS) on weekdays at 07:00 UTC."
+                }
+              },
+              "else": {
+                "actions": {}
+              },
+              "runAfter": {}
+            }
+          }
+        },
+        "Pause_19": {
+          "case": "19",
+          "actions": {
+            "Is_weekday_for_pause": {
+              "type": "If",
+              "expression": {
+                "and": [
+                  {
+                    "greaterOrEquals": [
+                      "@dayOfWeek(utcNow())",
+                      1
+                    ]
+                  },
+                  {
+                    "lessOrEquals": [
+                      "@dayOfWeek(utcNow())",
+                      5
+                    ]
+                  }
+                ]
+              },
+              "actions": {
+                "Suspend_AAS": {
+                  "type": "Http",
+                  "inputs": {
+                    "uri": "@concat('https://management.azure.com/subscriptions/', parameters('SubscriptionIdParam'), '/resourceGroups/', parameters('ResourceGroupNameParam'), '/providers/Microsoft.AnalysisServices/servers/', parameters('ServerNameParam'), '/suspend?api-version=2017-08-01')",
+                    "method": "POST",
+                    "authentication": {
+                      "type": "ActiveDirectoryOAuth",
+                      "authority": "https://login.microsoftonline.com/",
+                      "tenant": "@parameters('TenantIdParam')",
+                      "audience": "https://management.core.windows.net/",
+                      "clientId": "@parameters('ClientIdParam')",
+                      "credentialType": "Secret",
+                      "secret": "@parameters('ClientSecretParam')"
+                    }
+                  },
+                  "runtimeConfiguration": {
+                    "secureData": {
+                      "properties": ["inputs"]
+                    }
+                  },
+                  "runAfter": {},
+                  "description": "Suspend Azure Analysis Services (AAS) on weekdays at 19:00 UTC."
+                }
+              },
+              "else": {
+                "actions": {}
+              },
+              "runAfter": {}
+            }
+          }
+        },
+        "Scale_down_20": {
+          "case": "20",
+          "actions": {
+            "Scale_down_AAS": {
+              "type": "Http",
+              "inputs": {
+                "uri": "@concat('https://management.azure.com/subscriptions/', parameters('SubscriptionIdParam'), '/resourceGroups/', parameters('ResourceGroupNameParam'), '/providers/Microsoft.AnalysisServices/servers/', parameters('ServerNameParam'), '?api-version=2017-08-01')",
+                "method": "PATCH",
+                "body": {
+                  "sku": {
+                    "name": "@parameters('scaleDownSkuNameParam')",
+                    "tier": "Standard"
+                  }
+                },
+                "authentication": {
+                  "type": "ActiveDirectoryOAuth",
+                  "authority": "https://login.microsoftonline.com/",
+                  "tenant": "@parameters('TenantIdParam')",
+                  "audience": "https://management.core.windows.net/",
+                  "clientId": "@parameters('ClientIdParam')",
+                  "credentialType": "Secret",
+                  "secret": "@parameters('ClientSecretParam')"
+                }
+              },
+              "runtimeConfiguration": {
+                "secureData": {
+                  "properties": ["inputs"]
+                }
+              },
+              "runAfter": {},
+              "description": "Scale Azure Analysis Services (AAS) down to S1 Standard daily at 20:00 UTC."
+            }
+          }
+        }
+      },
+      "default": {
+        "actions": {}
+      },
+      "runAfter": {}
+    }
+  },
+  "outputs": {},
+  "parameters": {
+    "SubscriptionIdParam": {
+      "type": "String"
+    },
+    "ResourceGroupNameParam": {
+      "type": "String"
+    },
+    "ServerNameParam": {
+      "type": "String"
+    },
+    "TenantIdParam": {
+      "type": "String"
+    },
+    "ClientIdParam": {
+      "type": "String"
+    },
+    "ClientSecretParam": {
+      "type": "securestring"
+    },
+    "scaleDownSkuNameParam": {
+      "type": "String",
+      "defaultValue": "S1"
+    }
+  }
+}
