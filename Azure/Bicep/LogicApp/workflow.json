@@ -7,19 +7,25 @@
       "recurrence": {
         "frequency": "Day",
         "interval": 1,
-        "timeZone": "UTC",
+        "timeZone": "GMT Standard Time",
         "schedule": {
           "hours": [7, 19, 20],
           "minutes": [0]
         }
       },
-      "description": "Runs daily at 07:00, 19:00, and 20:00 UTC. Switch_on_run_hour selects one operation per run."
+      "description": "Runs daily at 07:00, 19:00 and 20:00 UK time (GMT Standard Time)"
     }
   },
   "actions": {
+    "Local_time": {
+      "type": "Compose",
+      "inputs": "@convertFromUtc(utcNow(), 'GMT Standard Time')",
+      "runAfter": {},
+      "description": "Current UK local time"
+    },
     "Switch_on_run_hour": {
       "type": "Switch",
-      "expression": "@utcNow('HH')",
+      "expression": "@formatDateTime(outputs('Local_time'), 'HH')",
       "cases": {
         "Resume_07": {
           "case": "07",
@@ -30,41 +36,48 @@
                 "and": [
                   {
                     "greaterOrEquals": [
-                      "@dayOfWeek(utcNow())",
+                      "@dayOfWeek(outputs('Local_time'))",
                       1
                     ]
                   },
                   {
                     "lessOrEquals": [
-                      "@dayOfWeek(utcNow())",
+                      "@dayOfWeek(outputs('Local_time'))",
                       5
                     ]
                   }
                 ]
               },
               "actions": {
-                "Resume_AAS": {
-                  "type": "Http",
-                  "inputs": {
-                    "uri": "@concat('https://management.azure.com/subscriptions/', parameters('SubscriptionIdParam'), '/resourceGroups/', parameters('ResourceGroupNameParam'), '/providers/Microsoft.AnalysisServices/servers/', parameters('ServerNameParam'), '/resume?api-version=2017-08-01')",
-                    "method": "POST",
-                    "authentication": {
-                      "type": "ActiveDirectoryOAuth",
-                      "authority": "https://login.microsoftonline.com/",
-                      "tenant": "@parameters('TenantIdParam')",
-                      "audience": "https://management.core.windows.net/",
-                      "clientId": "@parameters('ClientIdParam')",
-                      "credentialType": "Secret",
-                      "secret": "@parameters('ClientSecretParam')"
+                "Foreach_capacity_resume": {
+                  "type": "Foreach",
+                  "foreach": "@parameters('CapacityNamesParam')",
+                  "actions": {
+                    "Resume_PBI_Embedded": {
+                      "type": "Http",
+                      "inputs": {
+                        "uri": "@concat('https://management.azure.com/subscriptions/', parameters('SubscriptionIdParam'), '/resourceGroups/', parameters('ResourceGroupNameParam'), '/providers/Microsoft.PowerBIDedicated/capacities/', item(), '/resume?api-version=2017-10-01')",
+                        "method": "POST",
+                        "authentication": {
+                          "type": "ActiveDirectoryOAuth",
+                          "authority": "",
+                          "tenant": "@parameters('TenantIdParam')",
+                          "audience": "https://management.core.windows.net/",
+                          "clientId": "@parameters('ClientIdParam')",
+                          "credentialType": "Secret",
+                          "secret": "@parameters('ClientSecretParam')"
+                        }
+                      },
+                      "runtimeConfiguration": {
+                        "secureData": {
+                          "properties": ["inputs"]
+                        }
+                      },
+                      "runAfter": {},
+                      "description": "Resume the Power BI Embedded capacity (weekdays 07:00 UK time)."
                     }
                   },
-                  "runtimeConfiguration": {
-                    "secureData": {
-                      "properties": ["inputs"]
-                    }
-                  },
-                  "runAfter": {},
-                  "description": "Resume Azure Analysis Services (AAS) on weekdays at 07:00 UTC."
+                  "runAfter": {}
                 }
               },
               "else": {
@@ -74,36 +87,27 @@
             }
           }
         },
-        "Pause_19": {
+        "Scale_down_19": {
           "case": "19",
           "actions": {
-            "Is_weekday_for_pause": {
-              "type": "If",
-              "expression": {
-                "and": [
-                  {
-                    "greaterOrEquals": [
-                      "@dayOfWeek(utcNow())",
-                      1
-                    ]
-                  },
-                  {
-                    "lessOrEquals": [
-                      "@dayOfWeek(utcNow())",
-                      5
-                    ]
-                  }
-                ]
-              },
+            "Foreach_capacity_scale_down": {
+              "type": "Foreach",
+              "foreach": "@parameters('CapacityNamesParam')",
               "actions": {
-                "Suspend_AAS": {
+                "Scale_down_PBI_Embedded": {
                   "type": "Http",
                   "inputs": {
-                    "uri": "@concat('https://management.azure.com/subscriptions/', parameters('SubscriptionIdParam'), '/resourceGroups/', parameters('ResourceGroupNameParam'), '/providers/Microsoft.AnalysisServices/servers/', parameters('ServerNameParam'), '/suspend?api-version=2017-08-01')",
-                    "method": "POST",
+                    "uri": "@concat('https://management.azure.com/subscriptions/', parameters('SubscriptionIdParam'), '/resourceGroups/', parameters('ResourceGroupNameParam'), '/providers/Microsoft.PowerBIDedicated/capacities/', item(), '?api-version=2017-10-01')",
+                    "method": "PATCH",
+                    "body": {
+                      "sku": {
+                        "name": "@parameters('scaleDownSkuNameParam')",
+                        "tier": "@parameters('scaleDownSkuTierParam')"
+                      }
+                    },
                     "authentication": {
                       "type": "ActiveDirectoryOAuth",
-                      "authority": "https://login.microsoftonline.com/",
+                      "authority": "",
                       "tenant": "@parameters('TenantIdParam')",
                       "audience": "https://management.core.windows.net/",
                       "clientId": "@parameters('ClientIdParam')",
@@ -117,47 +121,45 @@
                     }
                   },
                   "runAfter": {},
-                  "description": "Suspend Azure Analysis Services (AAS) on weekdays at 19:00 UTC."
+                  "description": "Scale the Power BI Embedded capacity down daily at 19:00 UK time."
                 }
-              },
-              "else": {
-                "actions": {}
               },
               "runAfter": {}
             }
           }
         },
-        "Scale_down_20": {
+        "Pause_20": {
           "case": "20",
           "actions": {
-            "Scale_down_AAS": {
-              "type": "Http",
-              "inputs": {
-                "uri": "@concat('https://management.azure.com/subscriptions/', parameters('SubscriptionIdParam'), '/resourceGroups/', parameters('ResourceGroupNameParam'), '/providers/Microsoft.AnalysisServices/servers/', parameters('ServerNameParam'), '?api-version=2017-08-01')",
-                "method": "PATCH",
-                "body": {
-                  "sku": {
-                    "name": "@parameters('scaleDownSkuNameParam')",
-                    "tier": "Standard"
-                  }
-                },
-                "authentication": {
-                  "type": "ActiveDirectoryOAuth",
-                  "authority": "https://login.microsoftonline.com/",
-                  "tenant": "@parameters('TenantIdParam')",
-                  "audience": "https://management.core.windows.net/",
-                  "clientId": "@parameters('ClientIdParam')",
-                  "credentialType": "Secret",
-                  "secret": "@parameters('ClientSecretParam')"
+            "Foreach_capacity_pause": {
+              "type": "Foreach",
+              "foreach": "@parameters('CapacityNamesParam')",
+              "actions": {
+                "Pause_PBI_Embedded": {
+                  "type": "Http",
+                  "inputs": {
+                    "uri": "@concat('https://management.azure.com/subscriptions/', parameters('SubscriptionIdParam'), '/resourceGroups/', parameters('ResourceGroupNameParam'), '/providers/Microsoft.PowerBIDedicated/capacities/', item(), '/suspend?api-version=2017-10-01')",
+                    "method": "POST",
+                    "authentication": {
+                      "type": "ActiveDirectoryOAuth",
+                      "authority": "",
+                      "tenant": "@parameters('TenantIdParam')",
+                      "audience": "https://management.core.windows.net/",
+                      "clientId": "@parameters('ClientIdParam')",
+                      "credentialType": "Secret",
+                      "secret": "@parameters('ClientSecretParam')"
+                    }
+                  },
+                  "runtimeConfiguration": {
+                    "secureData": {
+                      "properties": ["inputs"]
+                    }
+                  },
+                  "runAfter": {},
+                  "description": "Pause (suspend) the Power BI Embedded capacity daily at 20:00 UK time."
                 }
               },
-              "runtimeConfiguration": {
-                "secureData": {
-                  "properties": ["inputs"]
-                }
-              },
-              "runAfter": {},
-              "description": "Scale Azure Analysis Services (AAS) down to S1 Standard daily at 20:00 UTC."
+              "runAfter": {}
             }
           }
         }
@@ -165,7 +167,11 @@
       "default": {
         "actions": {}
       },
-      "runAfter": {}
+      "runAfter": {
+        "Local_time": [
+          "Succeeded"
+        ]
+      }
     }
   },
   "outputs": {},
@@ -176,8 +182,8 @@
     "ResourceGroupNameParam": {
       "type": "String"
     },
-    "ServerNameParam": {
-      "type": "String"
+    "CapacityNamesParam": {
+      "type": "Array"
     },
     "TenantIdParam": {
       "type": "String"
@@ -190,7 +196,11 @@
     },
     "scaleDownSkuNameParam": {
       "type": "String",
-      "defaultValue": "S1"
+      "defaultValue": "A1"
+    },
+    "scaleDownSkuTierParam": {
+      "type": "String",
+      "defaultValue": "PBIE_Azure"
     }
   }
 }
