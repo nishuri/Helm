@@ -11,8 +11,10 @@
     "ResourceGroupName": {
       "value": "rg-t1pp-strategic-modelling"
     },
-    "ServerName": {
-      "value": "pppbiembedstrategicmodelling01"
+    "CapacityNames": {
+      "value": [
+        "pppbiembed1extpbi"
+      ]
     },
     "TenantId": {
       "value": "MICROSOFT-ENTRA-TENANT-ID"
